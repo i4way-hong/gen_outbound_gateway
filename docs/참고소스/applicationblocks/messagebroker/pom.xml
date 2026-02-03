@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
+   ===============================================================================
+     Any authorized distribution of any copy of this code (including any related
+     documentation) must reproduce the following restrictions, disclaimer and copyright
+     notice:
+
+     The Genesys name, trademarks and/or logo(s) of Genesys shall not be used to name
+     (even as a part of another name), endorse and/or promote products derived from
+     this code without prior written permission from Genesys Telecommunications
+     Laboratories, Inc.
+
+     The use, copy, and/or distribution of this code is subject to the terms of the Genesys
+     Developer License Agreement.  This code shall not be used, copied, and/or
+     distributed under any other license agreement.
+
+     THIS CODE IS PROVIDED BY GENESYS TELECOMMUNICATIONS LABORATORIES, INC.
+     ("GENESYS") "AS IS" WITHOUT ANY WARRANTY OF ANY KIND. GENESYS HEREBY
+     DISCLAIMS ALL EXPRESS, IMPLIED, OR STATUTORY CONDITIONS, REPRESENTATIONS AND
+     WARRANTIES WITH RESPECT TO THIS CODE (OR ANY PART THEREOF), INCLUDING, BUT
+     NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+     PARTICULAR PURPOSE OR NON-INFRINGEMENT. GENESYS AND ITS SUPPLIERS SHALL
+     NOT BE LIABLE FOR ANY DAMAGE SUFFERED AS A RESULT OF USING THIS CODE. IN NO
+     EVENT SHALL GENESYS AND ITS SUPPLIERS BE LIABLE FOR ANY DIRECT, INDIRECT,
+     CONSEQUENTIAL, ECONOMIC, INCIDENTAL, OR SPECIAL DAMAGES (INCLUDING, BUT
+     NOT LIMITED TO, ANY LOST REVENUES OR PROFITS).
+
+     Copyright (c) 2006 - 2018 Genesys Telecommunications Laboratories, Inc. All rights reserved.
+   ===============================================================================
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <organization>
+      <name>Genesys Telecommunication Laboratories, Inc.</name>
+      <url>http://www.genesys.com</url>
+   </organization>
+   <name>Message Broker Application Block</name>
+   <version>900.10.6</version>
+
+   <groupId>com.genesyslab.platform</groupId>
+   <artifactId>messagebrokerappblock</artifactId>
+   <packaging>jar</packaging>
+
+   <properties>
+      <GENESYS.PROJECT.VERSION>9.0.010.06</GENESYS.PROJECT.VERSION>
+
+      <manifest.file>${project.basedir}/target/classes/META-INF/MANIFEST.MF</manifest.file>
+      <manifest.implementation.title>com.genesyslab.platform.applicationblocks.commons</manifest.implementation.title>
+      <manifest.component.path>com/genesyslab/platform/applicationblocks/commons/broker</manifest.component.path>
+
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+      <!-- Plugin versions -->
+      <version.compiler.plugin>3.8.0</version.compiler.plugin>
+      <version.jar.plugin>3.2.0</version.jar.plugin>
+   </properties>
+
+   <dependencyManagement>
+      <dependencies>
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>appblocks-bom</artifactId>
+            <version>900.10.6</version>
+            <type>pom</type>
+            <scope>import</scope>
+         </dependency>
+      </dependencies>
+   </dependencyManagement>
+
+   <dependencies>
+      <dependency>
+         <groupId>com.genesyslab.platform</groupId>
+         <artifactId>protocol</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>com.genesyslab.platform</groupId>
+         <artifactId>commonsappblock</artifactId>
+      </dependency>
+   </dependencies>
+
+   <build>
+      <finalName>${project.artifactId}</finalName>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>${version.compiler.plugin}</version>
+            <configuration>
+               <source>1.8</source>
+               <target>1.8</target>
+               <optimize>true</optimize>
+               <showDeprecation>false</showDeprecation>
+               <showWarnings>false</showWarnings>
+            </configuration>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>${version.jar.plugin}</version>
+            <executions>
+               <execution>
+                  <id>default-jar</id>
+                  <configuration>
+                     <forceCreation>true</forceCreation>
+                     <archive>
+                        <manifestEntries>
+                           <Implementation-Title>${manifest.implementation.title}</Implementation-Title>
+                           <Implementation-Version>${GENESYS.PROJECT.VERSION}</Implementation-Version>
+                           <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
+                           <Specification-Title>${project.name}</Specification-Title>
+                           <Specification-Version>${GENESYS.PROJECT.VERSION}</Specification-Version>
+                           <Specification-Vendor>${project.organization.name}</Specification-Vendor>
+                        </manifestEntries>
+                        <manifestSections>
+                           <manifestSection>
+                              <name>${manifest.component.path}</name>
+                           </manifestSection>
+                        </manifestSections>
+                     </archive>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+   </build>
+
+   <!-- This profile required for non-Windows Installation Packages. It unpacks
+      Application Bloks sources from src.jar file -->
+   <profiles>
+      <profile>
+         <id>upack-src</id>
+         <activation>
+            <file>
+               <missing>${basedir}/src/main/java</missing>
+            </file>
+         </activation>
+         <build>
+            <plugins>
+               <plugin>
+                  <artifactId>maven-antrun-plugin</artifactId>
+                  <version>1.7</version>
+                  <executions>
+                     <execution>
+                        <id>upack-src</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                           <target>
+                              <echo>Unpack sources files.</echo>
+                              <unjar dest="${basedir}/src" overwrite="false" src="${basedir}/src/src.jar"/>
+                           </target>
+                        </configuration>
+                        <goals>
+                           <goal>run</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+   </profiles>
+</project>

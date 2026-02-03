@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
+   ===============================================================================
+    Genesys Platform SDK
+   ===============================================================================
+
+    Any authorized distribution of any copy of this code (including any related
+    documentation) must reproduce the following restrictions, disclaimer and copyright
+    notice:
+
+    The Genesys name, trademarks and/or logo(s) of Genesys shall not be used to name
+    (even as a part of another name), endorse and/or promote products derived from
+    this code without prior written permission from Genesys Telecommunications
+    Laboratories, Inc.
+
+    The use, copy, and/or distribution of this code is subject to the terms of the Genesys
+    Developer License Agreement.  This code shall not be used, copied, and/or
+    distributed under any other license agreement.
+
+    THIS CODE IS PROVIDED BY GENESYS TELECOMMUNICATIONS LABORATORIES, INC.
+    ("GENESYS") "AS IS" WITHOUT ANY WARRANTY OF ANY KIND. GENESYS HEREBY
+    DISCLAIMS ALL EXPRESS, IMPLIED, OR STATUTORY CONDITIONS, REPRESENTATIONS AND
+    WARRANTIES WITH RESPECT TO THIS CODE (OR ANY PART THEREOF), INCLUDING, BUT
+    NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+    PARTICULAR PURPOSE OR NON-INFRINGEMENT. GENESYS AND ITS SUPPLIERS SHALL
+    NOT BE LIABLE FOR ANY DAMAGE SUFFERED AS A RESULT OF USING THIS CODE. IN NO
+    EVENT SHALL GENESYS AND ITS SUPPLIERS BE LIABLE FOR ANY DIRECT, INDIRECT,
+    CONSEQUENTIAL, ECONOMIC, INCIDENTAL, OR SPECIAL DAMAGES (INCLUDING, BUT
+    NOT LIMITED TO, ANY LOST REVENUES OR PROFITS).
+
+    Copyright (c) 2006 - 2019 Genesys Telecommunications Laboratories, Inc. All rights reserved.
+   ===============================================================================
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+
+   <organization>
+      <name>Genesys Telecommunication Laboratories, Inc.</name>
+      <url>http://www.genesys.com</url>
+   </organization>
+   <name>PSDK :: Key-Value Lists Binding Engine</name>
+   <artifactId>kvlistbinding</artifactId>
+   <packaging>jar</packaging>
+
+   <parent>
+      <groupId>com.genesyslab.platform</groupId>
+      <artifactId>protocols-bom</artifactId>
+      <version>900.10.6</version>
+      <relativePath>../../../pom.xml</relativePath>
+   </parent>
+
+   <properties>
+      <automatic.module.name>com.genesyslab.platform.kvlistbinding</automatic.module.name>
+
+      <!-- Empty by default. may be overridden in osgi profile -->
+      <manifest.file/>
+      <manifest.implementation.title>com.genesyslab.platform.commons.collections.keyvaluebinding</manifest.implementation.title>
+      <manifest.component.path>com/genesyslab/platform/commons/collections/keyvaluebinding</manifest.component.path>
+
+      <classes.for.unit.test>${project.build.outputDirectory}</classes.for.unit.test>
+
+      <!-- Plugin versions -->
+      <version.emma.plugin>1.2</version.emma.plugin>
+      <version.emma4it.plugin>1.3</version.emma4it.plugin>
+      <version.dependency.plugin>2.2</version.dependency.plugin>
+      <version.resource.plugin>2.5</version.resource.plugin>
+      <version.properties.plugin>1.0-alpha-2</version.properties.plugin>
+      <version.cobertura.plugin>2.7</version.cobertura.plugin>
+      <version.findbugs.plugin>2.4.0</version.findbugs.plugin>
+   </properties>
+
+   <dependencies>
+      <dependency>
+         <groupId>com.genesyslab.platform</groupId>
+         <artifactId>kvlists</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>org.testng</groupId>
+         <artifactId>testng</artifactId>
+         <version>${version.testng}</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <version>${version.junit}</version>
+         <scope>test</scope>
+      </dependency>
+   </dependencies>
+
+   <!-- Main build -->
+   <build>
+      <finalName>kvlistbinding</finalName>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+               <classesDirectory>${classes.for.unit.test}</classesDirectory>
+            </configuration>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <executions>
+               <execution>
+                  <id>default-jar</id>
+                  <configuration>
+                     <archive>
+                        <manifestFile>${manifest.file}</manifestFile>
+                        <manifestEntries>
+                           <Implementation-Title>${manifest.implementation.title}</Implementation-Title>
+                           <Implementation-Version>${GENESYS.PROJECT.VERSION}</Implementation-Version>
+                           <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
+                           <Specification-Title>${project.name}</Specification-Title>
+                           <Specification-Version>${GENESYS.PROJECT.VERSION}</Specification-Version>
+                           <Specification-Vendor>${project.organization.name}</Specification-Vendor>
+                           <Comments>${BUILDTYPE}-${env.COMPUTERNAME}-${maven.build.timestamp}</Comments>
+                        </manifestEntries>
+                        <manifestSections>
+                           <manifestSection>
+                              <name>${manifest.component.path}</name>
+                           </manifestSection>
+                        </manifestSections>
+                     </archive>
+                     <includes>
+                        <include>com/**</include>
+                        <include>META-INF/*.*</include>
+                        <include>META-INF/maven/**</include>
+                        <include>META-INF/versions/11/module-info.class</include>
+                     </includes>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+   </build>
+
+   <!-- End main build -->
+   <profiles>
+      <profile>
+         <id>add-src</id>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-source-plugin</artifactId>
+                  <version>2.1.2</version>
+                  <executions>
+                     <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                           <goal>jar-no-fork</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+
+      <profile>
+         <id>java8-automodule</id>
+         <activation>
+            <jdk>[1.8,11)</jdk>
+         </activation>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-compiler-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>default-compile</id>
+                        <configuration>
+                           <jdkToolchain>
+                              <version>1.8</version>
+                           </jdkToolchain>
+                           <source>8</source>
+                           <target>8</target>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-jar-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>default-jar</id>
+                        <configuration>
+                           <archive>
+                              <manifestEntries>
+                                 <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
+                              </manifestEntries>
+                           </archive>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+
+      <profile>
+         <id>java11-module</id>
+         <activation>
+            <jdk>[11,)</jdk>
+         </activation>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.codehaus.mojo</groupId>
+                  <artifactId>build-helper-maven-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>add-module-info</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                           <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                           <sources>
+                              <source>${basedir}/src/main/module</source>
+                           </sources>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-compiler-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>default-compile</id>
+                        <configuration>
+                           <jdkToolchain>
+                              <version>1.8</version>
+                           </jdkToolchain>
+                           <source>8</source>
+                           <target>8</target>
+                           <excludes>
+                              <exclude>module-info.java</exclude>
+                           </excludes>
+                        </configuration>
+                     </execution>
+                     <execution>
+                        <id>compile-module</id>
+                        <goals>
+                           <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                           <jdkToolchain>
+                              <version>[11,)</version>
+                           </jdkToolchain>
+                           <source>11</source>
+                           <target>11</target>
+                           <!-- compile everything to ensure module-info contains right entries -->
+                           <multiReleaseOutput>true</multiReleaseOutput>
+                           <release>11</release>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-jar-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>default-jar</id>
+                        <configuration>
+                           <archive>
+                              <manifestEntries>
+                                 <Multi-Release>true</Multi-Release>
+                              </manifestEntries>
+                           </archive>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+               <plugin>
+                  <groupId>org.codehaus.mojo</groupId>
+                  <artifactId>exec-maven-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>setup-java-module-version</id>
+                        <phase>package</phase>
+                        <goals>
+                           <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                           <executable>jar</executable>
+                           <commandlineArgs>--verbose --update --file ${project.build.directory}/${project.artifactId}.jar --module-version ${GENESYS.PROJECT.VERSION} --release 11</commandlineArgs>
+                           <workingDirectory>${basedir}</workingDirectory>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+
+      <profile>
+         <id>osgi</id>
+         <properties>
+            <manifest.file>${project.basedir}/target/classes/META-INF/MANIFEST.MF</manifest.file>
+         </properties>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.apache.felix</groupId>
+                  <artifactId>maven-bundle-plugin</artifactId>
+                  <extensions>true</extensions>
+                  <executions>
+                     <execution>
+                        <id>bundle-manifest</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                           <goal>manifest</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+                  <configuration>
+                     <instructions>
+                        <Bundle-Name>Platform SDK Commons.KVListBinding</Bundle-Name>
+                        <Require-Bundle>com.genesyslab.platform.kvlists</Require-Bundle>
+                        <Import-Package>
+                           com.genesyslab.platform.commons.collections;version="[${@},${@}]" 
+                        </Import-Package>
+                        <Export-Package>
+                           com.genesyslab.platform.commons.collections.keyvaluebinding;version=${project.version} 
+                        </Export-Package>
+                     </instructions>
+                  </configuration>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+
+      <profile>
+         <id>resultpath-copy</id>
+         <build>
+            <plugins>
+               <plugin>
+                  <artifactId>maven-antrun-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <phase>install</phase>
+                        <configuration>
+                           <tasks>
+                              <echo>genesys.resultpath:${genesys.resultpath}</echo>
+                              <echo>project.build.directory:${project.build.directory}</echo>
+                              <echo>settings.localRepository:${settings.localRepository}</echo>
+                              <copy todir="${genesys.resultpath}/release">
+                                 <fileset dir="${project.build.directory}">
+                                    <include name="${project.artifactId}.jar"/>
+                                 </fileset>
+                              </copy>
+                              <copy flatten="true" todir="${genesys.resultpath}/release/maven/${project.artifactId}">
+                                 <fileset dir="${settings.localRepository}/com/genesyslab/platform/${project.artifactId}">
+                                    <include name="**/${project.artifactId}-${project.version}.jar"/>
+                                    <include name="**/${project.artifactId}-${project.version}-sources.jar"/>
+                                    <include name="**/${project.artifactId}-${project.version}.pom"/>
+                                    <include name="**/${project.artifactId}-${project.version}-xsd.zip"/>
+                                 </fileset>
+                              </copy>
+                           </tasks>
+                        </configuration>
+                        <goals>
+                           <goal>run</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+   </profiles>
+
+   <reporting>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-project-info-reports-plugin</artifactId>
+            <version>2.4</version>
+         </plugin>
+         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>cobertura-maven-plugin</artifactId>
+            <version>${version.cobertura.plugin}</version>
+         </plugin>
+      </plugins>
+   </reporting>
+
+   <distributionManagement>
+      <repository>
+         <uniqueVersion>false</uniqueVersion>
+         <id>${prod.distribution.repository.id}</id>
+         <name>${prod.distribution.repository.name}</name>
+         <url>${prod.distribution.repository.url}</url>
+      </repository>
+      <snapshotRepository>
+         <uniqueVersion>false</uniqueVersion>
+         <id>${distribution.repository.id}</id>
+         <name>${distribution.repository.name}</name>
+         <url>${distribution.repository.url}</url>
+      </snapshotRepository>
+   </distributionManagement>
+</project>

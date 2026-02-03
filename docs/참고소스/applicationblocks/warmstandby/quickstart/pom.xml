@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
+   ===============================================================================
+     Any authorized distribution of any copy of this code (including any related
+     documentation) must reproduce the following restrictions, disclaimer and copyright
+     notice:
+
+     The Genesys name, trademarks and/or logo(s) of Genesys shall not be used to name
+     (even as a part of another name), endorse and/or promote products derived from
+     this code without prior written permission from Genesys Telecommunications
+     Laboratories, Inc.
+
+     The use, copy, and/or distribution of this code is subject to the terms of the Genesys
+     Developer License Agreement.  This code shall not be used, copied, and/or
+     distributed under any other license agreement.
+
+     THIS CODE IS PROVIDED BY GENESYS TELECOMMUNICATIONS LABORATORIES, INC.
+     ("GENESYS") "AS IS" WITHOUT ANY WARRANTY OF ANY KIND. GENESYS HEREBY
+     DISCLAIMS ALL EXPRESS, IMPLIED, OR STATUTORY CONDITIONS, REPRESENTATIONS AND
+     WARRANTIES WITH RESPECT TO THIS CODE (OR ANY PART THEREOF), INCLUDING, BUT
+     NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+     PARTICULAR PURPOSE OR NON-INFRINGEMENT. GENESYS AND ITS SUPPLIERS SHALL
+     NOT BE LIABLE FOR ANY DAMAGE SUFFERED AS A RESULT OF USING THIS CODE. IN NO
+     EVENT SHALL GENESYS AND ITS SUPPLIERS BE LIABLE FOR ANY DIRECT, INDIRECT,
+     CONSEQUENTIAL, ECONOMIC, INCIDENTAL, OR SPECIAL DAMAGES (INCLUDING, BUT
+     NOT LIMITED TO, ANY LOST REVENUES OR PROFITS).
+
+     Copyright (c) 2006 - 2019 Genesys Telecommunications Laboratories, Inc. All rights reserved.
+   ===============================================================================
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+
+   <organization>
+      <name>Genesys Telecommunication Laboratories, Inc.</name>
+   </organization>
+
+   <groupId>com.genesyslab.platform</groupId>
+   <artifactId>warmstandbyappblockquickstart</artifactId>
+   <packaging>jar</packaging>
+   <version>900.10.6</version>
+
+   <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+      <!-- Plugin versions -->
+      <version.compiler.plugin>3.8.0</version.compiler.plugin>
+      <maven.compiler.source>1.8</maven.compiler.source>
+      <maven.compiler.target>1.8</maven.compiler.target>
+      <maven.compiler.failOnError>true</maven.compiler.failOnError>
+      <maven.compiler.failOnWarning>false</maven.compiler.failOnWarning>
+      <maven.compiler.showWarnings>false</maven.compiler.showWarnings>
+      <maven.compiler.showDeprecation>false</maven.compiler.showDeprecation>
+      <maven.compiler.optimize>true</maven.compiler.optimize>
+
+      <version.jar.plugin>3.2.0</version.jar.plugin>
+      <jar.forceCreation>true</jar.forceCreation>
+
+      <version.dependency.plugin>2.1</version.dependency.plugin>
+   </properties>
+
+   <dependencyManagement>
+      <dependencies>
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>appblocks-bom</artifactId>
+            <version>900.10.6</version>
+            <type>pom</type>
+            <scope>import</scope>
+         </dependency>
+      </dependencies>
+   </dependencyManagement>
+
+   <dependencies>
+      <dependency>
+         <groupId>com.genesyslab.platform</groupId>
+         <artifactId>warmstandbyappblock</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>com.genesyslab.platform</groupId>
+         <artifactId>configurationprotocol</artifactId>
+      </dependency>
+   </dependencies>
+
+   <build>
+      <finalName>${project.artifactId}</finalName>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>${version.compiler.plugin}</version>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>${version.dependency.plugin}</version>
+            <executions>
+               <execution>
+                  <id>copy-dependencies</id>
+                  <phase>package</phase>
+                  <goals>
+                     <goal>copy-dependencies</goal>
+                  </goals>
+                  <configuration>
+                     <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>${version.jar.plugin}</version>
+            <configuration>
+               <archive>
+                  <manifest>
+                     <mainClass>com.genesyslab.platform.applicationblocks.warmstandbyquickstart.MainForm</mainClass>
+                     <addClasspath>true</addClasspath>
+                     <classpathPrefix>lib/</classpathPrefix>
+                     <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                     <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                  </manifest>
+               </archive>
+            </configuration>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-deploy-plugin</artifactId>
+            <configuration>
+               <skip>true</skip>
+            </configuration>
+         </plugin>
+      </plugins>
+   </build>
+</project>

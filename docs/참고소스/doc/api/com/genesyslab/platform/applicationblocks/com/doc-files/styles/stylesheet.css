@@ -1,0 +1,85 @@
+/* Javadoc style sheet */
+
+
+/* Define colors, fonts and other style attributes here to override the defaults */
+
+/* Page background color */
+body { background-color: #FFFFFF }
+
+/* Headings */
+h1 { font-size: 145% }
+
+/* Table colors */
+.TableHeadingColor     { background: #CCCCFF } /* Dark mauve */
+.TableSubHeadingColor  { background: #EEEEFF } /* Light mauve */
+.TableRowColor         { background: #FFFFFF } /* White */
+
+/* Font used in left-hand frame lists */
+.FrameTitleFont   { font-size: 100%; font-family: Helvetica, Arial, sans-serif }
+.FrameHeadingFont { font-size:  90%; font-family: Helvetica, Arial, sans-serif }
+.FrameItemFont    { font-size:  90%; font-family: Helvetica, Arial, sans-serif }
+
+/* Navigation bar fonts and colors */
+.NavBarCell1    { background-color:#EEEEFF;} /* Light mauve */
+.NavBarCell1Rev { background-color:#00008B;} /* Dark Blue */
+.NavBarFont1    { font-family: Arial, Helvetica, sans-serif; color:#000000;}
+.NavBarFont1Rev { font-family: Arial, Helvetica, sans-serif; color:#FFFFFF;}
+
+.NavBarCell2    { font-family: Arial, Helvetica, sans-serif; background-color:#FFFFFF;}
+.NavBarCell3    { font-family: Arial, Helvetica, sans-serif; background-color:#FFFFFF;}
+
+table.dtTABLE
+	{
+	width: 100%; /* Forces tables to have correct right margin */
+	margin-top: .6em;
+	margin-bottom: .3em;
+	border-width: 1px 1px 0px 0px;
+	border-style: solid;
+	border-color: #999999;
+	background-color: #999999;
+	font-size: 100%; /* Text in Table is same size as text outside table */
+	}
+table.dtTABLE th, table.dtTABLE td
+	{
+	border-style: solid; /* Creates the cell border and color */
+	border-width: 0px 0px 1px 1px;
+	border-style: solid;
+	border-color: #999999;
+	padding: 4px 6px;
+	text-align: left;
+	}
+table.dtTABLE th
+	{
+	background: #ccccff; /* Creates the shaded table header row */
+	vertical-align: bottom;
+	}
+table.dtTABLE td
+	{
+	background: #ffffff;
+	vertical-align: top;
+	}
+pre.code
+	{
+	background-color: #eeeeee;
+	padding: 4px 6px 4px 6px;
+	}
+pre, div.syntax
+	{
+	margin-top: .5em;
+	margin-bottom: .5em;
+	}
+pre, code, .code, div.syntax
+	{
+	font: 100% Monospace, Courier New, Courier; /* This is 100% of 70% */
+	color: #000066;
+	}
+pre b, code b
+	{
+	letter-spacing: .1em; /* opens kerning on bold in Syntax/Code */
+	}
+.syntax span.lang
+	{
+	margin: 0;
+	font-weight: normal;
+	}
+

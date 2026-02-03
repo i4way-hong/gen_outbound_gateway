@@ -1,0 +1,869 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
+   ===============================================================================
+    Genesys Platform SDK
+   ===============================================================================
+
+    Any authorized distribution of any copy of this code (including any related
+    documentation) must reproduce the following restrictions, disclaimer and copyright
+    notice:
+
+    The Genesys name, trademarks and/or logo(s) of Genesys shall not be used to name
+    (even as a part of another name), endorse and/or promote products derived from
+    this code without prior written permission from Genesys Telecommunications
+    Laboratories, Inc.
+
+    The use, copy, and/or distribution of this code is subject to the terms of the Genesys
+    Developer License Agreement.  This code shall not be used, copied, and/or
+    distributed under any other license agreement.
+
+    THIS CODE IS PROVIDED BY GENESYS TELECOMMUNICATIONS LABORATORIES, INC.
+    ("GENESYS") "AS IS" WITHOUT ANY WARRANTY OF ANY KIND. GENESYS HEREBY
+    DISCLAIMS ALL EXPRESS, IMPLIED, OR STATUTORY CONDITIONS, REPRESENTATIONS AND
+    WARRANTIES WITH RESPECT TO THIS CODE (OR ANY PART THEREOF), INCLUDING, BUT
+    NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+    PARTICULAR PURPOSE OR NON-INFRINGEMENT. GENESYS AND ITS SUPPLIERS SHALL
+    NOT BE LIABLE FOR ANY DAMAGE SUFFERED AS A RESULT OF USING THIS CODE. IN NO
+    EVENT SHALL GENESYS AND ITS SUPPLIERS BE LIABLE FOR ANY DIRECT, INDIRECT,
+    CONSEQUENTIAL, ECONOMIC, INCIDENTAL, OR SPECIAL DAMAGES (INCLUDING, BUT
+    NOT LIMITED TO, ANY LOST REVENUES OR PROFITS).
+
+    Copyright (c) 2006 - 2019 Genesys Telecommunications Laboratories, Inc. All rights reserved.
+   ===============================================================================
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+
+   <organization>
+      <name>Genesys Telecommunication Laboratories, Inc.</name>
+      <url>http://www.genesys.com</url>
+   </organization>
+   <name>PSDK :: Open Media Protocol</name>
+
+   <parent>
+      <groupId>com.genesyslab.platform</groupId>
+      <artifactId>protocols-bom</artifactId>
+      <version>900.10.6</version>
+   </parent>
+   <artifactId>openmediaprotocol</artifactId>
+   <packaging>jar</packaging>
+
+   <properties>
+      <automatic.module.name>com.genesyslab.platform.openmediaprotocol</automatic.module.name>
+
+      <!-- Empty by default. may be overridden in osgi profile -->
+      <manifest.file/>
+      <manifest.implementation.title>com.genesyslab.platform.openmedia.protocol</manifest.implementation.title>
+      <manifest.component.path>com/genesyslab/platform/openmedia/protocol</manifest.component.path>
+
+      <xml.dir>${basedir}/../../psdk_xml/OpenMediaProtocolsXml/Src</xml.dir>
+      <doc.dir>${basedir}/../../psdk_doc/projects/protocols/OpenMediaProtocolsJava</doc.dir>
+      <doc.dir.xml>${basedir}/../../psdk_doc/projects/protocols/OpenMediaProtocolsXml/Src</doc.dir.xml>
+      <sdk_commons.dir>${basedir}/../../sdk_commons</sdk_commons.dir>
+
+      <generator.main>com.genesyslab.platform.commons.protocol.generator.Generator</generator.main>
+      <generator.kvbinding.main>com.genesyslab.platform.commons.kwgenerator.Generator</generator.kvbinding.main>
+      <!-- binding generator params -->
+      <generator.kvbinding.xml>kvbinding/MCRInteractionServerProtocol.xml</generator.kvbinding.xml>
+      <generator.kvbinding.output>${basedir}/src/generated</generator.kvbinding.output>
+      <kvbinding.dir>${basedir}/tools/kvbinding</kvbinding.dir>
+      <kvbinding.desc>OpenMediaAttributesNew.xml</kvbinding.desc>
+      <kvbinding.out.file>${basedir}/src/generated/com/genesyslab/platform/openmedia/protocol/openmediaattributes/OpenMediaAttributesBinding.java</kvbinding.out.file>
+      <javatools.dir>${basedir}/../JavaTools/KVGenerator</javatools.dir>
+      <!-- interatction generator params -->
+      <generator.inter.xml>InteractionServerProtocol.xml</generator.inter.xml>
+      <generator.inter.comments>${basedir}/../../psdk_doc/projects/protocols/OpenMediaProtocolsXml/Src/InteractionServerProtocolComments.xml</generator.inter.comments>
+      <generator.inter.output>${basedir}/src/generated</generator.inter.output>
+      <!-- external generator params -->
+      <generator.ext.xml>ExternalServiceProtocol.xml</generator.ext.xml>
+      <generator.ext.comments>${basedir}/../../psdk_doc/projects/protocols/OpenMediaProtocolsXml/Src/ExternalServiceProtocolComments.xml</generator.ext.comments>
+      <generator.ext.output>${basedir}/src/generated</generator.ext.output>
+
+      <classes.for.unit.test>${project.build.outputDirectory}</classes.for.unit.test>
+
+      <!-- Plugin versions -->
+      <version.emma.plugin>1.2</version.emma.plugin>
+      <version.emma4it.plugin>1.3</version.emma4it.plugin>
+      <version.dependency.plugin>2.2</version.dependency.plugin>
+      <version.resource.plugin>2.5</version.resource.plugin>
+      <version.properties.plugin>1.0-alpha-2</version.properties.plugin>
+      <version.assembly.plugin>2.2.1</version.assembly.plugin>
+      <version.ant.plugin>1.3</version.ant.plugin>
+      <version.cobertura.plugin>2.7</version.cobertura.plugin>
+      <version.findbugs.plugin>2.5.2</version.findbugs.plugin>
+      <version.info-reports.plugin>2.4</version.info-reports.plugin>
+      <version.xml.maven.plugin>1.0</version.xml.maven.plugin>
+
+      <version.saxon>8.8</version.saxon>
+      <version.saxon-dom>8.8</version.saxon-dom>
+      <version.ant-trax>1.7.1</version.ant-trax>
+   </properties>
+
+   <dependencies>
+      <dependency>
+         <groupId>javax.annotation</groupId>
+         <artifactId>javax.annotation-api</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>com.genesyslab.platform</groupId>
+         <artifactId>protocol</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>com.genesyslab.platform</groupId>
+         <artifactId>kvlistbinding</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>com.genesyslab.platform</groupId>
+         <artifactId>generator</artifactId>
+         <type>jar</type>
+         <scope>runtime</scope>
+         <optional>true</optional>
+      </dependency>
+      <dependency>
+         <groupId>com.genesyslab.platform</groupId>
+         <artifactId>kvbindinggenerator</artifactId>
+         <scope>runtime</scope>
+         <optional>true</optional>
+      </dependency>
+
+      <dependency>
+         <groupId>net.sf.saxon</groupId>
+         <artifactId>saxon</artifactId>
+         <version>${version.saxon}</version>
+         <scope>runtime</scope>
+         <optional>true</optional>
+      </dependency>
+      <dependency>
+         <groupId>net.sf.saxon</groupId>
+         <artifactId>saxon-dom</artifactId>
+         <version>${version.saxon-dom}</version>
+         <scope>runtime</scope>
+         <optional>true</optional>
+      </dependency>
+      <dependency>
+         <groupId>org.testng</groupId>
+         <artifactId>testng</artifactId>
+         <version>${version.testng}</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <version>${version.junit}</version>
+         <scope>test</scope>
+      </dependency>
+   </dependencies>
+
+   <build>
+      <finalName>${project.artifactId}</finalName>
+      <plugins>
+         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>xml-maven-plugin</artifactId>
+            <version>${version.xml.maven.plugin}</version>
+            <executions>
+               <execution>
+                  <id>generate-sources</id>
+                  <phase>generate-sources</phase>
+                  <goals>
+                     <goal>transform</goal>
+                  </goals>
+               </execution>
+            </executions>
+            <configuration>
+               <transformationSets>
+                  <transformationSet>
+                     <dir>${xml.dir}/kvbinding</dir>
+                     <stylesheet>../JavaTools/KVGenerator/kvgenerator_java_new.xsl</stylesheet>
+                     <includes>
+                        <inclide>${kvbinding.desc}</inclide>
+                     </includes>
+                     <outputDir>${generator.kvbinding.output}</outputDir>
+                     <parameters>
+                        <parameter>
+                           <name>rootFolder</name>
+                           <value>${generator.kvbinding.output}</value>
+                        </parameter>
+                        <parameter>
+                           <name>baseTypesFile</name>
+                           <value>base_types.xml</value>
+                        </parameter>
+                        <parameter>
+                           <name>customTypesFile</name>
+                           <value>../../OpenMediaProtocolsJava/tools/kvbinding/custom_types.xml</value>
+                        </parameter>
+                        <parameter>
+                           <name>commentsFile</name>
+                           <value/>
+                        </parameter>
+                     </parameters>
+                  </transformationSet>
+               </transformationSets>
+            </configuration>
+            <dependencies>
+               <dependency>
+                  <groupId>net.sf.saxon</groupId>
+                  <artifactId>saxon</artifactId>
+                  <version>8.7</version>
+               </dependency>
+            </dependencies>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>${version.ant.plugin}</version>
+            <executions>
+               <execution>
+                  <id>generate-kvbinding-sources</id>
+                  <phase>generate-sources</phase>
+                  <configuration>
+                     <tasks>
+                        <copy file="${xml.dir}\kvbinding\${kvbinding.desc}" tofile="${kvbinding.dir}\${kvbinding.desc}"/>
+                        <copy file="${javatools.dir}\kvbinding.xsl" tofile="${kvbinding.dir}\kvbinding.xsl"/>
+                        <copy file="${javatools.dir}\templates.xsl" tofile="${kvbinding.dir}\templates.xsl"/>
+                        <copy file="${javatools.dir}\base_types.xml" tofile="${kvbinding.dir}\base_types.xml"/>
+                        <delete file="${kvbinding.out.file}"/>
+                        <xslt basedir="${kvbinding.dir}" destdir="${kvbinding.dir}" in="${kvbinding.dir}\${kvbinding.desc}" out="${kvbinding.out.file}" style="${kvbinding.dir}\kvbinding.xsl">
+                           <param expression="" name="package_postfix"/>
+                        </xslt>
+                        <delete file="${kvbinding.dir}\${kvbinding.desc}"/>
+                        <delete file="${kvbinding.dir}\kvbinding.xsl"/>
+                        <delete file="${kvbinding.dir}\templates.xsl"/>
+                        <delete file="${kvbinding.dir}\base_types.xml"/>
+                     </tasks>
+                  </configuration>
+                  <goals>
+                     <goal>run</goal>
+                  </goals>
+               </execution>
+            </executions>
+            <dependencies>
+               <dependency>
+                  <groupId>org.apache.ant</groupId>
+                  <artifactId>ant-trax</artifactId>
+                  <version>${version.ant-trax}</version>
+                  <scope>runtime</scope>
+                  <optional>true</optional>
+               </dependency>
+               <dependency>
+                  <groupId>net.sf.saxon</groupId>
+                  <artifactId>saxon</artifactId>
+                  <version>${version.saxon}</version>
+                  <scope>runtime</scope>
+                  <optional>true</optional>
+               </dependency>
+            </dependencies>
+         </plugin>
+
+         <!-- generate protocol classes -->
+         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <executions>
+               <execution>
+                  <id>generator-kvbinding</id>
+                  <phase>generate-sources</phase>
+                  <goals>
+                     <goal>exec</goal>
+                  </goals>
+                  <configuration>
+                     <executable>java</executable>
+                     <arguments>
+                        <argument>-classpath</argument>
+                        <classpath>
+                           <dependency>com.genesyslab.platform:kvbindinggenerator</dependency>
+                           <dependency>net.sf.saxon:saxon</dependency>
+                           <dependency>net.sf.saxon:saxon-dom</dependency>
+                        </classpath>
+                        <argument>${generator.kvbinding.main}</argument>
+                        <argument>-xml</argument>
+                        <argument>${generator.kvbinding.xml}</argument>
+                        <argument>-out</argument>
+                        <argument>${generator.kvbinding.output}</argument>
+                     </arguments>
+                     <workingDirectory>${xml.dir}</workingDirectory>
+                  </configuration>
+               </execution>
+               <execution>
+                  <id>generator-interaction</id>
+                  <phase>generate-sources</phase>
+                  <goals>
+                     <goal>exec</goal>
+                  </goals>
+                  <configuration>
+                     <executable>java</executable>
+                     <arguments>
+                        <argument>-classpath</argument>
+                        <classpath>
+                           <dependency>com.genesyslab.platform:generator</dependency>
+                           <dependency>net.sf.saxon:saxon</dependency>
+                        </classpath>
+                        <argument>${generator.main}</argument>
+                        <argument>${generator.inter.xml}</argument>
+                        <argument>${generator.inter.output}</argument>
+                        <argument>${generator.inter.comments}</argument>
+                     </arguments>
+                     <workingDirectory>${xml.dir}</workingDirectory>
+                  </configuration>
+               </execution>
+               <execution>
+                  <id>generator-external</id>
+                  <phase>generate-sources</phase>
+                  <goals>
+                     <goal>exec</goal>
+                  </goals>
+                  <configuration>
+                     <executable>java</executable>
+                     <arguments>
+                        <argument>-classpath</argument>
+                        <classpath>
+                           <dependency>com.genesyslab.platform:generator</dependency>
+                           <dependency>net.sf.saxon:saxon</dependency>
+                        </classpath>
+                        <argument>${generator.main}</argument>
+                        <argument>${generator.ext.xml}</argument>
+                        <argument>${generator.ext.output}</argument>
+                        <argument>${generator.ext.comments}</argument>
+                     </arguments>
+                     <workingDirectory>${xml.dir}</workingDirectory>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+
+         <!-- Add generated protocol classes to build path -->
+         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+               <execution>
+                  <phase>process-sources</phase>
+                  <goals>
+                     <goal>add-source</goal>
+                  </goals>
+                  <configuration>
+                     <sources>
+                        <source>${basedir}/src/generated</source>
+                     </sources>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+
+         <!-- compile protocol -->
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+         </plugin>
+
+         <!-- run unit tests -->
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+               <classesDirectory>${classes.for.unit.test}</classesDirectory>
+               <classpathDependencyExcludes>
+                  <classpathDependencyExcludes>net.sf.saxon:saxon</classpathDependencyExcludes>
+               </classpathDependencyExcludes>
+               <suiteXmlFiles>
+                  <suiteXmlFile>tools\testng.xml</suiteXmlFile>
+               </suiteXmlFiles>
+            </configuration>
+         </plugin>
+
+         <!-- create jar -->
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <executions>
+               <execution>
+                  <id>default-jar</id>
+                  <configuration>
+                     <archive>
+                        <manifestFile>${manifest.file}</manifestFile>
+                        <manifestEntries>
+                           <Implementation-Title>${manifest.implementation.title}</Implementation-Title>
+                           <Implementation-Version>${GENESYS.PROJECT.VERSION}</Implementation-Version>
+                           <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
+                           <Specification-Title>${project.name}</Specification-Title>
+                           <Specification-Version>${GENESYS.PROJECT.VERSION}</Specification-Version>
+                           <Specification-Vendor>${project.organization.name}</Specification-Vendor>
+                           <Comments>${BUILDTYPE}-${env.COMPUTERNAME}-${maven.build.timestamp}</Comments>
+                        </manifestEntries>
+                        <manifestSections>
+                           <manifestSection>
+                              <name>${manifest.component.path}</name>
+                           </manifestSection>
+                        </manifestSections>
+                     </archive>
+                     <includes>
+                        <include>com/**</include>
+                        <include>META-INF/*.*</include>
+                        <include>META-INF/maven/**</include>
+                        <include>META-INF/versions/11/module-info.class</include>
+                     </includes>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+
+         <!-- attach xsd files to maven artifact -->
+         <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>${version.assembly.plugin}</version>
+            <executions>
+               <execution>
+                  <goals>
+                     <goal>single</goal>
+                  </goals>
+                  <phase>package</phase>
+               </execution>
+            </executions>
+            <configuration>
+               <descriptors>
+                  <descriptor>assembly.xml</descriptor>
+                  <descriptor>xml-assembly.xml</descriptor>
+               </descriptors>
+            </configuration>
+         </plugin>
+      </plugins>
+   </build>
+
+   <profiles>
+      <profile>
+         <id>add-src</id>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-source-plugin</artifactId>
+                  <version>2.1.2</version>
+                  <executions>
+                     <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                           <goal>jar-no-fork</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+
+      <profile>
+         <id>java8-automodule</id>
+         <activation>
+            <jdk>[1.8,11)</jdk>
+         </activation>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-compiler-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>default-compile</id>
+                        <configuration>
+                           <jdkToolchain>
+                              <version>1.8</version>
+                           </jdkToolchain>
+                           <source>8</source>
+                           <target>8</target>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-jar-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>default-jar</id>
+                        <configuration>
+                           <archive>
+                              <manifestEntries>
+                                 <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
+                              </manifestEntries>
+                           </archive>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+
+      <profile>
+         <id>java11-module</id>
+         <activation>
+            <jdk>[11,)</jdk>
+         </activation>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.codehaus.mojo</groupId>
+                  <artifactId>build-helper-maven-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>add-module-info</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                           <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                           <sources>
+                              <source>${basedir}/src/main/module</source>
+                           </sources>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-compiler-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>default-compile</id>
+                        <configuration>
+                           <jdkToolchain>
+                              <version>1.8</version>
+                           </jdkToolchain>
+                           <source>1.8</source>
+                           <target>1.8</target>
+                           <excludes>
+                              <exclude>module-info.java</exclude>
+                           </excludes>
+                        </configuration>
+                     </execution>
+                     <execution>
+                        <id>compile-module</id>
+                        <goals>
+                           <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                           <jdkToolchain>
+                              <version>[11,)</version>
+                           </jdkToolchain>
+                           <source>11</source>
+                           <target>11</target>
+                           <!-- compile everything to ensure module-info contains right entries -->
+                           <multiReleaseOutput>true</multiReleaseOutput>
+                           <release>11</release>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-jar-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>default-jar</id>
+                        <configuration>
+                           <archive>
+                              <manifestEntries>
+                                 <Multi-Release>true</Multi-Release>
+                              </manifestEntries>
+                           </archive>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+               <plugin>
+                  <groupId>org.codehaus.mojo</groupId>
+                  <artifactId>exec-maven-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>setup-java-module-version</id>
+                        <phase>package</phase>
+                        <goals>
+                           <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                           <executable>jar</executable>
+                           <commandlineArgs>--verbose --update --file ${project.build.directory}/${project.artifactId}.jar --module-version ${GENESYS.PROJECT.VERSION} --release 11</commandlineArgs>
+                           <workingDirectory>${basedir}</workingDirectory>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+
+      <profile>
+         <id>osgi</id>
+         <properties>
+            <manifest.file>${project.basedir}/target/classes/META-INF/MANIFEST.MF</manifest.file>
+         </properties>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.apache.felix</groupId>
+                  <artifactId>maven-bundle-plugin</artifactId>
+                  <extensions>true</extensions>
+                  <executions>
+                     <execution>
+                        <id>bundle-manifest</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                           <goal>manifest</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+                  <configuration>
+                     <instructions>
+                        <Bundle-Name>Platform SDK OpenMedia Protocols</Bundle-Name>
+                        <Private-Package>
+                           com.genesyslab.platform.openmedia.protocol.server,
+                           com.genesyslab.platform.openmedia.*runtime* 
+                        </Private-Package>
+                        <Export-Package>
+                           com.genesyslab.platform.openmedia.protocol;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.openmedia.protocol.openmediaattributes;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.openmedia.protocol.externalservice;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.openmedia.protocol.externalservice.request;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.openmedia.protocol.externalservice.event;version=${project.version};-noimport:=true,                           
+                           com.genesyslab.platform.openmedia.protocol.interactionserver;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.openmedia.protocol.interactionserver.esp;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.openmedia.protocol.interactionserver.requests;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.openmedia.protocol.interactionserver.requests.agentmanagement;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.openmedia.protocol.interactionserver.requests.interactionmanagement;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.openmedia.protocol.interactionserver.requests.interactiondelivery;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.openmedia.protocol.interactionserver.events;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.openmedia.protocol.interactionserver.events.interactionmanagement;version=${project.version};-noimport:=true 
+                        </Export-Package>
+                        <Import-Package>
+                           com.genesyslab.platform.commons;version="[${@},${@}]",
+                           com.genesyslab.platform.commons.*;version="[${@},${@}]",
+                           * 
+                        </Import-Package>
+                     </instructions>
+                  </configuration>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+
+      <profile>
+         <id>doc</id>
+         <build>
+            <plugins>
+               <!-- read doc.properties file, prepared by doc team -->
+               <plugin>
+                  <groupId>org.codehaus.mojo</groupId>
+                  <artifactId>properties-maven-plugin</artifactId>
+                  <version>${version.properties.plugin}</version>
+                  <executions>
+                     <execution>
+                        <goals>
+                           <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                           <files>
+                              <file>${doc.dir}/doc.properties</file>
+                           </files>
+                        </configuration>
+                        <phase>prepare-package</phase>
+                     </execution>
+                  </executions>
+               </plugin>
+               <!--copy psdk_doc content to project's javadoc directory -->
+               <plugin>
+                  <artifactId>maven-resources-plugin</artifactId>
+                  <version>2.5</version>
+                  <executions>
+                     <execution>
+                        <id>copy-resources</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                           <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                           <outputDirectory>${basedir}/src/main/javadoc</outputDirectory>
+                           <resources>
+                              <resource>
+                                 <directory>${doc.dir}/pre-build</directory>
+                                 <filtering>false</filtering>
+                              </resource>
+                              <resource>
+                                 <directory>${doc.dir}/post-build</directory>
+                                 <filtering>false</filtering>
+                              </resource>
+                           </resources>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-javadoc-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <goals>
+                           <goal>jar</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+                  <configuration>
+                     <outputDirectory>${project.build.directory}/doc/api</outputDirectory>
+                     <docfilessubdirs>true</docfilessubdirs>
+                     <author>true</author>
+                     <nodeprecated>false</nodeprecated>
+                     <nodeprecatedlist>false</nodeprecatedlist>
+                     <notree>false</notree>
+                     <nonavbar>false</nonavbar>
+                     <noindex>false</noindex>
+                     <show>public</show>
+                     <source>1.8</source>
+                     <splitindex>true</splitindex>
+                     <use>true</use>
+                     <version>true</version>
+                     <quiet>true</quiet>
+                     <overview>${doc.dir}/pre-build/welcome.html</overview>
+                     <sourcepath>
+                        ${sdk_commons.dir}\SystemJava\logging\src\main\java;
+                        ${sdk_commons.dir}\SystemJava\system\src\main\java;
+                        ${sdk_commons.dir}\CommonsProtocolsConnectionJava\src\main\java;
+                        ${sdk_commons.dir}\CommonsJava\src\main\java;
+                        ${sdk_commons.dir}\KVListsJava\kvlists\src\main\java;
+                        ${basedir}\src\main\java;
+                        ${basedir}\src\generated 
+                     </sourcepath>
+                     <excludePackageNames> *.runtime; *.impl;
+                        *.interceptor; *.timer; *.processing; *.xml;
+                        *.collections.util; 
+                     </excludePackageNames>
+                     <doctitle>${text.doc.title}</doctitle>
+                     <header>${text.doc.header}</header>
+                     <footer>${text.doc.footer}</footer>
+                     <bottom>${text.doc.bottom}</bottom>
+                  </configuration>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+
+      <profile>
+         <id>eclipse-custom-settings</id>
+         <activation>
+            <property>
+               <name>eclipse.application</name>
+            </property>
+         </activation>
+         <build>
+            <pluginManagement>
+               <plugins>
+                  <!-- Suppress Eclipse error messages "Plugin execution 
+                     not covered by lifecycle" -->
+                  <plugin>
+                     <groupId>org.eclipse.m2e</groupId>
+                     <artifactId>lifecycle-mapping</artifactId>
+                     <version>1.0.0</version>
+                     <configuration>
+                        <lifecycleMappingMetadata>
+                           <pluginExecutions>
+                              <pluginExecution>
+                                 <pluginExecutionFilter>
+                                    <groupId>org.codehaus.mojo</groupId>
+                                    <artifactId>exec-maven-plugin</artifactId>
+                                    <versionRange>[1.0,)</versionRange>
+                                    <goals>
+                                       <goal>exec</goal>
+                                    </goals>
+                                 </pluginExecutionFilter>
+                                 <action>
+                                    <ignore/>
+                                 </action>
+                              </pluginExecution>
+                              <pluginExecution>
+                                 <pluginExecutionFilter>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-antrun-plugin</artifactId>
+                                    <versionRange>[1.0,)</versionRange>
+                                    <goals>
+                                       <goal>run</goal>
+                                    </goals>
+                                 </pluginExecutionFilter>
+                                 <action>
+                                    <ignore/>
+                                 </action>
+                              </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                     </configuration>
+                  </plugin>
+               </plugins>
+            </pluginManagement>
+         </build>
+      </profile>
+
+      <profile>
+         <id>resultpath-copy</id>
+         <build>
+            <plugins>
+               <plugin>
+                  <artifactId>maven-antrun-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <phase>install</phase>
+                        <configuration>
+                           <tasks>
+                              <echo>genesys.resultpath:${genesys.resultpath}</echo>
+                              <echo>project.build.directory:${project.build.directory}</echo>
+                              <echo>settings.localRepository:${settings.localRepository}</echo>
+                              <copy todir="${genesys.resultpath}/release">
+                                 <fileset dir="${project.build.directory}">
+                                    <include name="${project.artifactId}.jar"/>
+                                 </fileset>
+                              </copy>
+                              <copy flatten="true" todir="${genesys.resultpath}/release/maven/${project.artifactId}">
+                                 <fileset dir="${settings.localRepository}/com/genesyslab/platform/${project.artifactId}">
+                                    <include name="**/${project.artifactId}-${project.version}.jar"/>
+                                    <include name="**/${project.artifactId}-${project.version}-sources.jar"/>
+                                    <include name="**/${project.artifactId}-${project.version}.pom"/>
+                                    <include name="**/${project.artifactId}-${project.version}-xsd.zip"/>
+                                    <include name="**/${project.artifactId}-${project.version}-xml.zip"/>
+                                 </fileset>
+                              </copy>
+                              <copy file="${xml.dir}/externalservicemessages.xsd" tofile="${genesys.resultpath}/release/ExternalServiceMessages.xsd"/>
+                              <copy file="${xml.dir}/interactionservermessages.xsd" tofile="${genesys.resultpath}/release/InteractionServerMessages.xsd"/>
+                           </tasks>
+                        </configuration>
+                        <goals>
+                           <goal>run</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+   </profiles>
+
+   <reporting>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-project-info-reports-plugin</artifactId>
+            <version>2.4</version>
+         </plugin>
+      </plugins>
+   </reporting>
+
+   <distributionManagement>
+      <repository>
+         <uniqueVersion>false</uniqueVersion>
+         <id>${prod.distribution.repository.id}</id>
+         <name>${prod.distribution.repository.name}</name>
+         <url>${prod.distribution.repository.url}</url>
+      </repository>
+      <snapshotRepository>
+         <uniqueVersion>false</uniqueVersion>
+         <id>${distribution.repository.id}</id>
+         <name>${distribution.repository.name}</name>
+         <url>${distribution.repository.url}</url>
+      </snapshotRepository>
+   </distributionManagement>
+</project>

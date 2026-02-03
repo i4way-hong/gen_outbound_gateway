@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
+   ===============================================================================
+    Genesys Platform SDK
+   ===============================================================================
+
+    Any authorized distribution of any copy of this code (including any related
+    documentation) must reproduce the following restrictions, disclaimer and copyright
+    notice:
+
+    The Genesys name, trademarks and/or logo(s) of Genesys shall not be used to name
+    (even as a part of another name), endorse and/or promote products derived from
+    this code without prior written permission from Genesys Telecommunications
+    Laboratories, Inc.
+
+    The use, copy, and/or distribution of this code is subject to the terms of the Genesys
+    Developer License Agreement.  This code shall not be used, copied, and/or
+    distributed under any other license agreement.
+
+    THIS CODE IS PROVIDED BY GENESYS TELECOMMUNICATIONS LABORATORIES, INC.
+    ("GENESYS") "AS IS" WITHOUT ANY WARRANTY OF ANY KIND. GENESYS HEREBY
+    DISCLAIMS ALL EXPRESS, IMPLIED, OR STATUTORY CONDITIONS, REPRESENTATIONS AND
+    WARRANTIES WITH RESPECT TO THIS CODE (OR ANY PART THEREOF), INCLUDING, BUT
+    NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+    PARTICULAR PURPOSE OR NON-INFRINGEMENT. GENESYS AND ITS SUPPLIERS SHALL
+    NOT BE LIABLE FOR ANY DAMAGE SUFFERED AS A RESULT OF USING THIS CODE. IN NO
+    EVENT SHALL GENESYS AND ITS SUPPLIERS BE LIABLE FOR ANY DIRECT, INDIRECT,
+    CONSEQUENTIAL, ECONOMIC, INCIDENTAL, OR SPECIAL DAMAGES (INCLUDING, BUT
+    NOT LIMITED TO, ANY LOST REVENUES OR PROFITS).
+
+    Copyright (c) 2006 - 2019 Genesys Telecommunications Laboratories, Inc. All rights reserved.
+   ===============================================================================
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+
+   <organization>
+      <name>Genesys Telecommunication Laboratories, Inc.</name>
+      <url>http://www.genesys.com</url>
+   </organization>
+   <name>PSDK :: Protocols BOM</name>
+
+   <groupId>com.genesyslab.platform</groupId>
+   <artifactId>protocols-bom</artifactId>
+   <packaging>pom</packaging>
+   <version>900.10.6</version>
+
+   <properties>
+      <GENESYS.PROJECT.VERSION>9.0.010.06</GENESYS.PROJECT.VERSION>
+
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+      <!-- Plugin versions -->
+      <version.compiler.plugin>3.8.0</version.compiler.plugin>
+      <maven.compiler.source>1.8</maven.compiler.source>
+      <maven.compiler.target>1.8</maven.compiler.target>
+      <maven.compiler.failOnError>true</maven.compiler.failOnError>
+      <maven.compiler.failOnWarning>false</maven.compiler.failOnWarning>
+      <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
+      <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
+      <maven.compiler.optimize>true</maven.compiler.optimize>
+
+      <version.helper.plugin>1.12</version.helper.plugin>
+
+      <version.surefire.plugin>2.22.0</version.surefire.plugin>
+
+      <version.jar.plugin>3.2.0</version.jar.plugin>
+      <jar.forceCreation>true</jar.forceCreation>
+
+      <version.exec.plugin>1.6.0</version.exec.plugin>
+      <version.bundle.plugin>3.5.0</version.bundle.plugin>
+      <version.clean.plugin>2.6.1</version.clean.plugin>
+      <version.javadoc.plugin>3.0.1</version.javadoc.plugin>
+
+      <!-- Common dependencies Build versions -->
+      <version.testng>6.14.3</version.testng>
+      <version.junit>4.12</version.junit>
+      <version.io.netty>4.1.100.Final</version.io.netty>
+   </properties>
+
+   <dependencyManagement>
+      <dependencies>
+         <!-- Commons -->
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>kvlists</artifactId>
+            <version>900.10.6</version>
+         </dependency>
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>kvlistbinding</artifactId>
+            <version>900.10.6</version>
+         </dependency>
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>kv65_adapter</artifactId>
+            <version>900.10.6</version>
+         </dependency>
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>commons</artifactId>
+            <version>900.10.6</version>
+         </dependency>
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>system</artifactId>
+            <version>900.10.6</version>
+         </dependency>
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>connection</artifactId>
+            <version>900.10.6</version>
+         </dependency>
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>protocol</artifactId>
+            <version>900.10.6</version>
+         </dependency>
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>protocol</artifactId>
+            <version>900.10.6</version>
+            <classifier>tests</classifier>
+         </dependency>
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>protocol</artifactId>
+            <version>900.10.6</version>
+            <classifier>xsd</classifier>
+            <type>zip</type>
+         </dependency>
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>generator</artifactId>
+            <version>900.10.6</version>
+         </dependency>
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>kvbindinggenerator</artifactId>
+            <version>900.10.6</version>
+         </dependency>
+
+         <!--Protocols -->
+         <!--Configuration -->
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>configurationprotocol</artifactId>
+            <version>900.10.6</version>
+         </dependency>
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>configurationprotocol</artifactId>
+            <version>900.10.6</version>
+            <classifier>xsd</classifier>
+            <type>zip</type>
+         </dependency>
+         <!--Contacts -->
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>contactsprotocol</artifactId>
+            <version>900.10.6</version>
+         </dependency>
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>contactsprotocol</artifactId>
+            <version>900.10.6</version>
+            <classifier>xsd</classifier>
+            <type>zip</type>
+         </dependency>
+         <!--Management -->
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>managementprotocol</artifactId>
+            <version>900.10.6</version>
+         </dependency>
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>managementprotocol</artifactId>
+            <version>900.10.6</version>
+            <classifier>xsd</classifier>
+            <type>zip</type>
+         </dependency>
+         <!--Openmedia -->
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>openmediaprotocol</artifactId>
+            <version>900.10.6</version>
+         </dependency>
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>openmediaprotocol</artifactId>
+            <version>900.10.6</version>
+            <classifier>xsd</classifier>
+            <type>zip</type>
+         </dependency>
+         <!--Outbound -->
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>outboundprotocol</artifactId>
+            <version>900.10.6</version>
+         </dependency>
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>outboundprotocol</artifactId>
+            <version>900.10.6</version>
+            <classifier>xsd</classifier>
+            <type>zip</type>
+         </dependency>
+         <!--Routing -->
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>routingprotocol</artifactId>
+            <version>900.10.6</version>
+         </dependency>
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>routingprotocol</artifactId>
+            <version>900.10.6</version>
+            <classifier>xsd</classifier>
+            <type>zip</type>
+         </dependency>
+         <!--Reporting -->
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>reportingprotocol</artifactId>
+            <version>900.10.6</version>
+         </dependency>
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>reportingprotocol</artifactId>
+            <version>900.10.6</version>
+            <classifier>xsd</classifier>
+            <type>zip</type>
+         </dependency>
+         <!--Voice -->
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>voiceprotocol</artifactId>
+            <version>900.10.6</version>
+         </dependency>
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>voiceprotocol</artifactId>
+            <version>900.10.6</version>
+            <classifier>xsd</classifier>
+            <type>zip</type>
+         </dependency>
+         <!--Webmedia -->
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>webmediaprotocol</artifactId>
+            <version>900.10.6</version>
+         </dependency>
+         <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>webmediaprotocol</artifactId>
+            <version>900.10.6</version>
+            <classifier>xsd</classifier>
+            <type>zip</type>
+         </dependency>
+
+         <!-- 3rd parties -->
+         <!--dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>${version.io.netty}</version>
+            <type>pom</type>
+            <scope>import</scope>
+         </dependency-->
+         <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-buffer</artifactId>
+            <version>${version.io.netty}</version>
+         </dependency>
+         <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec</artifactId>
+            <version>${version.io.netty}</version>
+         </dependency>
+         <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec-http</artifactId>
+            <version>${version.io.netty}</version>
+         </dependency>
+         <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec-socks</artifactId>
+            <version>${version.io.netty}</version>
+         </dependency>
+         <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-common</artifactId>
+            <version>${version.io.netty}</version>
+         </dependency>
+         <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-handler</artifactId>
+            <version>${version.io.netty}</version>
+         </dependency>
+         <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-handler-proxy</artifactId>
+            <version>${version.io.netty}</version>
+         </dependency>
+         <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-resolver</artifactId>
+            <version>${version.io.netty}</version>
+         </dependency>
+         <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport</artifactId>
+            <version>${version.io.netty}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-bom</artifactId>
+            <version>2.17.1</version>
+            <type>pom</type>
+            <scope>import</scope>
+         </dependency>
+         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.30</version>
+         </dependency>
+
+         <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-bom</artifactId>
+            <version>2.3.1</version>
+            <type>pom</type>
+            <scope>import</scope>
+         </dependency>
+         <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.3.2</version>
+         </dependency>
+
+         <dependency>
+            <groupId>com.atlassian.clover</groupId>
+            <artifactId>clover</artifactId>
+            <version>4.4.1</version>
+            <scope>test</scope>
+         </dependency>
+
+      </dependencies>
+   </dependencyManagement>
+
+   <modules>
+      <module>Commons/KVListsJava/kvlists</module>
+      <module>Commons/KVListsJava/kvbinding</module>
+      <module>Commons/KVListsJava/kv65adapter</module>
+      <module>Commons/CommonsProtocolsConnectionJava/Connection</module>
+      <module>Commons/CommonsProtocolsConnectionJava/System/logging</module>
+      <module>Commons/CommonsProtocolsConnectionJava/System/system</module>
+      <module>Commons/Generators/Generator</module>
+      <module>Commons/Generators/KVBindingGenerator</module>
+      <module>Commons/CommonsJava</module>
+      <module>ConfServerProtocolsJava/confserver</module>
+      <module>ConfServerProtocolsJava/confserver-lite</module>
+      <module>ContactServerProtocolsJava</module>
+      <module>ManagementProtocolsJava</module>
+      <module>OpenMediaProtocolsJava</module>
+      <module>OutboundProtocolsJava</module>
+      <module>RoutingProtocolsJava</module>
+      <module>RTMEStatisticsProtocolsJava</module>
+      <module>VoiceProtocolsJava</module>
+      <module>WebMediaProtocolsJava</module>
+   </modules>
+
+   <build>
+      <pluginManagement>
+         <plugins>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-compiler-plugin</artifactId>
+               <version>${version.compiler.plugin}</version>
+            </plugin>
+            <plugin>
+               <groupId>org.codehaus.mojo</groupId>
+               <artifactId>build-helper-maven-plugin</artifactId>
+               <version>${version.helper.plugin}</version>
+            </plugin>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-surefire-plugin</artifactId>
+               <version>${version.surefire.plugin}</version>
+            </plugin>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-jar-plugin</artifactId>
+               <version>${version.jar.plugin}</version>
+            </plugin>
+            <plugin>
+               <groupId>org.codehaus.mojo</groupId>
+               <artifactId>exec-maven-plugin</artifactId>
+               <version>${version.exec.plugin}</version>
+            </plugin>
+            <plugin>
+               <groupId>org.apache.felix</groupId>
+               <artifactId>maven-bundle-plugin</artifactId>
+               <version>${version.bundle.plugin}</version>
+            </plugin>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-clean-plugin</artifactId>
+               <version>${version.clean.plugin}</version>
+            </plugin>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-javadoc-plugin</artifactId>
+               <version>${version.javadoc.plugin}</version>
+            </plugin>
+         </plugins>
+      </pluginManagement>
+   </build>
+
+   <profiles>
+      <profile>
+         <id>java11-sources</id>
+         <activation>
+            <jdk>[11,)</jdk>
+         </activation>
+         <properties>
+            <maven.compiler.source>11</maven.compiler.source>
+            <maven.compiler.target>11</maven.compiler.target>
+         </properties>
+      </profile>
+      <profile>
+         <id>dependency-check</id>
+         <build>
+           <plugins>
+              <plugin>
+                 <groupId>org.owasp</groupId>
+                 <artifactId>dependency-check-maven</artifactId>
+                 <version>6.1.5</version>
+                 <configuration>
+                    <format>XML</format>
+                    <outputDirectory>${project.build.directory}/dependency-check</outputDirectory>
+                    <suppressionFile>Build/dependency-check-suppression.xml</suppressionFile>
+                 </configuration>
+                 <executions>
+                    <execution>
+                       <goals>
+                          <goal>check</goal>
+                       </goals>
+                    </execution>
+                 </executions>
+              </plugin>
+           </plugins>
+        </build>
+        <reporting>
+           <plugins>
+              <plugin>
+                 <groupId>org.owasp</groupId>
+                 <artifactId>dependency-check-maven</artifactId>
+                 <version>6.1.5</version>
+                 <reportSets>
+                    <reportSet>
+                       <reports>
+                          <report>aggregate</report>
+                       </reports>
+                    </reportSet>
+                 </reportSets>
+              </plugin>
+           </plugins>
+        </reporting>
+      </profile>
+      <profile>
+         <id>code-coverage</id>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.openclover</groupId>
+                  <artifactId>clover-maven-plugin</artifactId>
+                  <version>4.4.1</version>
+                  <configuration>
+                    <includes>
+                      <include>com/genesyslab/platform/**/*.java</include>
+                    </includes>
+                    <excludes>
+                      <exclude>com/genesyslab/platform/commons/kwgenerator/**</exclude>
+                      <exclude>com/genesyslab/platform/commons/protocol/generator/**</exclude>
+                     </excludes>
+                  </configuration>
+               </plugin>
+            </plugins>
+         </build>		 
+      </profile>
+      <profile>
+         <id>resultpath-copy</id>
+         <build>
+            <plugins>
+               <plugin>
+                  <artifactId>maven-antrun-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>copy-pom</id>
+                        <phase>install</phase>
+                        <configuration>
+                           <tasks>
+                              <echo>genesys.resultpath:${genesys.resultpath}</echo>
+                              <echo>project.build.directory:${project.build.directory}</echo>
+                              <copy file="${basedir}/pom.xml" tofile="${genesys.resultpath}/release/maven/${project.artifactId}/${project.artifactId}-${project.version}.pom"/>
+                           </tasks>
+                        </configuration>
+                        <goals>
+                           <goal>run</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+   </profiles>
+
+   <distributionManagement>
+      <repository>
+         <uniqueVersion>false</uniqueVersion>
+         <id>${prod.distribution.repository.id}</id>
+         <name>${prod.distribution.repository.name}</name>
+         <url>${prod.distribution.repository.url}</url>
+      </repository>
+      <snapshotRepository>
+         <uniqueVersion>false</uniqueVersion>
+         <id>${distribution.repository.id}</id>
+         <name>${distribution.repository.name}</name>
+         <url>${distribution.repository.url}</url>
+      </snapshotRepository>
+   </distributionManagement>
+</project>

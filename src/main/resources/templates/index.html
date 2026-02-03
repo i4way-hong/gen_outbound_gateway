@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title th:text="${appName}">Gen Outbound Gateway</title>
+    <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+<div class="container">
+    <h1 th:text="${appName}">Gen Outbound Gateway</h1>
+    <p>Genesys Engage Outbound Gateway 기본 화면입니다.</p>
+    <ul>
+        <li>API 상태: <a href="/api/status">/api/status</a></li>
+        <li>Swagger UI: <a href="/swagger-ui">/swagger-ui</a></li>
+        <li>헬스 체크: <a href="/actuator/health">/actuator/health</a></li>
+    </ul>
+    <p class="timestamp" th:text="${#temporals.format(now, 'yyyy-MM-dd HH:mm:ss XXX')}"></p>
+</div>
+</body>
+</html>

@@ -1,0 +1,724 @@
+59f764c7|LMS|1.0|common.lms|8.5.000|*
+; ##############################################################
+; Copyright (c) 1999-2007 Genesys Telecommunications Labs, Inc, 
+; All Rights Reserved
+;
+; Genesys Common Log Messages
+;
+; File: common.lms
+; ##############################################################
+; The file contains all messages common for all Genesys 
+; applications, range is 1..10000
+
+
+; ##############################################################
+; STANDARD MESSAGES. Ids from 1 to 3999.
+; ##############################################################
+
+; The most important errors ====================================
+
+1000|STANDARD|GCTI_EXIT|%s Exiting
+
+; General system errors (2000 - 2099) ==========================
+
+2000|STANDARD|GCTI_REGISTRY|Unable to obtain registry key: '%s', subkey: '%s'
+
+2001|STANDARD|GCTI_STDLIB|Standard library '%s' initialization failed
+
+2002|STANDARD|GCTI_LOAD_RESOURCE|Unable to load resource '%s', error code '%s'
+
+2003|STANDARD|GCTI_MEMORY|Insufficient memory
+
+2024|STANDARD|GCTI_SIGNAL|OS signal '%s' received
+; For critical signals only
+
+; File, disk and storage errors ================================
+
+2004|STANDARD|GCTI_DISK_SPACE|Not enough disk space
+
+2005|STANDARD|GCTI_DISK_PERMISSION|Not enough permissions to perform disk operation
+
+2006|STANDARD|GCTI_FILE_NOT_FOUND|File '%s' not found 
+
+2007|STANDARD|GCTI_PATH_NOT_FOUND|Path '%s' not found
+
+2008|STANDARD|GCTI_DRIVE_NOT_FOUND|Drive '%s' not found
+
+2009|STANDARD|GCTI_LOCK_FILE|Cannot access file '%s', it is locked
+
+2010|STANDARD|GCTI_CREATE|Cannot create file or folder '%s'
+
+2011|STANDARD|GCTI_FILE_NAME|File name '%s' is too long
+
+2012|STANDARD|GCTI_FILE_HANDLE|No more system file handlers
+
+2013|STANDARD|GCTI_INVALID_NAME|File name, folder name syntax is incorrect
+
+2014|STANDARD|GCTI_DIR_NOT_EMPTY|The directory '%s' is not empty
+
+2015|STANDARD|GCTI_PIPE_BROKEN|Pipe has been broken
+
+2016|STANDARD|GCTI_FILE_UNABLE_TO_OPEN|Unable to open %s file '%s', error code %d 
+
+2017|STANDARD|GCTI_FILE_UNABLE_TO_CLOSE|Unable to close %s file '%s', error code %d 
+
+2018|STANDARD|GCTI_FILE_UNABLE_TO_READ|Unable to read %s file '%s', error code %d 
+
+2019|STANDARD|GCTI_FILE_UNABLE_TO_WRITE|Unable to write %s file '%s', error code %d 
+
+2020|STANDARD|GCTI_FILE_UNABLE_TO_CREATE|Unable to create %s file/folder '%s', error code %d 
+
+2021|STANDARD|GCTI_FILE_UNABLE_TO_DELETE|Unable to delete %s file/folder '%s', error code %d
+
+;First %s file type (such as log, license, or phone); second %s file name; %d error code as reported by system
+
+; Network(protocol)-related errors	============================
+
+2100|STANDARD|GCTI_WRONG_COMMAND|Wrong command %s, state %s, client %s
+
+2101|STANDARD|GCTI_NET_READ|Data read error, client %s, socket number %d, error code %d
+
+2102|STANDARD|GCTI_NET_SEND|Data send error, client %s, socket number %d, error code %d
+;As reported by system
+
+; Memory, processes errors =====================================
+
+2200|STANDARD|GCTI_PROCESS_START|Cannot start new process
+
+2201|STANDARD|GCTI_PROCESS_STOP|Cannot stop the process
+
+2202|STANDARD|GCTI_THREAD_START|Cannot start new thread
+
+2203|STANDARD|GCTI_THREAD_LIMIT|Cannot start one more thread, too many started already
+
+2204|STANDARD|GCTI_MEM_HANDLE|Invalid memory handle
+
+2205|STANDARD|GCTI_CREATE_MUTEX|Cannot create mutex
+
+2206|STANDARD|GCTI_CREATE_SEMAPHORE|Cannot create semaphore
+
+2207|STANDARD|GCTI_ACCESS_VIOLATION|Access violation, address %s
+
+; Configuration errors =========================================
+
+3000|STANDARD|GCTI_CFG_NOT_FOUND|Configuration server not found at %s:%d
+
+3001|STANDARD|GCTI_CFG_WRONG_PROTOCOL|Wrong configuration protocol
+
+3002|STANDARD|GCTI_CFG_WRONG_MSG|Wrong configuration message
+
+3003|STANDARD|GCTI_OBJECT_NOT_FOUND|Configuration object '%s' not found
+
+3004|STANDARD|GCTI_CFG_LIST|Configuration list item not found
+
+3005|STANDARD|GCTI_CFG_UNIQ|Configuration uniqueness violation
+
+3006|STANDARD|GCTI_CFG_INCOMPLETE_DATA|Incomplete configuration object data
+
+3007|STANDARD|GCTI_APPLICATION_NOT_FOUND|Application '%s' not found in configuration database
+
+3008|STANDARD|GCTI_APPLICATION_LOCKED|Application '%s' is being used already
+
+3009|STANDARD|GCTI_OPTION_NOT_FOUND|Configuration option '%s' not found
+
+3010|STANDARD|GCTI_OPTION_VALUE|Configuration option '%s' has wrong value '%s'
+
+; Network related errors =======================================
+
+3100|STANDARD|GCTI_TO_MANY_CNTS|Too many connections opened already
+
+3101|STANDARD|GCTI_SELECT|Select error %d
+
+3102|STANDARD|GCTI_HOST_NOT_FOUND|Invalid host name '%s'
+
+3103|STANDARD|GCTI_NET_INIT|Cannot initialize network sockets layer
+
+; Login, Identification, Authentication =======================
+
+3200|STANDARD|GCTI_NO_LOGIN|User login or password incorrect
+
+3201|STANDARD|GCTI_LOGIN_EXP|User login expired
+
+3202|STANDARD|GCTI_PERMISSIONS|User have not enough permissions to login
+
+3203|STANDARD|GCTI_LOGIN_DISABLED|Login currently disabled
+
+3204|STANDARD|GCTI_TOO_MANY_USERS|Login currently disabled; too many users
+
+
+; ##############################################################
+; NORMAL MESSAGES. Ids from 4000 to 5999
+; ##############################################################
+
+; Start/Stop ===================================================
+
+4001|TRACE|GCTI_SERVICE_SUSPEND|%s service suspended
+
+4002|TRACE|GCTI_SERVICE_CONTINUE|%s service continued
+
+4003|TRACE|GCTI_SERVICE_START|%s main process started
+
+4004|TRACE|GCTI_SERVICE_STOP|%s main process stopped
+
+4005|TRACE|GCTI_PROC_START|%s subprocess started
+
+4006|TRACE|GCTI_PROC_STOP|%s subprocess stopped
+
+; Logging ======================================================
+
+4100|TRACE|GCTI_LOG_START|Logging service started
+
+4101|TRACE|GCTI_LOG_SEGMENT_START|New log segment started %s
+
+4102|TRACE|GCTI_LOG_OPT_LEVEL|Log level changed from '%s' to '%s'
+
+4103|TRACE|GCTI_LOG_OPT_SEGMENT|Log segmentation turned %s
+
+4104|TRACE|GCTI_LOG_OPT_WRONG_VALUE|Option '%s' set to the wrong value '%s'
+
+4105|TRACE|GCTI_LOG_OPT_NOT_SUPPORTED|Option '%s' not supported
+
+4106|STANDARD|GCTI_LOG_MSGFILELOADED|Log Messages file '%s' successfully loaded
+
+4107|STANDARD|GCTI_LOG_MSGFILELOADERROR|Unable to load Log Messages file '%s', error code %d
+
+4108|TRACE|GCTI_LOG_OPT_EXPIRATION|Log expiration turned '%s'
+
+4109|TRACE|GCTI_LOG_STOP|Logging service stopped
+
+4110|TRACE|GCTI_LOG_OPTSET|Option '%s' has been set to the value '%s'
+
+4111|TRACE|GCTI_LOG_OPTDEL|Option '%s' has been deleted, default value '%s' restored
+
+4112|TRACE|GCTI_LOG_OUTCREATED|The Log Output of type '%s' has been created and opened
+
+4113|TRACE|GCTI_LOG_OUTDELETED|The Log Output of type '%s' has been closed and deleted
+
+4114|TRACE|GCTI_LOG_OPTDUMP|Option '%s' has value '%s'
+
+4115|ALARM|GCTI_LOG_ALARM|%s, alarm condition(%s)|ALARM
+; First %s alarm condition text, second - alarm condition dbid.
+
+4116|TRACE|GCTI_LOG_SUSPENDED|Logging service suspended
+
+4117|TRACE|GCTI_LOG_RESUMED|Logging service resumed
+
+4118|STANDARD|GCTI_LOG_NETFILE_WARNING|Warning, log output file '%s' has been opened on network drive.
+4119|STANDARD|GCTI_LOG_MMAP_ON_NETWORK_WARNING|Warning, memory mapped buffering cannot be used on the network drive, snapshot file will be not created.
+4120|TRACE|GCTI_LOG_CHECK_POINT|Check point %s
+
+4130|STANDARD|GCTI_LOG_THROTTLE|Log throttling changed verbose level to %s.
+4131|STANDARD|GCTI_LOG_THROTTLE_END|Log throttling ended.  Original verbose level restored.
+
+4200|ALARM|GCTI_ALARM_CREATION|Active Alarm "%s" Created (ID=%s)|ALARM
+; First %s - Alarm Condition Name
+; Second %s - Unique ID of Active Alarm 
+ 
+4210|ALARM|GCTI_ALARM_CLEARANCE|Active Alarm "%s" Cleared (ID=%s)|ALARM
+; First %s - Alarm Condition Name
+; Second %s - Unique ID of Active Alarm
+
+; ############################################################
+; CLIENT/SERVER CONNECTION
+; ############################################################
+; Client Side . =================================
+4500|TRACE|GCTI_CLIENT_CONNECTING|Connecting to %s '%s' at host '%s', port %d
+;First %s server type (such as TServer); second %s server name; then host name and port number
+
+4501|TRACE|GCTI_CLIENT_CONTACTED|Server %s contacted, socket %d
+
+4502|STANDARD|GCTI_CLIENT_UNABLE_CONNECT|Cannot connect to %s '%s' at host '%s', port %d, reason '%s'
+;First %s server type (such as TServer); second %s server name; then host name and port number
+
+4503|STANDARD|GCTI_CLIENT_CONNECTED|Connected to %s '%s' at host '%s', port %d
+;Application type, Application name, host, port
+
+4504|STANDARD|GCTI_CLIENT_CONNECTION_LOST|Connection to %s '%s' at host '%s', port %d lost
+;Application type, Application name, host, port
+
+4505|STANDARD|GCTI_CLIENT_DISCONNECTED|Disconnected from %s '%s'
+;Application type/name (message is generated when application calls CloseServer)
+
+; Server Side ====================================
+
+4520|TRACE|GCTI_SERVER_NEW_CLIENT_CONNECTED|New client %d connected
+;Socket number
+
+4521|TRACE|GCTI_SERVER_NEW_CLIENT_CONNECTED_FROM|New client %d connected from '%s'
+;Socket number, IP address
+
+4522|TRACE|GCTI_SERVER_CLIENT_AUTHORIZED|Client %d authorized, name '%s', type '%s'
+;Socket number, app. name, app. type
+
+4523|STANDARD|GCTI_SERVER_CONNECTION_CLOSED|Connection to client '%s' closed, reason '%s'
+;Connection to client closeddue to error
+
+4524|TRACE|GCTI_SERVER_CLIENT_DISCONNECTED|Client '%s' disconnected
+
+4525|STANDARD|GCTI_SERVER_PORT_OPENED|Port %d opened for listening
+
+4526|STANDARD|GCTI_SERVER_PORT_UNABLE_TO_OPEN|Cannot open port %d for listening, reason '%s'
+
+4527|STANDARD|GCTI_SERVER_CLIENT_VERSION_INCOMPATIBLE|Client version '%s' is incompatible with server version '%s'
+
+4528|TRACE|GCTI_AUTHORIZATION_MESSAGE_RECEIVED|Authorization message received, socket %d
+
+; #########################################################
+; CLIENT/SERVER COMMUNICATION
+; #########################################################
+
+4540|TRACE|GCTI_COMMUNICATION_UNKNOWN_MESSAGE|Unknown Message %s received from %d (%s '%s')
+;Message type, socket number, app. type, app. Name
+
+4541|TRACE|GCTI_COMMUNICATION_MESSAGE_RECEIVED|Message %s received from %d (%s '%s')
+;Message type, socket number, app. type, app. Name
+
+4542|TRACE|GCTI_COMMUNICATION_MESSAGE_SENT|Message %s sent to %d (%s '%s')
+;Message type, socket number, app. type, app. name
+
+
+4543|INTERACTION|GCTI_INTERACTION_MESSAGE_RECEIVED|Interaction message "%s" received from %d ("%s")
+; Sent when application receives interaction-related message 
+; %s - Type of interaction-related message 
+; %d - Socket 
+; %s - Name of application that sent interaction message (optional)
+ 
+4544|INTERACTION|GCTI_INTERACTION_MESSAGE_GENERATED|Interaction message "%s" generated
+; Sent when application generates interaction-related message 
+; and sends it to multiple clients 
+; %s - Type of interaction-related message 
+
+4545|INTERACTION|GCTI_INTERACTION_MESSAGE_SENT|Interaction message "%s" sent to %d ("%s")
+; Sent when application sends interaction-related message to single client
+; %s - Type of interaction-related message 
+; %d - Socket 
+; %s - Name of application where interaction message is sent (optional)
+
+4546|STANDARD|GCTI_INVALID_MESSAGE_RECEIVED|Invalid %s message received from %s, %s
+; %s - Protocol name (e.g. TLib, CfgLib etc)
+; %s - From whom it received (application name and/or host:port)
+; %s - Free-form explanation of what's wrong
+
+
+; #########################################################
+; REDUNDANCY MESSAGES
+; #########################################################
+
+4560|STANDARD|GCTI_REDUNDANCY_WARM_STANDBY_BACKUP_ACTIVATED|Warm Standby (backup) mode activated 
+
+4561|STANDARD|GCTI_REDUNDANCY_HOT_STANDBY_BACKUP_ACTIVATED|Hot Standby (backup) mode activated
+
+4562|STANDARD|GCTI_REDUNDANCY_WARM_STANDBY_PRIMARY_ACTIVATED|Warm Standby (Primary) mode activated
+
+4563|STANDARD|GCTI_REDUNDANCY_HOT_STANDBY_PRIMARY_ACTIVATED|Hot Standby (Primary) mode activated
+
+
+4580|STANDARD|GCTI_REDUNDANCY_CONNECTED_HOT_STANDBY|Connected to server in Hot Standby mode: Primary server %s '%s', backup server %s '%s'
+;App type, App name, App type, App name
+
+4581|STANDARD|GCTI_REDUNDANCY_PRIMARY_NOT_AVAILABLE|Primary server %s '%s' is not available, switching to backup %s '%s'
+;App type, App name, App type, App name
+
+
+; #########################################################
+; Access to windows NT registry
+; #########################################################
+
+5000|STANDARD|GCTI_ACCESS_NT_REGISTRY|Unable to obtain registry key: '%s', subkey: '%s', error code %d
+
+; #########################################################
+; PROCESSES
+; #########################################################
+
+5020|STANDARD|GCTI_PROCESS_CANNOT_START|Cannot start process '%s', error code %d
+
+5021|STANDARD|GCTI_PROCESS_CANNOT_STOP|Cannot stop process '%s', error code %d
+
+5022|STANDARD|GCTI_PROCESS_STARTED|Process '%s' started
+
+5023|STANDARD|GCTI_PROCESS_STOPPED|Process '%s' stopped
+
+5024|STANDARD|GCTI_PROCESS_ABNORMALLY_TERMINATED|Process '%s' abnormally terminated, error code %d
+
+; #########################################################
+; THREADS
+; #########################################################
+
+5040|STANDARD|GCTI_THREAD_CANNOT_START|Cannot start new thread, error code %d
+
+5041|STANDARD|GCTI_THREAD_CANNOT_CREATE_MUTEX|Cannot create mutex, erro code %d
+
+5042|STANDARD|GCTI_THREAD_CANNOT_CREATE_SEMAPHORE|Cannot create semaphore, error code %d
+
+; #########################################################
+; APPLICATION ITSELF
+; #########################################################
+
+5060|STANDARD|GCTI_APP_STARTED|Application started
+; Generated by SCS on behalf of application for third-party applications only. 
+
+5061|STANDARD|GCTI_APP_INIT_COMPLETED|Initialization completed
+
+5062|STANDARD|GCTI_APP_INIT_FAILED|Application initialization failed, reason '%s'
+
+5063|STANDARD|GCTI_APP_STOPPED|Normal termination 
+
+5064|STANDARD|GCTI_APP_TERMINATED|Application type: %s. Application terminated due to internal condition
+; Produced by SCS on behalf of application when application stopped without 
+; request to stop application (manual stop or crash). In addition, produced 
+; when SCS looses connections to LCA for all applications configured on that host
+
+5065|STANDARD|GCTI_APP_FAILED|Application stopped
+
+5066|STANDARD|GCTI_APP_INIT_COMPONENT_FAILED|Initialization of %s failed, reason '%s'
+; Initialization of internal component failed
+
+; #########################################################
+; NT SERVICES
+; #########################################################
+
+5080|STANDARD|GCTI_NT_SERVICE_CANNOT_START|Application cannot start as NT service, reason '%s'
+
+; #########################################################
+; APPLICATION-RELATED MESSAGES, GENERATED BY SCS 
+; Messages 5090-6000 are generated by SCS on behalf of 
+; application and could be used for more reliable alarming.
+; Applications should not send these logmessages. 
+; #########################################################
+
+5090|STANDARD|GCTI_SCS_APP_START|Application type: %s. Application start detected by Management Layer
+; Produced by SCS on behalf of application when application registers at LCA
+
+5091|STANDARD|GCTI_SCS_APP_PLANNED_STOP|Application type: %s. Application stopped by Management Layer as planned
+; Produced by SCS on behalf of application when application stopped according to 
+; the request. Request may be received from SCI, via SNMP or initiated by alarm reaction. 
+
+5092|STANDARD|GCTI_SCS_APP_INITIALIZING|Application entered initialization state
+; Produced by SCS on behalf of application when application 
+; changes it's status to "Initializing".
+
+5093|STANDARD|GCTI_SCS_APP_SERVICE_AVAILABLE|Application is ready to provide service
+; Produced by SCS on behalf of application when application 
+; changes it's status to "Running".
+ 
+5094|STANDARD|GCTI_SCS_APP_SERVICE_UNAVAILABLE|Application is not able to provide service
+; Produced by SCS on behalf of application when application 
+; changes it's status to "Service Unavailable". 
+
+5095|STANDARD|GCTI_SCS_APP_STATUS_UNKNOWN|Application has unknown status
+; Produced by SCS on behalf of application when application status cannot be detected by SCS
+
+5096|STANDARD|GCTI_SCS_APP_SUSPENDING|Application is suspending
+; Produced by SCS on behalf of application when application
+; change it's status to "Suspending"
+
+5097|STANDARD|GCTI_SCS_APP_SUSPENDED|Application is suspended
+; Produced by SCS on behalf of application when application
+; change it's status to "Suspended"
+
+5150|STANDARD|GCTI_SCS_APP_RUNMODE_CHANGED_TO_PRIMARY|Application's runmode changed to Primary
+; Produced by SCS on behalf of application when its
+; runmode changed to PRIMARY
+
+5151|STANDARD|GCTI_SCS_APP_RUNMODE_CHANGED_TO_BACKUP|Application's runmode changed to Backup
+; Produced by SCS on behalf of application when its
+; runmode changed to BACKUP
+
+5160|STANDARD|GCTI_SCS_APP_HANGUP_DETECTED|Application hang-up detected, reason '%s'
+; Produced by SCS on behalf of application when LCA reports to SCS that this application's hangup detected
+; %s - hangup detection reason
+
+5161|STANDARD|GCTI_SCS_APP_RESTORED_AFTER_HANGUP|Application restored after hang-up
+; Produced by SCS on behalf of application when LCA reports to SCS that this application restored after hangup
+
+5200|STANDARD|GCTI_VERSION|%s. Version %s
+; Produced by application
+; %s - Official application name
+; %s - Version number
+
+5201|STANDARD|GCTI_COPYRIGHT|Copyright (c) %d-%d Genesys Telecommunications Laboratories, Inc.
+; Produced by application
+; %d - Copyright start year
+; %d - Current version year
+
+; #########################################################
+; PERFORMANCE
+; #########################################################
+
+
+; #########################################################
+; SYSTEM LIBRARIES
+; #########################################################
+
+6020|STANDARD|GCTI_SYSLIB_INIT_FAILED|System library '%s' initialization failed, error code %d
+
+
+; #########################################################
+; CONFIGURATION / CONFIGSERVER LIBRARY
+; #########################################################
+
+
+6040|STANDARD|GCTI_CFG_DATA_NOT_AVAILABLE|Configuration data is not available, reason '%s'
+
+6041|STANDARD|GCTI_CFG_DATA_READ|Configuration data successfully read
+
+6042|STANDARD|GCTI_CFG_DATA_READ_ERROR|Configuration data read error: object type:'%s', DBID [%ld], reason '%s'
+
+6043|STANDARD|GCTI_CFG_DATA_WRITE_ERROR|Configuration data write error: object type:'%s', object name '%s', object DBID [%ld], reason '%s'
+
+6044|STANDARD|GCTI_CFG_DATA_ITEM_NOT_FOUND|Configuration item not found: object type:'%s'
+
+6045|STANDARD|GCTI_CFG_DATA_SPECIFIC_ITEM_NOT_FOUND|Configuration item not found: object type:'%s', object name '%s', reason '%s'
+
+6046|STANDARD|GCTI_CFG_MANDATORY_ENTITY_MISSING|Mandatory configuration entity missing: object type '%s', object name '%s', property name '%s' 
+
+6047|STANDARD|GCTI_CFG_OPTIONAL_ENTITY_MISSING|Optional configuration entity is missed: object type '%s', object name '%s', property name '%s', assuming default '%s'
+;Object_type, object_name, property_name, value
+
+6048|STANDARD|GCTI_CFG_ENTITY_INVALID_VALUE|Invalid value for configuration entity: object type:'%s', object name '%s', property name '%s' ='%s'
+;Object_type, object_name, property_name, value
+
+6049|TRACE|GCTI_CFG_ENTITY_SET|Configuration entity set: object type '%s', object name '%s', property name '%s' = '%s'
+;Object_type, object_name, property_name, value
+
+6050|TRACE|GCTI_CFG_OBJECT_ADDED|Configuration object added: object type '%s' object name '%s'
+
+6051|TRACE|GCTI_CFG_OBJECT_DELETED|Configuration object deleted: object type '%s' object name '%s'
+
+6052|STANDARD|GCTI_NO_CFG_APP|Unable to obtain application '%s' from configuration server
+
+6053|STANDARD|GCTI_CFG_APP|Configuration for application obtained
+
+6054|STANDARD|GCTI_CFG_REGISTERFAILED|Unable to register for configuration server notifications 
+
+; #########################################################
+; APPLICATION OPTIONS
+; #########################################################
+
+6080|STANDARD|GCTI_OPTION_MANDATORY_NOT_FOUND|Mandatory configuration option not found: '%s':'%s'
+;Section name, option name
+
+6081|STANDARD|GCTI_APP_OPTION_NOT_FOUND|Configuration option not found: '%s':'%s'
+;Section name, option name
+
+6082|STANDARD|GCTI_OPTION_MANDATORY_INVALID_VALUE|Mandatory configuration option has invalid value: '%s':'%s' = '%s'. 
+;Section name, option name, value
+
+6083|STANDARD|GCTI_OPTION_INVALID_VALUE|Configuration option has invalid value: '%s':'%s' = '%s'. 
+;Non mandatory options Section name, option name, value
+
+6084|TRACE|GCTI_OPTION_SET|Configuration option set: '%s':'%s' = '%s'
+;Section name, option name, value
+
+6085|TRACE|GCTI_OPTION_SET_DEFAULT|Configuration option set to default value: '%s':'%s' = '%s'
+;Section name, option name, value
+
+6086|TRACE|GCTI_OPTION_CHANGED|Configuration option changed: '%s':'%s' = '%s'
+;Dynamic change Section name, option name, value
+
+
+; #########################################################
+; DATABASE 
+; #########################################################
+
+7000|STANDARD|GCTI_DB_UNABLE_TO_OPEN|Could not open database '%s'; reason '%s'; error code %d
+;Database name
+
+7001|STANDARD|GCTI_DB_OPENED|Database '%s' opened 
+;Database name
+
+7002|STANDARD|GCTI_DB_EXECUTION_FAILURE|Execution failure: SQL statement '%s', reason '%s', error code %d
+
+
+
+; #########################################################
+; PERMISSIONS
+; #########################################################
+
+7020|STANDARD|GCTI_PERMISSION_DENIED|User '%s' permission denied, reason '%s'
+;User login or password incorrect;
+;User login expired;
+;User does not have enough permissions to login;
+;Login currently disabled;
+;Cannot login - too many users logged in already
+
+; #########################################################
+; ADDP (former KPL)
+; #########################################################
+
+7040|STANDARD|GCTI_ADDP_NO_RESPONSE|No response from %s '%s' is received within %d seconds, request ID %d
+;App Type, App Name
+
+7041|STANDARD|GCTI_ADDP_NO_RESPONSE_FROM_SOCKET|Socket %d is not responding within %d milliseconds, remote socket %d
+
+; #########################################################
+; TLIBRARY
+; #########################################################
+
+7060|STANDARD|GCTI_TLIBRARY_UNABLE_TO_REGISTER_DN|Unable to register DN '%s', reason '%s'
+
+; #########################################################
+; LICENSING
+; #########################################################
+
+7100|STANDARD|GCTI_LICENSE_FAIL|Licensing violation is identified, the violation type %s
+;Possible violation types are: 
+; License info is invalid, 
+; Licensable feature has expired, 
+; Feature usage level has exceeded
+; Licensing system general failure
+
+7101|STANDARD|GCTI_LICENSE_CHECKED_OUT|Feature '%s': %d licenses checked out
+; %s - feature name (e.g. 'tserver' or 'extrouter')
+; %d - number of licenses
+
+;##########################################################
+; Internal GLM messages
+;##########################################################
+7102|STANDARD|GCTI_LICENSE_CONNECTION_LOST|Connection to the license server is lost
+7103|STANDARD|GCTI_LICENSE_CONNECTION_RESTORED|Connection to the license server is restored
+7104|STANDARD|GCTI_LICENSE_FILE_CHANGED|The license file is changed
+
+; Clearance for the 7100
+7105|STANDARD|GCTI_LICENSE_RESTORED|Licensing violation condition, violation type '%s', no longer exists
+;Possible violation types are: 
+; License info is invalid, 
+; Licensable feature has expired, 
+; Feature usage level has exceeded
+; Licensing system general failure
+
+; #########################################################
+; Availability
+; #########################################################
+
+8000|STANDARD|GCTI_HOST_DOWN|Host '%s' inaccessible - LCA is not listening on port %d
+; Produced by SCS when SCS is disconnected or unable to connect to LCA on specified host.
+; Indicates that connection to specified host and port was actively refused, 
+; i.e. LCA is not listening on specified port.
+
+8001|STANDARD|GCTI_HOST_UP|Host '%s' operates in normal condition
+; Produced by SCS when SCS successfully connects to the LCA on specified host.
+
+8002|STANDARD|GCTI_HOST_UNAVAILABLE|Host '%s' unavailable
+; Produced by SCS when attempt to connect to LCA on specified host 
+; was aborted by timeout. Indicates that host is completely down (power off).
+
+8003|STANDARD|GCTI_HOST_UNREACHABLE|Host '%s' unreachable
+; Produced by SCS when attempt to connect to LCA on specified host 
+; was unsuccessful and error code "UNREACHABLE" was returned by OS. 
+; Indicates network problem, most probably that there is no route
+; to specified host.
+
+8004|STANDARD|GCTI_HOST_UNDER_CONTROL|The host '%s' is under control of Management Layer. SCS '%s' has connected from the host '%s' on the socket %lu.
+; Can be produced by an application which receives a REventHostUnderControl message from LCA.
+; %s - name of host where the LCA generated the log event is running.
+; %s - name of a SCS which has connected to the LCA
+; %s - name of a host where the SCS connected to the LCA from 
+; %lu  - the socket identifier which is used by LCA for comunication with SCS.
+
+8005|STANDARD|GCTI_HOST_NO_CONTROLLING_SCS|No connections to LCA on host '%s' from SCSs.
+; Can be produced by an application which receives a REventNoControllingSCS message from LCA.
+; %s - name of host where the LCA generated the log event is running.
+
+8006|STANDARD|GCTI_HOST_NON_SCS_REQ_CONNECTED|Non SCS requester '%s' has connected from the host '%s' on the socket %lu.
+; The message is output by a LCA when non SCS client registers in the LCA through SCS interface.
+; %s  - name of an application which has connected to the LCA
+; %s  - name of a host where the application connected to the LCA from 
+; %lu - the socket identifier which is used by LCA for communication with the application.
+
+8007|STANDARD|GCTI_HOST_NON_SCS_REQ_DISCONNECTED|Non SCS requester '%s' has disconnected from the socket %lu.
+; The message is output by a LCA when non SCS client, which connected through SCS interface, disconnects from the LCA.
+; %s  - name of a disconnected application
+; %lu - the identifier of the socket used for communication with the application.
+
+8008|STANDARD|GCTI_HOST_NTP_SERVICE_UNAVAILABLE|NTP service is unavailable on the host '%s'.
+; The message is output by a SCS when NTP service becomes unavailable on some host controlled.
+; %s  - name of host
+
+8009|STANDARD|GCTI_HOST_NTP_SERVICE_AVAILABLE|NTP service is available on the host '%s'.
+; The message is output by a SCS when NTP service becomes available on some host controlled.
+; %s  - name of host
+
+; #########################################################
+; Security 8100..8199
+; #########################################################
+
+
+8100|STANDARD|GCTI_SECURITY_CERTIFICATE_EXPIRED|Certificate is expired, type '%s', date '%s', issuer '%s', subject '%s'
+; Produced by application when expired certificate is detected
+; %s - type of the certificate, local or peer
+; %s - date of expiration
+; %s - issuer of the certificate
+; %s - subject of the certificate
+
+8101|STANDARD|GCTI_SECURITY_CERTIFCATE_ERROR|Certificate is not valid - '%s'
+; Produced by application when certificate is invalid
+; %s - additional information about the problem
+
+8102|STANDARD|GCTI_SECURITY_ERROR|Secure connection error, '%s'
+; Produced by application in case of error in secure channel
+; %s - additional information, i.e. error code or error description
+
+8103|TRACE|GCTI_SECURITY_ESTABLISHED|Secure connection is established. type '%s', info '%s', issuer '%s', subject '%s'
+; Produced by application when connection to the server established through secure channel
+; %s - type of conneciton 'server' for inbound connection, 'client' for outbound connection
+; %s - connection information, local and remote address
+; %s - issuer of the certificate
+; %s - subject of the certificate
+
+; #########################################################
+; RESERVED 8500..8599
+; #########################################################
+; 8500..8599 IDs range is reserver for use by gts_core library
+; DON'T use IDs from this range!
+
+; #########################################################
+; Future reserve 8600..
+; #########################################################
+; 8600.. IDs range is FREE now but possibly will be used by gts_core library in future
+; Should not be used without solid reason!
+
+; ##############################################################
+; DEBUG MESSAGES. Id started from 9000.
+; ##############################################################
+
+; Network(protocol)-related debug messages. ====================
+
+9000|DEBUG|GCTI_NET_NEW_CONNECTION|New connection established with '%s'
+
+9001|DEBUG|GCTI_NET_COMMAND|Command received '%s' from '%s'
+
+9002|DEBUG|GCTI_NET_DATA|Data sent '%s' to '%s'
+
+9003|DEBUG|GCTI_NET_TRANS|Transition '%s' done for '%s'
+
+9004|DEBUG|GCTI_NET_BUF|Data buffer received '%s' from '%s'
+
+9005|DEBUG|GCTI_NET_CONNECTION_CLOSE|Connection closed with '%s'
+
+; ##############################################################
+; Log events extensions (logmsg.ext) Reserved region  9500-9599
+; ##############################################################
+
+9500|STANDARD|GCTI_STUCK_CALLS_DETECTED|Stuck calls detected
+9501|STANDARD|GCTI_STUCK_CALLS_NOT_DETECTED|Stuck calls not detected
+
+; ##############################################################
+; Custom log events (logmsg.ext). Reserved region  9600-9799
+; Reserverd for customer use.
+; ##############################################################
+ 
+
+; ##############################################################
+; DEBUG MESSAGES continued from 9801
+; ##############################################################
+
+9900|DEBUG|GCTI_DEBUG|%s
+
+; Internal errors ==============================================
+
+9999|STANDARD|GCTI_INTERNAL|Internal error '%s' occurred
+
+; ##############################################################
+; End
+; ##############################################################

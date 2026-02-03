@@ -1,0 +1,30 @@
+server:
+    port: 8080
+    servlet:
+        session:
+            timeout: 30
+    ssl:
+        enabled: false
+        key-store: "/app/Gen_Web_API/cert/star_hmc_co_kr.jks"
+        key-store-password: "w853kx7q"
+        key-store-type: "JKS"
+      
+    boardinfo:
+      genesys_license: 555
+      uw_kt: 210
+      uw_toll: 60
+      uw_lg: 60
+      yd_kt: 90   
+
+---      
+spring:
+  profiles:
+    active: prod
+---
+spring:
+  profiles:
+    active: dev 
+---
+spring:
+  profiles:
+    active: stg 

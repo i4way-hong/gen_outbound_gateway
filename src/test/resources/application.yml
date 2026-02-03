@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:genoutbound-test;MODE=MSSQLServer;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+
+app:
+  security:
+    admin-username: test
+    admin-password: test
+    auth-enabled: true
+    jwt:
+      issuer: test-issuer
+      secret: test-jwt-secret-should-be-at-least-32-bytes
+      access-token-minutes: 15
+      refresh-token-days: 7
+    encryption:
+      enabled: false
+  genesys:
+    enabled: false
+  outbound:
+    enabled: false

@@ -1,0 +1,82 @@
+spring:
+  application:
+    name: gen-outbound-gateway
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:prod}
+  datasource:
+    url: ${DB_URL:}
+    username: "${DB_USERNAME:}"
+    password: "${DB_PASSWORD:}"
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+  thymeleaf:
+    cache: false
+
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui
+    operations-sorter: alpha
+    tags-sorter: alpha
+
+app:
+  security:
+    admin-username: ${ADMIN_USERNAME:}
+    admin-password: "${ADMIN_PASSWORD:}"
+    auth-enabled: ${AUTH_ENABLED:true}
+    jwt-enabled: ${JWT_ENABLED:true}
+    jwt:
+      issuer: ${JWT_ISSUER:gen-outbound-gateway}
+      secret: ${JWT_SECRET:}
+      access-token-minutes: ${JWT_ACCESS_TOKEN_MINUTES:15}
+      refresh-token-days: ${JWT_REFRESH_TOKEN_DAYS:7}
+    encryption:
+      enabled: ${CCC_SERVICE_ENC_ENABLED:}
+      key: "${CCC_SERVICE_ENC_KEY:}"
+      iv: "${CCC_SERVICE_ENC_IV:}"
+  outbound:
+    enabled: true
+    uri: ${OUTBOUND_URI:tcp://172.168.30.2:7001}
+    client-name: ${OUTBOUND_CLIENT_NAME:default}
+    client-password: "${OUTBOUND_CLIENT_PASSWORD:}"
+    app-name: ${OUTBOUND_APP_NAME:ocserver}
+    app-password: "${OUTBOUND_APP_PASSWORD:}"
+  genesys:
+    enabled: true
+    primary:
+      endpoint: ${GENESYS_CFG_ENDPOINT_P:Cfg_EP_P}
+      ip: ${GENESYS_CFG_IP_P:172.168.30.2}
+      port: ${GENESYS_CFG_PORT_P:2020}
+    backup:
+      endpoint: ${GENESYS_CFG_ENDPOINT_B:Cfg_EP_B}
+      ip: ${GENESYS_CFG_IP_B:172.168.30.2}
+      port: ${GENESYS_CFG_PORT_B:2020}
+    client-name: ${GENESYS_CFG_CLIENT_NAME_B:default}
+    username: ${GENESYS_CFG_USERNAME:}
+    password: "${GENESYS_CFG_PASSWORD:}"
+    tenant-dbid: ${GENESYS_TENANT_DBID:101}
+    switch-dbid-primary: ${GENESYS_SWITCH_DBID_PRIMARY:101}
+    switch-dbid-secondary: ${GENESYS_SWITCH_DBID_SECONDARY:101}
+    charset: ${GENESYS_CHARSET:MS949}
+  addp-enabled: ${GENESYS_CFG_ADDP_ENABLED:true}
+  addp-client-timeout: ${GENESYS_CFG_ADDP_CLIENT_TIMEOUT:5}
+  addp-server-timeout: ${GENESYS_CFG_ADDP_SERVER_TIMEOUT:5}
+  health-check-interval-ms: ${GENESYS_CFG_HEALTH_CHECK_INTERVAL_MS:30000}
+ 

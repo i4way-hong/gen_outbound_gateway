@@ -1,0 +1,86 @@
+    server:
+        port: 8080
+        servlet:
+            session:
+                timeout: 30
+        ssl:
+            enabled: false
+            key-store: "/app/Gen_Web_API/cert/star_hmc_co_kr.jks"
+            key-store-password: "w853kx7q"
+            key-store-type: "JKS"
+
+    ccc-service:
+      enc-iv: 1234567890123456
+      enc-key: 12345678901234567890123456789012
+      #Yes : Encrypt On, No : Encrypt Off
+      #enc-yn: 'Yes'
+      enc-yn: 'No'
+
+      
+            
+    genesysinfo:
+      cfg_ip_p: hctipapp01.hmc.co.kr
+      cfg_ip_b: hctipapp02.hmc.co.kr
+      cfg_port_p: 2020
+      cfg_port_b: 2020
+      cfg_endpoint_p: Cfg_EP_P 
+      cfg_endpoint_b: Cfg_EP_B
+      cfg_client_name: default
+      cfg_tenant_dbid: 1
+      cfg_switch_dbid: 101
+      cfg_switch_dbid2: 102
+      cfg_id: ctiadm
+      cfg_passwd: ENC(0NvQrV/XiOyxCB+n6xL97JmMw1/kQlUc)
+      cfg_charset: MS949
+      oc_ip_p: hctipapp01.hmc.co.kr
+      oc_port_p: 7001
+      oc_id: ctiadm
+      oc_passwd: ENC(0NvQrV/XiOyxCB+n6xL97JmMw1/kQlUc)
+      oc_client_id: 
+      oc_client_passwd: 
+      oc_charset: MS949
+      stat_ip_p: hctipapp01.hmc.co.kr
+      stat_port_p: 2034
+      stat_ip_b: hctipapp02.hmc.co.kr
+      stat_port_b: 2034
+      stat_charset: MS949
+      stat_endpoint1: Stat_EP_P
+      stat_endpoint2: Stat_EP_B
+      stat_clientname: i4way_service_stat
+      stat_tenant: Environment
+      stat_tenantdbid: 1
+      stat_switch: Switch_SIP
+      stat_frequency: 1
+      stat_lastrefid: 679
+      stat_delay: 100
+      stat-timeout: 2000
+      sc_ip_p: hctipapp01.hmc.co.kr
+      sc_ip_b: hctipapp02.hmc.co.kr
+      sc_port_p: 2024
+      sc_port_b: 2024
+      sc_endpoint_p: Sc_EP_P
+      sc_endpoint_b: Sc_EP_B
+      sc_client_name: i4way_service_sc
+      sc_id: ctiadm 
+      sc_tenant_dbid: 1
+      sc_client_dbid: 108
+      sc_charset: MS949
+      sc_monitoring_dbids: 99,109,110,111,167,168,172,174,161,162,121,122,123,124      
+      t_ip_p: 10.10.61.54
+      t_ip_b: 10.10.61.55
+      t_port_p: 3000
+      t_port_b: 3000
+      t_endpoint_p: T_EP_P
+      t_endpoint_b: T_EP_B
+      t_client_name: i4way_service_sip
+      t_tenant_dbid: 1
+      t_charset: MS949
+      
+
+    jasypt:
+      encryptor:
+        bean: jasyptStringEncryptor
+        property:
+          prefix: ENC(
+          suffix: )                
+#Password Encript Test Site : https://www.devglan.com/online-tools/jasypt-online-encryption-decryption             

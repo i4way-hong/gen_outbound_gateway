@@ -1,0 +1,726 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--
+   ===============================================================================
+     Any authorized distribution of any copy of this code (including any related 
+     documentation) must reproduce the following restrictions, disclaimer and copyright 
+     notice:
+
+     The Genesys name, trademarks and/or logo(s) of Genesys shall not be used to name 
+     (even as a part of another name), endorse and/or promote products derived from 
+     this code without prior written permission from Genesys Telecommunications 
+     Laboratories, Inc. 
+
+     The use, copy, and/or distribution of this code is subject to the terms of the Genesys 
+     Developer License Agreement.  This code shall not be used, copied, and/or 
+     distributed under any other license agreement.    
+
+     THIS CODE IS PROVIDED BY GENESYS TELECOMMUNICATIONS LABORATORIES, INC. 
+     ("GENESYS") "AS IS" WITHOUT ANY WARRANTY OF ANY KIND. GENESYS HEREBY 
+     DISCLAIMS ALL EXPRESS, IMPLIED, OR STATUTORY CONDITIONS, REPRESENTATIONS AND 
+     WARRANTIES WITH RESPECT TO THIS CODE (OR ANY PART THEREOF), INCLUDING, BUT 
+     NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
+     PARTICULAR PURPOSE OR NON-INFRINGEMENT. GENESYS AND ITS SUPPLIERS SHALL 
+     NOT BE LIABLE FOR ANY DAMAGE SUFFERED AS A RESULT OF USING THIS CODE. IN NO 
+     EVENT SHALL GENESYS AND ITS SUPPLIERS BE LIABLE FOR ANY DIRECT, INDIRECT, 
+     CONSEQUENTIAL, ECONOMIC, INCIDENTAL, OR SPECIAL DAMAGES (INCLUDING, BUT 
+     NOT LIMITED TO, ANY LOST REVENUES OR PROFITS).
+
+     Copyright (c) 2006 - 2019 Genesys Telecommunications Laboratories, Inc. All rights reserved.
+   ===============================================================================
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+
+   <organization>
+      <name>Genesys Telecommunication Laboratories, Inc.</name>
+      <url>http://www.genesys.com</url>
+   </organization>
+   <name>PSDK :: Jackson Module</name>
+   <artifactId>jackson2-module</artifactId>
+   <packaging>jar</packaging>
+
+   <parent>
+      <groupId>com.genesyslab.platform</groupId>
+      <artifactId>appblocks-bom</artifactId>
+      <version>900.10.6</version>
+      <relativePath>../../pom.xml</relativePath>
+   </parent>
+
+   <properties>
+      <automatic.module.name>com.genesyslab.platform.json.jackson2impl</automatic.module.name>
+
+      <manifest.file/>
+      <manifest.implementation.title>com.genesyslab.platform.json.jackson2</manifest.implementation.title>
+      <manifest.component.path>com/genesyslab/platform/json/jackson2</manifest.component.path>
+
+      <version.xml.maven.plugin>1.0</version.xml.maven.plugin>
+
+      <testESP.xsl>${basedir}/testESP.xsl</testESP.xsl>
+      <jackson.xsl>${basedir}/jackson.xsl</jackson.xsl>
+      <jackson.output>${basedir}/target</jackson.output>
+      <gen.folder>${basedir}/src/generated</gen.folder>
+      <test.gen.folder>${basedir}/src/test/generated</test.gen.folder>
+      <xml.path>${basedir}/../../../psdk_xml</xml.path>
+
+      <classes.for.unit.test>${project.build.outputDirectory}</classes.for.unit.test>
+
+      <jackson.version>2.12.1</jackson.version>
+      <jackson.annotations.version>2.12.1</jackson.annotations.version>
+      <jackson.databind.version>2.12.1</jackson.databind.version>
+   </properties>
+
+   <dependencies>
+        <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>generator</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>configurationprotocol</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>webmediaprotocol</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>contactsprotocol</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>voiceprotocol</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>outboundprotocol</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>managementprotocol</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>routingprotocol</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.genesyslab.platform</groupId>
+            <artifactId>reportingprotocol</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.annotations.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.databind.version}</version>
+        </dependency>
+
+        <dependency>
+           <groupId>org.testng</groupId>
+           <artifactId>testng</artifactId>
+           <version>${version.testng}</version>
+           <scope>test</scope>
+        </dependency>
+        <dependency>
+           <groupId>junit</groupId>
+           <artifactId>junit</artifactId>
+           <version>${version.junit}</version>
+           <scope>test</scope>
+        </dependency>
+   </dependencies>
+
+   <build>
+    <finalName>${project.artifactId}</finalName>
+    <plugins>
+         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>xml-maven-plugin</artifactId>
+            <version>${version.xml.maven.plugin}</version>
+            <executions>
+               <execution>
+                  <id>generate-sources-modules-esp-message</id>
+                  <phase>generate-sources</phase>
+                  <goals>
+                     <goal>transform</goal>
+                  </goals>
+                    <configuration>
+                       <transformationSets>
+                          <transformationSet>
+                             <dir>${xml.path}</dir>
+                             <stylesheet>${jackson.xsl}</stylesheet>
+                             <includes>
+                                <inclide>**/ContactServerNew.xml</inclide>
+                                <inclide>**/ESPEmailNew.xml</inclide>
+                             </includes>
+                             <outputDir>${jackson.output}</outputDir>
+                             <parameters>
+                                <parameter>
+                                   <name>testGenFolder</name>
+                                   <value>${test.gen.folder}</value>
+                                </parameter>
+                                <parameter>
+                                   <name>genFolder</name>
+                                   <value>${gen.folder}</value>
+                                </parameter>
+                                 <parameter>
+                                     <name>message</name>
+                                     <value>1</value>
+                                 </parameter>
+                             </parameters>
+                          </transformationSet>
+                       </transformationSets>
+                    </configuration>
+               </execution>
+
+                <execution>
+                    <id>generate-sources-modules-esp-data</id>
+                    <phase>generate-sources</phase>
+                    <goals>
+                        <goal>transform</goal>
+                    </goals>
+                    <configuration>
+                        <transformationSets>
+                            <transformationSet>
+                                <dir>${xml.path}</dir>
+                                <stylesheet>${jackson.xsl}</stylesheet>
+                                <includes>
+                                    <inclide>**/OpenMediaAttributesNew.xml</inclide>
+                                    <inclide>**/OutboundDesktopNew.xml</inclide>
+                                    <inclide>**/PreviewInteractionsNew.xml</inclide>
+                                </includes>
+                                <outputDir>${jackson.output}</outputDir>
+                                <parameters>
+                                    <parameter>
+                                        <name>testGenFolder</name>
+                                        <value>${test.gen.folder}</value>
+                                    </parameter>
+                                    <parameter>
+                                        <name>genFolder</name>
+                                        <value>${gen.folder}</value>
+                                    </parameter>
+                                </parameters>
+                            </transformationSet>
+                        </transformationSets>
+                    </configuration>
+                </execution>
+
+                <execution>
+                  <id>generate-sources-modules-2nd-group</id>
+                  <phase>generate-sources</phase>
+                  <goals>
+                     <goal>transform</goal>
+                  </goals>
+                    <configuration>
+                       <transformationSets>
+                          <transformationSet>
+                             <dir>${xml.path}</dir>
+                             <stylesheet>${jackson.xsl}</stylesheet>
+                             <includes>
+                                <inclide>**/OutboundServerProtocol.xml</inclide>
+                                <inclide>**/ExternalServiceProtocol.xml</inclide>
+                                <inclide>**/InteractionServerProtocol.xml</inclide>
+                                <inclide>**/MessageServerProtocol.xml</inclide>
+                                <inclide>**/SolutionControlServerProtocol.xml</inclide>
+                                <inclide>**/TServerProtocol.xml</inclide>
+
+                                <inclide>**/URSCustomProtocol.xml</inclide>
+
+                                <inclide>**/RoutingProtocol.xml</inclide>
+                                <inclide>**/RTMEStatistics.xml</inclide>
+                                <inclide>**/BasicChatProtocol.xml</inclide>
+                                <inclide>**/CallbackProtocol.xml</inclide>
+                                <inclide>**/EmailProtocol.xml</inclide>
+                                <inclide>**/FlexChatProtocol.xml</inclide>
+
+                                <inclide>**/LocalControlAgentProtocol.xml</inclide>
+
+                             </includes>
+                             <outputDir>${jackson.output}</outputDir>
+                             <parameters>
+                                <parameter>
+                                   <name>testGenFolder</name>
+                                   <value>${test.gen.folder}</value>
+                                </parameter>
+                                <parameter>
+                                   <name>genFolder</name>
+                                   <value>${gen.folder}</value>
+                                </parameter>
+                                <parameter>
+                                   <name>staticFactory</name>
+                                   <value>true</value>
+                                </parameter>
+                                 <parameter>
+                                     <name>message</name>
+                                     <value>1</value>
+                                 </parameter>
+                             </parameters>
+                          </transformationSet>
+                       </transformationSets>
+                    </configuration>
+               </execution>
+
+               <execution>
+                  <id>generate-sources-configserver-module</id>
+                  <phase>generate-sources</phase>
+                  <goals>
+                     <goal>transform</goal>
+                  </goals>
+                    <configuration>
+                       <transformationSets>
+                          <transformationSet>
+                             <dir>${xml.path}</dir>
+                             <stylesheet>${jackson.xsl}</stylesheet>
+                             <includes>
+                                <include>ConfServerProtocolsXml/Src/ConfServerProtocol.Java.xml</include>
+                             </includes>
+                             <outputDir>${jackson.output}</outputDir>
+                             <parameters>
+                                <parameter>
+                                   <name>genFolder</name>
+                                   <value>${gen.folder}</value>
+                                </parameter>
+                                <parameter>
+                                   <name>testGenFolder</name>
+                                   <value>${test.gen.folder}</value>
+                                </parameter>
+                                <parameter>
+                                   <name>staticFactory</name>
+                                   <value>true</value>
+                                </parameter>
+                                <parameter>
+                                   <name>extFile</name>
+                                   <value>file:/${xml.path}/ConfServerProtocolsXml/Src/ConfServerEnum.xml</value>
+                                </parameter>
+                                <parameter>
+                                   <name>customBaseClass</name>
+                                   <value>CustomConfServerModule</value>
+                                </parameter>
+                                <parameter>
+                                   <name>extArgType</name>
+                                   <value>com.genesyslab.platform.configuration.protocol.metadata.CfgMetadata</value>
+                                </parameter>
+                                <parameter>
+                                   <name>extArgName</name>
+                                   <value>metadata</value>
+                                </parameter>
+                                <parameter>
+                                   <name>extArgDesc</name>
+                                   <value>defines a version which will be used to deserialize ConfServer protocol messages from JSON.
+     *      If it's null then the latest metadata, that PSDK contains, will be used.</value>
+                                </parameter>
+                                <parameter>
+                                   <name>defaultConstructorDesc</name>
+                                   <value>Creates ConfServerModule instance using the latest metadata that PSDK contains.</value>
+                                </parameter>
+                                <parameter>
+                                   <name>extConstructorDesc</name>
+                                   <value>Creates ConfServerModule instance using a specified metadata version.
+     * &lt;p&gt;Example. How to get a config server's metadata.
+     * &lt;pre&gt;
+     *      ConfServerProtocol c = new ConfServerProtocol(endpoint);
+     *      c.open();
+     *      CfgMetaData metadata = ((ConfServerContext)c.connectionContext().serverContext()).getMetadata();
+     *      ConfServerModule module = new ConfServerModule(metadata);
+     *      ObjectMapper mapper = new ObjectMapper();
+     *      mapper.registerModule(module);
+     * &lt;/pre&gt;
+                                   </value>
+                                </parameter>
+                                 <parameter>
+                                     <name>message</name>
+                                     <value>1</value>
+                                 </parameter>
+                             </parameters>
+                          </transformationSet>
+                       </transformationSets>
+                    </configuration>
+               </execution>
+            </executions>
+            <dependencies>
+               <dependency>
+                  <groupId>net.sf.saxon</groupId>
+                  <artifactId>saxon</artifactId>
+                  <version>8.7</version>
+               </dependency>
+            </dependencies>
+         </plugin>
+
+         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+               <execution>
+                  <phase>process-sources</phase>
+                  <goals>
+                     <goal>add-source</goal>
+                  </goals>
+                  <configuration>
+                     <sources>
+                        <source>${basedir}/src/generated</source>
+                     </sources>
+                  </configuration>
+               </execution>
+               <execution>
+                  <id>add-test-source</id>
+                  <phase>generate-test-sources</phase>
+                  <goals>
+                     <goal>add-test-source</goal>
+                  </goals>
+                  <configuration>
+                     <sources>
+                        <source>${basedir}/src/test/generated</source>
+                     </sources>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+         </plugin>
+
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+               <classesDirectory>${classes.for.unit.test}</classesDirectory>
+               <suiteXmlFiles>
+                  <suiteXmlFile>${basedir}/testng.xml</suiteXmlFile>
+               </suiteXmlFiles>
+            </configuration>
+         </plugin>
+
+         <!-- Create jar -->
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <executions>
+               <execution>
+                  <id>default-jar</id>
+                  <configuration>
+                     <archive>
+                        <manifestFile>${manifest.file}</manifestFile>
+                        <manifestEntries>
+                           <Implementation-Title>${manifest.implementation.title}</Implementation-Title>
+                           <Implementation-Version>${GENESYS.PROJECT.VERSION}</Implementation-Version>
+                           <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
+                           <Specification-Title>${project.name}</Specification-Title>
+                           <Specification-Version>${GENESYS.PROJECT.VERSION}</Specification-Version>
+                           <Specification-Vendor>${project.organization.name}</Specification-Vendor>
+                           <Comments>${BUILDTYPE}-${env.COMPUTERNAME}-${maven.build.timestamp}</Comments>
+                        </manifestEntries>
+                        <manifestSections>
+                           <manifestSection>
+                              <name>${manifest.component.path}</name>
+                           </manifestSection>
+                        </manifestSections>
+                     </archive>
+                     <includes>
+                        <include>com/**</include>
+                        <include>META-INF/*.*</include>
+                        <include>META-INF/maven/**</include>
+                        <include>META-INF/versions/11/module-info.class</include>
+                     </includes>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+    </build>
+
+    <profiles>
+      <profile>
+         <id>java8-automodule</id>
+         <activation>
+            <jdk>[1.8,11)</jdk>
+         </activation>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-compiler-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>default-compile</id>
+                        <configuration>
+                           <jdkToolchain>
+                              <version>1.8</version>
+                           </jdkToolchain>
+                           <source>8</source>
+                           <target>8</target>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-jar-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>default-jar</id>
+                        <configuration>
+                           <archive>
+                              <manifestEntries>
+                                 <Automatic-Module-Name>${automatic.module.name}</Automatic-Module-Name>
+                              </manifestEntries>
+                           </archive>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+
+      <profile>
+         <id>java11-module</id>
+         <activation>
+            <jdk>[11,)</jdk>
+         </activation>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.codehaus.mojo</groupId>
+                  <artifactId>build-helper-maven-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>add-module-info</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                           <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                           <sources>
+                              <source>${basedir}/src/main/module</source>
+                           </sources>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-compiler-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>default-compile</id>
+                        <configuration>
+                           <jdkToolchain>
+                              <version>1.8</version>
+                           </jdkToolchain>
+                           <source>1.8</source>
+                           <target>1.8</target>
+                           <excludes>
+                              <exclude>module-info.java</exclude>
+                           </excludes>
+                        </configuration>
+                     </execution>
+                     <execution>
+                        <id>compile-module</id>
+                        <goals>
+                           <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                           <jdkToolchain>
+                              <version>[11,)</version>
+                           </jdkToolchain>
+                           <source>11</source>
+                           <target>11</target>
+                           <!-- compile everything to ensure module-info contains right entries -->
+                           <multiReleaseOutput>true</multiReleaseOutput>
+                           <release>11</release>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-jar-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>default-jar</id>
+                        <configuration>
+                           <archive>
+                              <manifestEntries>
+                                 <Multi-Release>true</Multi-Release>
+                              </manifestEntries>
+                           </archive>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+               <plugin>
+                  <groupId>org.codehaus.mojo</groupId>
+                  <artifactId>exec-maven-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <id>setup-java-module-version</id>
+                        <phase>package</phase>
+                        <goals>
+                           <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                           <executable>jar</executable>
+                           <commandlineArgs>--verbose --update --file ${project.build.directory}/${project.artifactId}.jar --module-version ${GENESYS.PROJECT.VERSION} --release 11</commandlineArgs>
+                           <workingDirectory>${basedir}</workingDirectory>
+                        </configuration>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+
+      <profile>
+         <id>resultpath-copy</id>
+         <build>
+            <plugins>
+               <plugin>
+                  <artifactId>maven-antrun-plugin</artifactId>
+                  <executions>
+                     <execution>
+                        <phase>install</phase>
+                        <configuration>
+                           <tasks>
+                              <echo>genesys.resultpath:${genesys.resultpath}</echo>
+                              <echo>project.build.directory:${project.build.directory}</echo>
+                              <echo>settings.localRepository:${settings.localRepository}</echo>
+                              <copy todir="${genesys.resultpath}/release">
+                                 <fileset dir="${project.build.directory}">
+                                    <include name="${project.artifactId}.jar"/>
+                                 </fileset>
+                              </copy>
+                              <copy flatten="true" todir="${genesys.resultpath}/release/maven/${project.artifactId}">
+                                 <fileset dir="${settings.localRepository}/com/genesyslab/platform/${project.artifactId}">
+                                    <include name="**/${project.artifactId}-${project.version}.jar"/>
+                                    <include name="**/${project.artifactId}-${project.version}-sources.jar"/>
+                                    <include name="**/${project.artifactId}-${project.version}.pom"/>
+                                 </fileset>
+                              </copy>
+                           </tasks>
+                        </configuration>
+                        <goals>
+                           <goal>run</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+      <profile>
+         <id>add-src</id>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-source-plugin</artifactId>
+                  <version>2.1.2</version>
+                  <executions>
+                     <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                           <goal>jar-no-fork</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+      <profile>
+         <id>osgi</id>
+         <properties>
+            <manifest.file>${project.basedir}/target/classes/META-INF/MANIFEST.MF</manifest.file>
+         </properties>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.apache.felix</groupId>
+                  <artifactId>maven-bundle-plugin</artifactId>
+                  <extensions>true</extensions>
+                  <executions>
+                     <execution>
+                        <id>bundle-manifest</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                           <goal>manifest</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+                  <configuration>
+                     <instructions>
+                        <Bundle-Name>Platform SDK Jackson JSON Module</Bundle-Name>
+                        <Import-Package>
+                           com.genesyslab.platform.commons;version="[${@},${@}]",
+                           com.genesyslab.platform.commons.*;version="[${@},${@}]",
+                           com.genesyslab.platform.configuration.protocol;version="[${@},${@}]",
+                           com.genesyslab.platform.configuration.protocol.*;version="[${@},${@}]",
+                           com.genesyslab.platform.contacts.protocol;version="[${@},${@}]";resolution:=optional,
+                           com.genesyslab.platform.contacts.protocol.*;version="[${@},${@}]";resolution:=optional,
+                           com.genesyslab.platform.management.protocol;version="[${@},${@}]";resolution:=optional,
+                           com.genesyslab.platform.management.protocol.*;version="[${@},${@}]";resolution:=optional,
+                           com.genesyslab.platform.openmedia.protocol;version="[${@},${@}]";resolution:=optional,
+                           com.genesyslab.platform.openmedia.protocol.*;version="[${@},${@}]";resolution:=optional,
+                           com.genesyslab.platform.outbound.protocol;version="[${@},${@}]";resolution:=optional,
+                           com.genesyslab.platform.outbound.protocol.*;version="[${@},${@}]";resolution:=optional,
+                           com.genesyslab.platform.routing.protocol;version="[${@},${@}]";resolution:=optional,
+                           com.genesyslab.platform.routing.protocol.*;version="[${@},${@}]";resolution:=optional,
+                           com.genesyslab.platform.reporting.protocol;version="[${@},${@}]";resolution:=optional,
+                           com.genesyslab.platform.reporting.protocol.*;version="[${@},${@}]";resolution:=optional,
+                           com.genesyslab.platform.voice.protocol;version="[${@},${@}]";resolution:=optional,
+                           com.genesyslab.platform.voice.protocol.*;version="[${@},${@}]";resolution:=optional,
+                           com.genesyslab.platform.webmedia.protocol;version="[${@},${@}]";resolution:=optional,
+                           com.genesyslab.platform.webmedia.protocol.*;version="[${@},${@}]";resolution:=optional,
+                           com.genesyslab.platform.webmedia.protocol.espemail;version="[${@},${@}]";resolution:=optional,
+                           com.genesyslab.platform.webmedia.protocol.espemail.*;version="[${@},${@}]";resolution:=optional,
+                           * 
+                        </Import-Package>
+                        <Export-Package>
+                           com.genesyslab.platform.json.jackson2;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.json.jackson2.basicchat;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.json.jackson2.callback;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.json.jackson2.confserver;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.json.jackson2.contactserver;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.json.jackson2.customserver;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.json.jackson2.email;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.json.jackson2.espemail;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.json.jackson2.externalservice;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.json.jackson2.flexchat;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.json.jackson2.interactionserver;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.json.jackson2.localcontrolagent;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.json.jackson2.messageserver;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.json.jackson2.openmediaattributes;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.json.jackson2.outbounddesktop;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.json.jackson2.outboundserver;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.json.jackson2.previewinteraction;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.json.jackson2.routingserver;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.json.jackson2.solutioncontrolserver;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.json.jackson2.statserver;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.json.jackson2.tserver;version=${project.version};-noimport:=true,
+                           com.genesyslab.platform.json.serializer;version=${project.version};-noimport:=true
+                        </Export-Package>
+                     </instructions>
+                  </configuration>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+   </profiles>
+</project>
