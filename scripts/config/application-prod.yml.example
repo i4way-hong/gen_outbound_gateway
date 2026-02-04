@@ -1,0 +1,55 @@
+# production profile sample (secrets should NOT be committed)
+# 실제 운영 값은 config/application-prod.yml에 저장하고 .gitignore로 제외하세요.
+
+spring:
+  datasource:
+    url: jdbc:sqlserver://<DB_HOST>:1433;databaseName=<DB_NAME>;encrypt=true;trustServerCertificate=true
+    username: <DB_USERNAME>
+    password: <DB_PASSWORD>
+
+server:
+  port: 8080
+
+app:
+  security:
+    admin-username: <ADMIN_USERNAME>
+    admin-password: <ADMIN_PASSWORD>
+    auth-enabled: true
+    jwt-enabled: true
+    jwt:
+      issuer: gen-outbound-gateway
+      secret: <JWT_SECRET>
+      access-token-minutes: 15
+      refresh-token-days: 7
+    encryption:
+      enabled: false
+      key: <CCC_SERVICE_ENC_KEY>
+      iv: <CCC_SERVICE_ENC_IV>
+  outbound:
+    enabled: true
+    uri: tcp://<OUTBOUND_HOST>:7001
+    client-name: default
+    client-password: <OUTBOUND_CLIENT_PASSWORD>
+    app-name: ocserver
+    app-password: <OUTBOUND_APP_PASSWORD>
+  genesys:
+    enabled: true
+    primary:
+      endpoint: Cfg_EP_P
+      ip: <GENESYS_CFG_IP_P>
+      port: 2020
+    backup:
+      endpoint: Cfg_EP_B
+      ip: <GENESYS_CFG_IP_B>
+      port: 2020
+    client-name: default
+    username: <GENESYS_CFG_USERNAME>
+    password: <GENESYS_CFG_PASSWORD>
+    tenant-dbid: 101
+    switch-dbid-primary: 101
+    switch-dbid-secondary: 101
+    charset: MS949
+  addp-enabled: true
+  addp-client-timeout: 5
+  addp-server-timeout: 5
+  health-check-interval-ms: 30000

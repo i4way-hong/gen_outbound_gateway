@@ -16,8 +16,30 @@ Genesys Engage OCS와 외부 시스템을 연결하는 Outbound Gateway 프로�
 - PowerShell: `scripts/run-app.ps1`
 - CMD: `scripts/run-app.cmd`
 
+### JAR 실행 스크립트 (운영용)
+- PowerShell: `scripts/run-jar.ps1`
+- CMD: `scripts/run-jar.cmd`
+- Linux: `scripts/run-jar.sh`
+
+JAR 이름은 `outbound.jar`이며, 실행 스크립트와 같은 폴더에 두는 것을 기본으로 합니다.
+`config` 폴더도 스크립트와 같은 폴더에 두면 자동으로 읽습니다.
+필요 시 `JAR_PATH` 환경변수로 경로를 지정할 수 있습니다.
+
 두 스크립트 모두 기본 환경변수를 내장하고 있어 별도 설정 없이 실행할 수 있습니다. 외부에서 값을 지정하면 해당 값을 우선합니다.
 한글 출력이 깨지면 스크립트를 UTF-8 BOM으로 저장하고 콘솔 코드페이지를 65001로 맞춰주세요.
+
+### 운영 보안 분리 안내
+- 운영 환경용 설정은 `config/application-prod.yml` 또는 `config/.env.prod`에 분리해 관리하세요.
+- 예시는 `config/application-prod.yml.example`, `config/.env.prod.example`에 있습니다.
+- `config/application-prod.yml`, `config/.env.prod`는 `.gitignore`에 포함되어 커밋되지 않습니다.
+
+### Genesys SDK 로컬/사설 저장소 설치
+빌드 전에 `lib/`의 Genesys SDK를 로컬 Maven 저장소에 설치해야 합니다. 설치 후에는 빌드 결과 JAR에 SDK가 포함되므로 런타임에 `lib/`를 별도로 배포하지 않아도 됩니다.
+
+- Windows: `scripts/install-genesys-sdk-local.ps1`
+- Linux: `scripts/install-genesys-sdk-local.sh`
+
+사설 저장소를 쓰는 경우, `settings.xml`에 서버/미러 설정을 추가한 뒤 `deploy` 방식으로 업로드하세요. (인증 정보는 리포지토리에 커밋하지 마세요.)
 
 ### 주요 환경 변수
 #### DB
@@ -116,7 +138,7 @@ Genesys Engage OCS와 외부 시스템을 연결하는 Outbound Gateway 프로�
 > `/events`는 `messageType`, `userEventId`, `limit` 파라미터로 필터링할 수 있습니다.
 
 ## 메모
-- Genesys Platform SDK JAR은 `lib/` 경로에 있으며 `genesys-sdk` 프로파일로 연결됩니다.
+- Genesys SDK는 로컬/사설 Maven 저장소에 설치한 뒤 `genesys-sdk` 프로파일로 참조합니다.
 - 보안/권한은 추후 RBAC 설계에 맞춰 확장하세요.
 
 ## DB 사용자 인증

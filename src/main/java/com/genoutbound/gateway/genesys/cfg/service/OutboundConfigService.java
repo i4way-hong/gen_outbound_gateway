@@ -163,7 +163,9 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 CfgFilter filter = new CfgFilter(service);
                 filter.setTenantDBID(resolvedTenant);
                 filter.setName(request.name());
-                filter.setDescription(request.description());
+                if (request.description() != null) {
+                    filter.setDescription(request.description());
+                }
                 if (request.formatDbid() != null) {
                     filter.setFormatDBID(request.formatDbid());
                 }
@@ -194,7 +196,9 @@ public class OutboundConfigService extends GenesysConfigSupport {
                     throw new ApiException(HttpStatus.NOT_FOUND, "Filter를 찾을 수 없습니다.");
                 }
                 filter.setName(request.name());
-                filter.setDescription(request.description());
+                if (request.description() != null) {
+                    filter.setDescription(request.description());
+                }
                 if (request.userProperties() != null && !request.userProperties().isEmpty()) {
                     filter.setUserProperties(toUserProperties(request.userProperties()));
                 }
@@ -349,7 +353,9 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 CfgCallingList callingList = new CfgCallingList(service);
                 callingList.setTenantDBID(resolvedTenant);
                 callingList.setName(request.name());
-                callingList.setDescription(request.description());
+                if (request.description() != null) {
+                    callingList.setDescription(request.description());
+                }
                 if (request.filterDbid() != null) {
                     callingList.setFilterDBID(request.filterDbid());
                 }
@@ -401,7 +407,9 @@ public class OutboundConfigService extends GenesysConfigSupport {
                     throw new ApiException(HttpStatus.NOT_FOUND, "콜링리스트를 찾을 수 없습니다.");
                 }
                 callingList.setName(request.name());
-                callingList.setDescription(request.description());
+                if (request.description() != null) {
+                    callingList.setDescription(request.description());
+                }
                 if (request.filterDbid() != null) {
                     callingList.setFilterDBID(request.filterDbid());
                 }

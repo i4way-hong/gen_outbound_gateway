@@ -18,3 +18,9 @@ Thumbs.db
 # Logs
 logs/
 *.log
+
+# Local secrets
+/config/application-prod.yml
+/config/.env
+/config/.env.prod
+/config/.env.local
