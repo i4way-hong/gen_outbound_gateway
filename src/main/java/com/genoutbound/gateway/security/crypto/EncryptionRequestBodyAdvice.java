@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.genoutbound.gateway.config.EncryptionProperties;
 import com.genoutbound.gateway.core.ApiException;
 import com.genoutbound.gateway.genesys.cfg.web.ConfigurationApiController;
+import com.genoutbound.gateway.web.annotation.CccEncryptedController;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -58,7 +59,9 @@ public class EncryptionRequestBodyAdvice extends RequestBodyAdviceAdapter {
 
     private boolean isConfigurationApiController(MethodParameter parameter) {
         return AnnotatedElementUtils.hasAnnotation(parameter.getContainingClass(),
-            ConfigurationApiController.class);
+            ConfigurationApiController.class)
+            || AnnotatedElementUtils.hasAnnotation(parameter.getContainingClass(),
+            CccEncryptedController.class);
     }
 
     private static class ResettableHttpInputMessage implements HttpInputMessage {

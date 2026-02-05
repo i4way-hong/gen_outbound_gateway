@@ -2,6 +2,7 @@ package com.genoutbound.gateway.security.crypto;
 
 import com.genoutbound.gateway.config.EncryptionProperties;
 import com.genoutbound.gateway.genesys.cfg.web.ConfigurationApiController;
+import com.genoutbound.gateway.web.annotation.CccEncryptedController;
 import java.util.Map;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.MethodParameter;
@@ -27,7 +28,9 @@ public class EncryptionResponseBodyAdvice implements ResponseBodyAdvice<Object> 
             return false;
         }
         return AnnotatedElementUtils.hasAnnotation(returnType.getContainingClass(),
-            ConfigurationApiController.class);
+            ConfigurationApiController.class)
+            || AnnotatedElementUtils.hasAnnotation(returnType.getContainingClass(),
+            CccEncryptedController.class);
     }
 
     @Override

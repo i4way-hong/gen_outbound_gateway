@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 @Tag(name = "Outbound Desktop API", description = "Outbound Desktop 메시지 POC")
 @SecurityRequirement(name = "bearerAuth")
-@RestController
+//@RestController
 @RequestMapping("/api/v1/outbound/desktop")
 public class OutboundDesktopController {
 

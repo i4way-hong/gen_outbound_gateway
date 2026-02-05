@@ -150,7 +150,7 @@ public class TsvrCtrl {
 	public void unregister(String dn) {
 		Message response;
 		RequestUnregisterAddress request = RequestUnregisterAddress.create(dn,
-				ControlMode.RegisterDefault);
+				ControlMode.RegisterDefault, AddressType.DN);
 		try {
 			response = protocol.request(request);
 			logger.info("Received: \n" + response.toString());

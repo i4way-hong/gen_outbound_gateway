@@ -13,6 +13,9 @@ import com.genoutbound.gateway.genesys.cfg.config.GenesysProperties;
 import com.genoutbound.gateway.core.ApiException;
 import com.genoutbound.gateway.genesys.common.GenesysUnavailableException;
 import jakarta.annotation.PreDestroy;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -258,5 +261,82 @@ public class GenesysConfigClient {
         int result = properties.getSwitchDbidSecondary();
         log.debug("getSecondarySwitchDbid 응답: {}", result);
         return result;
+    }
+
+    /**
+     * Config Server 연결 상태를 반환합니다.
+     */
+    public Map<String, Object> getConnectionStatus() {
+        Map<String, Object> status = new LinkedHashMap<>();
+        status.put("enabled", properties.isEnabled());
+        status.put("endpoints", buildEndpoints());
+        status.put("connectionPool", buildPoolStatus(false, "singleton"));
+        status.put("info", buildInfo());
+
+        if (!properties.isEnabled()) {
+            status.put("connected", false);
+            status.put("state", "disabled");
+            return status;
+        }
+
+        boolean connected = false;
+        String state = "UNKNOWN";
+        String error = null;
+
+        synchronized (connectionLock) {
+            try {
+                ensureConnected();
+                connected = protocol != null && protocol.getState() == ChannelState.Opened;
+                state = protocol == null ? "NULL" : protocol.getState().name();
+            } catch (Exception ex) {
+                connected = false;
+                state = "ERROR";
+                error = ex.getMessage();
+            }
+        }
+
+        status.put("connected", connected);
+        status.put("state", state);
+        status.put("connectionPool", buildPoolStatus(connected, "singleton"));
+        if (error != null) {
+            status.put("error", error);
+        }
+        return status;
+    }
+
+    private Map<String, Object> buildPoolStatus(boolean connected, String mode) {
+        Map<String, Object> pool = new LinkedHashMap<>();
+        pool.put("mode", mode);
+        pool.put("max", 1);
+        pool.put("active", connected ? 1 : 0);
+        pool.put("idle", 0);
+        return pool;
+    }
+
+    private List<Map<String, Object>> buildEndpoints() {
+        return List.of(
+            buildEndpoint("primary", properties.getPrimary()),
+            buildEndpoint("backup", properties.getBackup())
+        );
+    }
+
+    private Map<String, Object> buildEndpoint(String role, GenesysProperties.ConfigServer server) {
+        Map<String, Object> info = new LinkedHashMap<>();
+        info.put("role", role);
+        if (server == null) {
+            return info;
+        }
+        info.put("endpoint", server.getEndpoint());
+        info.put("ip", server.getIp());
+        info.put("port", server.getPort());
+        return info;
+    }
+
+    private Map<String, Object> buildInfo() {
+        Map<String, Object> info = new LinkedHashMap<>();
+        info.put("clientName", properties.getClientName());
+        info.put("addpEnabled", properties.isAddpEnabled());
+        info.put("charset", properties.getCharset());
+        return info;
     }
 }

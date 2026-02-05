@@ -17,7 +17,8 @@ public class OpenApiConfig {
         "/api/v1/configuration/persons",
         "/api/v1/configuration/place-groups",
         "/api/v1/configuration/places",
-        "/api/v1/configuration/transactions"
+        "/api/v1/configuration/transactions",
+        "/api/v1/outbound/desktop"
     );
 
     @Bean
