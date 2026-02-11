@@ -3,6 +3,7 @@ package com.genoutbound.gateway.security.crypto;
 import com.genoutbound.gateway.config.EncryptionProperties;
 import com.genoutbound.gateway.genesys.cfg.web.ConfigurationApiController;
 import com.genoutbound.gateway.web.annotation.CccEncryptedController;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.MethodParameter;
@@ -17,9 +18,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 public class EncryptionResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 
     private final EncryptionProperties properties;
+    private final ObjectMapper objectMapper;
 
-    public EncryptionResponseBodyAdvice(EncryptionProperties properties) {
+    public EncryptionResponseBodyAdvice(EncryptionProperties properties, ObjectMapper objectMapper) {
         this.properties = properties;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -41,7 +44,7 @@ public class EncryptionResponseBodyAdvice implements ResponseBodyAdvice<Object> 
             return body;
         }
         try {
-            String json = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(body);
+            String json = objectMapper.writeValueAsString(body);
             String encrypted = Aes256.encrypt(json, properties.getKey(), properties.getIv());
             return Map.of("encData", encrypted);
         } catch (Exception ex) {

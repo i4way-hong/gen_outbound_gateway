@@ -7,6 +7,9 @@ chcp 65001 >nul
 
 if "%SPRING_PROFILES_ACTIVE%"=="" set SPRING_PROFILES_ACTIVE=prod
 
+if "%LOGBACK_CONFIG_PATH%"=="" set LOGBACK_CONFIG_PATH=./scripts/config/logback-spring.xml
+if "%LOG_DIR%"=="" set LOG_DIR=./logs
+
 if "%DB_URL%"=="" set DB_URL=jdbc:sqlserver://172.168.30.61:1433;databaseName=RND_TEST;encrypt=true;trustServerCertificate=true
 if "%DB_USERNAME%"=="" set DB_USERNAME=RND_USER
 if "%DB_PASSWORD%"=="" set DB_PASSWORD=RND_USER
@@ -14,12 +17,12 @@ if "%DB_PASSWORD%"=="" set DB_PASSWORD=RND_USER
 if "%ADMIN_USERNAME%"=="" set ADMIN_USERNAME=admin
 if "%ADMIN_PASSWORD%"=="" set ADMIN_PASSWORD=admin123
 
-if "%JWT_ENABLED%"=="" set JWT_ENABLED=false
+if "%JWT_ENABLED%"=="" set JWT_ENABLED=true
 
 if "%GENESYS_CFG_USERNAME%"=="" set GENESYS_CFG_USERNAME=default
 if "%GENESYS_CFG_PASSWORD%"=="" set GENESYS_CFG_PASSWORD=password
 
-if "%CCC_SERVICE_ENC_ENABLED%"=="" set CCC_SERVICE_ENC_ENABLED=false
+if "%CCC_SERVICE_ENC_ENABLED%"=="" set CCC_SERVICE_ENC_ENABLED=true
 if "%CCC_SERVICE_ENC_KEY%"=="" set CCC_SERVICE_ENC_KEY=12345678901234567890123456789012
 if "%CCC_SERVICE_ENC_IV%"=="" set CCC_SERVICE_ENC_IV=1234567890123456
 

@@ -5,6 +5,8 @@ import com.genoutbound.gateway.genesys.outbound.dto.OutboundCommandRequest;
 import com.genoutbound.gateway.genesys.outbound.dto.OutboundDialRequest;
 import com.genoutbound.gateway.genesys.outbound.dto.OutboundStatusResponse;
 import com.genoutbound.gateway.genesys.outbound.service.OutboundService;
+import com.genoutbound.gateway.web.annotation.CccEncryptedController;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -74,6 +76,7 @@ import org.springframework.web.bind.annotation.RestController;
             })
     )
 })
+@CccEncryptedController
 @RestController
 @RequestMapping("/api/v1/outbound")
 public class OutboundController {
@@ -95,7 +98,7 @@ public class OutboundController {
     @Operation(summary = "캠페인 로드", description = "Outbound 캠페인을 로드합니다.")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "application/json",
         examples = @ExampleObject(name = "campaign-command",
-            value = "{\"campaignDbid\":7001,\"groupDbid\":6001}")))
+            value = "{\"campaignDbid\":104,\"groupDbid\":129}")))
     /**
      * 캠페인을 로드합니다.
      */
@@ -112,7 +115,7 @@ public class OutboundController {
     @Operation(summary = "캠페인 언로드", description = "Outbound 캠페인을 언로드합니다.")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "application/json",
         examples = @ExampleObject(name = "campaign-command",
-            value = "{\"campaignDbid\":7001,\"groupDbid\":6001}")))
+            value = "{\"campaignDbid\":104,\"groupDbid\":129}")))
     /**
      * 캠페인을 언로드합니다.
      */
@@ -129,7 +132,7 @@ public class OutboundController {
     @Operation(summary = "캠페인 강제 언로드", description = "Outbound 캠페인을 강제 언로드합니다.")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "application/json",
         examples = @ExampleObject(name = "campaign-command",
-            value = "{\"campaignDbid\":7001,\"groupDbid\":6001}")))
+            value = "{\"campaignDbid\":104,\"groupDbid\":129}")))
     /**
      * 캠페인을 강제로 언로드합니다.
      */
@@ -146,7 +149,7 @@ public class OutboundController {
     @Operation(summary = "다이얼 시작", description = "Outbound 다이얼링을 시작합니다.")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "application/json",
         examples = @ExampleObject(name = "dial-request",
-            value = "{\"campaignDbid\":7001,\"groupDbid\":6001,\"dialMode\":\"Predictive\",\"optimizeMethod\":\"Availability\",\"optimizeGoal\":0}")))
+            value = "{\"campaignDbid\":104,\"groupDbid\":129,\"dialMode\":\"predict\",\"optimizeMethod\":\"busyfactor\",\"optimizeGoal\":80}")))
     /**
      * 다이얼링을 시작합니다.
      */
@@ -163,7 +166,7 @@ public class OutboundController {
     @Operation(summary = "다이얼 중지", description = "Outbound 다이얼링을 중지합니다.")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "application/json",
         examples = @ExampleObject(name = "campaign-command",
-            value = "{\"campaignDbid\":7001,\"groupDbid\":6001}")))
+            value = "{\"campaignDbid\":104,\"groupDbid\":129}")))
     /**
      * 다이얼링을 중지합니다.
      */
@@ -180,7 +183,7 @@ public class OutboundController {
     @Operation(summary = "캠페인 상태 조회", description = "Outbound 캠페인 상태를 조회합니다.")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "application/json",
         examples = @ExampleObject(name = "campaign-command",
-            value = "{\"campaignDbid\":7001,\"groupDbid\":6001}")))
+            value = "{\"campaignDbid\":104,\"groupDbid\":129}")))
     /**
      * 캠페인 상태를 조회합니다.
      */

@@ -43,6 +43,10 @@ import com.genoutbound.gateway.genesys.cfg.dto.OutboundBatchCreateResponse;
 import com.genoutbound.gateway.genesys.cfg.dto.OutboundBatchCreateSummary;
 import com.genoutbound.gateway.genesys.cfg.dto.ServerSummary;
 import com.genoutbound.gateway.genesys.cfg.dto.TableAccessSummary;
+import com.genoutbound.gateway.genesys.cfg.dto.TreatmentSummary;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -527,6 +531,70 @@ public class OutboundConfigService extends GenesysConfigSupport {
             }
         });
         log.debug("listTableAccess 응답: count={}", result == null ? 0 : result.size());
+        return result;
+    }
+
+
+    public TreatmentSummary getTreatmentByName(String name, Integer tenantDbid) {
+        log.debug("getTableTreatmentByName 요청: name={}, tenantDbid={}", name, tenantDbid);
+        int resolvedTenant = resolveTenantDbid(tenantDbid);
+        TreatmentSummary result = configClient.withConfService(service -> {
+            try {
+                CfgTreatmentQuery query = new CfgTreatmentQuery();
+                query.setTenantDbid(resolvedTenant);
+                query.setName(name);
+                CfgTreatment treatment = service.retrieveObject(CfgTreatment.class, query);
+                if (treatment == null) {
+                    throw new ApiException(HttpStatus.NOT_FOUND, "Treatment을 찾을 수 없습니다.");
+                }
+                return toTreatmentSummary(treatment);
+            } catch (ConfigException ex) {
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Treatment 조회 실패");
+            }
+        });
+        log.debug("getTableTreatmentByName 응답: {}", result);
+        return result;
+    }
+
+    public TreatmentSummary getTreatment(int treatmentDbid, Integer tenantDbid) {
+        log.debug("getTreatment 요청: treatmentDbid={}, tenantDbid={}", treatmentDbid, tenantDbid);
+        int resolvedTenant = resolveTenantDbid(tenantDbid);
+        TreatmentSummary result = configClient.withConfService(service -> {
+            try {
+                CfgTreatmentQuery query = new CfgTreatmentQuery();
+                query.setTenantDbid(resolvedTenant);
+                query.setDbid(treatmentDbid);
+                CfgTreatment treatment = service.retrieveObject(CfgTreatment.class, query);
+                if (treatment == null) {
+                    throw new ApiException(HttpStatus.NOT_FOUND, "Treatment을 찾을 수 없습니다.");
+                }
+                return toTreatmentSummary(treatment);
+            } catch (ConfigException ex) {
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Treatment 조회 실패");
+            }
+        });
+        log.debug("getTreatment 응답: {}", result);
+        return result;
+    }
+
+    public List<TreatmentSummary> listTreatment(Integer tenantDbid) {
+        log.debug("listTreatment 요청: tenantDbid={}", tenantDbid);
+        int resolvedTenant = resolveTenantDbid(tenantDbid);
+        List<TreatmentSummary> result = configClient.withConfService(service -> {
+            try {
+                CfgTreatmentQuery query = new CfgTreatmentQuery();
+                query.setTenantDbid(resolvedTenant);
+                Collection<CfgTreatment> treatments = service.retrieveMultipleObjects(CfgTreatment.class, query);
+                List<TreatmentSummary> summaries = new ArrayList<>();
+                for (CfgTreatment treatment : safeCollection(treatments)) {
+                    summaries.add(toTreatmentSummary(treatment));
+                }
+                return summaries;
+            } catch (ConfigException | InterruptedException ex) {
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Treatment 목록 조회 실패");
+            }
+        });
+        log.debug("listtreatment 응답: count={}", result == null ? 0 : result.size());
         return result;
     }
 
@@ -1021,6 +1089,38 @@ public class OutboundConfigService extends GenesysConfigSupport {
             state,
             toMap(tableAccess.getUserProperties())
         );
+    }
+
+
+    private TreatmentSummary toTreatmentSummary(CfgTreatment treatment) {
+        String callResult = treatment.getCallResult() == null ? null : treatment.getCallResult().name();
+        String recActionCode = treatment.getRecActionCode() == null ? null : treatment.getRecActionCode().name();
+        String callActionCode = treatment.getCallActionCode() == null ? null : treatment.getCallActionCode().name();
+        String state = treatment.getState() == null ? null : treatment.getState().name();
+        return new TreatmentSummary(
+            treatment.getDBID(),
+            treatment.getName(),
+            treatment.getTenantDBID(),
+            treatment.getDescription(),
+            callResult,
+            recActionCode,
+            treatment.getAttempts(),
+            toIsoString(treatment.getDateTime()),
+            treatment.getCycleAttempt(),
+            treatment.getInterval(),
+            treatment.getIncrement(),
+            callActionCode,
+            treatment.getDestDNDBID(),
+            state,
+            toMap(treatment.getUserProperties())
+        );
+    }
+
+    private String toIsoString(Calendar calendar) {
+        if (calendar == null) {
+            return null;
+        }
+        return OffsetDateTime.ofInstant(calendar.toInstant(), ZoneId.systemDefault()).toString();
     }
 
     private FilterSummary toFilterSummary(CfgFilter filter) {

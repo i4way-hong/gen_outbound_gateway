@@ -1,6 +1,7 @@
 package com.genoutbound.gateway.security.crypto;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.genoutbound.gateway.config.EncryptionProperties;
 import com.genoutbound.gateway.core.ApiException;
 import com.genoutbound.gateway.genesys.cfg.web.ConfigurationApiController;
@@ -22,9 +23,11 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdviceAd
 public class EncryptionRequestBodyAdvice extends RequestBodyAdviceAdapter {
 
     private final EncryptionProperties properties;
+    private final ObjectMapper objectMapper;
 
-    public EncryptionRequestBodyAdvice(EncryptionProperties properties) {
+    public EncryptionRequestBodyAdvice(EncryptionProperties properties, ObjectMapper objectMapper) {
         this.properties = properties;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -45,7 +48,7 @@ public class EncryptionRequestBodyAdvice extends RequestBodyAdviceAdapter {
         if (rawBody == null || rawBody.isBlank()) {
             return inputMessage;
         }
-        JsonNode node = new com.fasterxml.jackson.databind.ObjectMapper().readTree(rawBody);
+        JsonNode node = objectMapper.readTree(rawBody);
         if (node != null && node.has("encData")) {
             String encData = node.path("encData").asText();
             if (encData == null || encData.isBlank()) {
@@ -54,7 +57,7 @@ public class EncryptionRequestBodyAdvice extends RequestBodyAdviceAdapter {
             String decrypted = Aes256.decrypt(encData, properties.getKey(), properties.getIv());
             return new ResettableHttpInputMessage(inputMessage.getHeaders(), decrypted);
         }
-        return new ResettableHttpInputMessage(inputMessage.getHeaders(), rawBody);
+        throw new ApiException(HttpStatus.BAD_REQUEST, "암호화가 활성화되어 있어 encData 요청만 허용됩니다.");
     }
 
     private boolean isConfigurationApiController(MethodParameter parameter) {

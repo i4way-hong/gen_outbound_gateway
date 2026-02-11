@@ -15,6 +15,14 @@ if (-not $env:SPRING_PROFILES_ACTIVE) {
     $env:SPRING_PROFILES_ACTIVE = "prod"
 }
 
+if (-not $env:LOGBACK_CONFIG_PATH) {
+    $env:LOGBACK_CONFIG_PATH = "./scripts/config/logback-spring.xml"
+}
+
+if (-not $env:LOG_DIR) {
+    $env:LOG_DIR = "./logs"
+}
+
 if (-not $env:SPRING_CONFIG_ADDITIONAL_LOCATION) {
     $configDir = Join-Path $baseDir "config"
     if (Test-Path $configDir) {

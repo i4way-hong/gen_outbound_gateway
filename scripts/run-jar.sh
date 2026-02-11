@@ -8,6 +8,9 @@ PARENT_LIB_DIR="${BASE_DIR}/../lib"
 
 export SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
 
+export LOGBACK_CONFIG_PATH=${LOGBACK_CONFIG_PATH:-./scripts/config/logback-spring.xml}
+export LOG_DIR=${LOG_DIR:-./logs}
+
 if [[ -z "${SPRING_CONFIG_ADDITIONAL_LOCATION:-}" && -d "${BASE_DIR}/config" ]]; then
   export SPRING_CONFIG_ADDITIONAL_LOCATION="${BASE_DIR}/config/"
 fi

@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.genoutbound.gateway.genesys.common.GenesysUnavailableException;
@@ -23,6 +25,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleGenesysUnavailable(GenesysUnavailableException ex) {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
+    public ResponseEntity<ApiResponse<Void>> handleValidation(Exception ex) {
+        String message = "요청값이 올바르지 않습니다.";
+        if (ex instanceof MethodArgumentNotValidException manve
+                && manve.getBindingResult().getFieldError() != null) {
+            message = manve.getBindingResult().getFieldError().getDefaultMessage();
+        }
+        if (ex instanceof BindException be && be.getBindingResult().getFieldError() != null) {
+            message = be.getBindingResult().getFieldError().getDefaultMessage();
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(message));
     }
 
     @ExceptionHandler(Exception.class)

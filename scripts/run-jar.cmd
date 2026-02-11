@@ -13,6 +13,9 @@ set "LOADER_PATH="
 
 if "%SPRING_PROFILES_ACTIVE%"=="" set SPRING_PROFILES_ACTIVE=prod
 
+if "!LOGBACK_CONFIG_PATH!"=="" set "LOGBACK_CONFIG_PATH=./scripts/config/logback-spring.xml"
+if "!LOG_DIR!"=="" set "LOG_DIR=./logs"
+
 if "!SPRING_CONFIG_ADDITIONAL_LOCATION!"=="" (
   if exist "!BASE_DIR!\config" set "SPRING_CONFIG_ADDITIONAL_LOCATION=!BASE_DIR!\config\"
 )

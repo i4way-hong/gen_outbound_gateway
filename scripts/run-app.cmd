@@ -7,6 +7,9 @@ chcp 65001 >nul
 
 if "%SPRING_PROFILES_ACTIVE%"=="" set SPRING_PROFILES_ACTIVE=prod
 
+if "%LOGBACK_CONFIG_PATH%"=="" set LOGBACK_CONFIG_PATH=./scripts/config/logback-spring.xml
+if "%LOG_DIR%"=="" set LOG_DIR=./logs
+
 if "%DB_URL%"=="" set DB_URL=jdbc:sqlserver://172.168.30.61:1433;databaseName=RND_TEST;encrypt=true;trustServerCertificate=true
 if "%DB_USERNAME%"=="" set DB_USERNAME=RND_USER
 if "%DB_PASSWORD%"=="" set DB_PASSWORD=RND_USER

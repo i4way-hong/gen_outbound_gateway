@@ -42,8 +42,8 @@ public class SecurityConfig {
             return http.build();
         }
 
-        http.authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/css/**", "/js/**", "/images/**", "/actuator/health", "/swagger-ui/**", "/v3/api-docs/**", "/auth/**")
+    http.authorizeHttpRequests(auth -> auth
+            .requestMatchers("/", "/css/**", "/js/**", "/images/**", "/actuator/health", "/swagger-ui/**", "/v3/api-docs/**", "/auth/**", "/api/v1/crypto/**")
                         .permitAll()
                         .requestMatchers("/admin/**")
                         .hasRole("ADMIN")

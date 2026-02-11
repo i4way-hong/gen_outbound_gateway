@@ -11,6 +11,14 @@ if (-not $env:SPRING_PROFILES_ACTIVE) {
     $env:SPRING_PROFILES_ACTIVE = "prod"
 }
 
+if (-not $env:LOGBACK_CONFIG_PATH) {
+    $env:LOGBACK_CONFIG_PATH = "./scripts/config/logback-spring.xml"
+}
+
+if (-not $env:LOG_DIR) {
+    $env:LOG_DIR = "./logs"
+}
+
 $env:DB_URL = "jdbc:sqlserver://172.168.30.61:1433;databaseName=RND_TEST;encrypt=true;trustServerCertificate=true"
 $env:DB_USERNAME = "RND_USER"
 $env:DB_PASSWORD = "RND_USER"

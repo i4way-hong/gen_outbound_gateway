@@ -151,9 +151,9 @@ public class TServerClient {
     public Map<String, Object> getConnectionStatus() {
         Map<String, Object> status = new LinkedHashMap<>();
         status.put("enabled", properties.isEnabled());
-        status.put("endpoints", List.of(buildEndpoint("primary")));
+        //status.put("endpoints", List.of(buildEndpoint("primary")));
         status.put("connectionPool", buildPoolStatus(false, "per-request"));
-        status.put("info", buildInfo());
+        //status.put("info", buildInfo());
 
         if (!properties.isEnabled()) {
             status.put("connected", false);

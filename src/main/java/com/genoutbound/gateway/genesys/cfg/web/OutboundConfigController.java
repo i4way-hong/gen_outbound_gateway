@@ -13,6 +13,7 @@ import com.genoutbound.gateway.genesys.cfg.dto.FormatSummary;
 import com.genoutbound.gateway.genesys.cfg.dto.OutboundBatchCreateRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.OutboundBatchCreateResponse;
 import com.genoutbound.gateway.genesys.cfg.dto.TableAccessSummary;
+import com.genoutbound.gateway.genesys.cfg.dto.TreatmentSummary;
 import com.genoutbound.gateway.genesys.cfg.service.OutboundConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -405,6 +406,46 @@ public class OutboundConfigController {
         ApiResponse<TableAccessSummary> response = ApiResponse.ok("TableAccess 조회",
             outboundService.getTableAccessByName(name, tenantDbid));
         log.debug("getTableAccessByName 응답: {}", response);
+        return response;
+    }
+
+    @GetMapping("/treatment")
+    @Operation(summary = "treatment 목록", description = "treatment 목록을 조회합니다.")
+    public ApiResponse<List<TreatmentSummary>> listtreatment(
+        @Parameter(description = "테넌트 DBID", example = "101")
+        @RequestParam(required = false) Integer tenantDbid) {
+        log.debug("treatment 요청: tenantDbid={}", tenantDbid);
+        ApiResponse<List<TreatmentSummary>> response = ApiResponse.ok("treatment 목록",
+            outboundService.listTreatment(tenantDbid));
+        log.debug("listtreatment 응답: count={}", response.data() == null ? 0 : response.data().size());
+        return response;
+    }
+
+    @GetMapping("/treatment/{treatmentDbid}")
+    @Operation(summary = "Treatment 조회", description = "Treatment를 DBID로 조회합니다.")
+    public ApiResponse<TreatmentSummary> getTreatment(
+        @Parameter(description = "Treatment DBID", example = "13001")
+        @PathVariable int treatmentDbid,
+        @Parameter(description = "테넌트 DBID", example = "101")
+        @RequestParam(required = false) Integer tenantDbid) {
+        log.debug("getTreatment 요청: treatmentDbid={}, tenantDbid={}", treatmentDbid, tenantDbid);
+        ApiResponse<TreatmentSummary> response = ApiResponse.ok("Treatment 조회",
+            outboundService.getTreatment(treatmentDbid, tenantDbid));
+        log.debug("getTreatment 응답: {}", response);
+        return response;
+    }
+
+    @GetMapping("/treatment/by-name")
+    @Operation(summary = "Treatment 조회(이름)", description = "Treatment를 이름으로 조회합니다.")
+    public ApiResponse<TreatmentSummary> getTreatmentByName(
+        @Parameter(description = "Treatment 이름", example = "TREATMENT_A")
+        @RequestParam String name,
+        @Parameter(description = "테넌트 DBID", example = "101")
+        @RequestParam(required = false) Integer tenantDbid) {
+        log.debug("getTreatmentByName 요청: name={}, tenantDbid={}", name, tenantDbid);
+        ApiResponse<TreatmentSummary> response = ApiResponse.ok("Treatment 조회",
+            outboundService.getTreatmentByName(name, tenantDbid));
+        log.debug("getTreatmentByName 응답: {}", response);
         return response;
     }
 

@@ -36,6 +36,11 @@ springdoc:
     operations-sorter: alpha
     tags-sorter: alpha
 
+logging:
+  config: ${LOGBACK_CONFIG_PATH:file:./scripts/config/logback-spring.xml}
+  level:
+    root: INFO
+
 app:
   security:
     admin-username: ${ADMIN_USERNAME:}
@@ -48,7 +53,7 @@ app:
       access-token-minutes: ${JWT_ACCESS_TOKEN_MINUTES:15}
       refresh-token-days: ${JWT_REFRESH_TOKEN_DAYS:7}
     encryption:
-      enabled: ${CCC_SERVICE_ENC_ENABLED:}
+      enabled: ${CCC_SERVICE_ENC_ENABLED:true}
       key: "${CCC_SERVICE_ENC_KEY:}"
       iv: "${CCC_SERVICE_ENC_IV:}"
   outbound:
