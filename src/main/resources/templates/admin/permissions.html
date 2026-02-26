@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>권한 관리</title>
+    <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+<div class="container wide">
+    <div class="page-header">
+        <div>
+            <h1>권한 관리</h1>
+            <p class="subtitle">API 접근 권한 코드를 조회합니다. (읽기 전용)</p>
+        </div>
+    </div>
+
+    <nav class="admin-nav">
+        <a href="/admin/users">사용자</a>
+        <a href="/admin/roles">역할</a>
+        <a class="active" href="/admin/permissions">권한</a>
+        <a href="/">홈</a>
+        <a href="/admin/logout">로그아웃</a>
+    </nav>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>코드</th>
+            <th>설명</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${#lists.isEmpty(permissions)}">
+            <td colspan="3" class="empty">등록된 권한이 없습니다.</td>
+        </tr>
+        <tr th:each="perm : ${permissions}">
+            <td th:text="${perm.id}"></td>
+            <td th:text="${perm.code}"></td>
+            <td th:text="${perm.description}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

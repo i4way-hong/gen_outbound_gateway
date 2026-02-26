@@ -151,13 +151,20 @@ public class TServerClient {
     public Map<String, Object> getConnectionStatus() {
         Map<String, Object> status = new LinkedHashMap<>();
         status.put("enabled", properties.isEnabled());
-        //status.put("endpoints", List.of(buildEndpoint("primary")));
+        status.put("endpoints", buildEndpoints());
         status.put("connectionPool", buildPoolStatus(false, "per-request"));
-        //status.put("info", buildInfo());
+    status.put("info", buildInfo());
 
         if (!properties.isEnabled()) {
             status.put("connected", false);
             status.put("state", "disabled");
+            return status;
+        }
+
+        if (!isValidPrimary() && !isValidBackup()) {
+            status.put("connected", false);
+            status.put("state", "unconfigured");
+            status.put("error", "T-Server 접속 설정이 필요합니다.");
             return status;
         }
 
@@ -199,31 +206,77 @@ public class TServerClient {
     }
 
     private TServerProtocol openProtocol() {
+        if (!isValidPrimary() && !isValidBackup()) {
+            throw new GenesysUnavailableException("T-Server 접속 설정이 필요합니다.");
+        }
+        PropertyConfiguration config = buildConfig();
+        try {
+            return openProtocol(buildEndpoint("primary", config), "primary");
+        } catch (GenesysUnavailableException primaryError) {
+            if (!isValidBackup()) {
+                throw primaryError;
+            }
+            log.warn("Primary T-Server 연결 실패. Backup으로 재시도합니다.", primaryError);
+            return openProtocol(buildEndpoint("backup", config), "backup");
+        }
+    }
+
+    private TServerProtocol openProtocol(Endpoint endpoint, String role) {
+        TServerProtocol protocol = new TServerProtocol(endpoint);
+        protocol.setClientName(properties.getClientName());
+        try {
+            protocol.open();
+            log.info("T-Server 연결 성공({}): {}:{}", role, endpoint.getHost(), endpoint.getPort());
+            return protocol;
+        } catch (ProtocolException | IllegalStateException | InterruptedException ex) {
+            throw new GenesysUnavailableException("T-Server 연결 실패(" + role + ")", ex);
+        }
+    }
+
+    private PropertyConfiguration buildConfig() {
         PropertyConfiguration config = new PropertyConfiguration();
         config.setUseAddp(properties.isAddpEnabled());
         config.setAddpClientTimeout(properties.getAddpClientTimeout());
         config.setAddpServerTimeout(properties.getAddpServerTimeout());
         config.setOption(Connection.STR_ATTR_ENCODING_NAME_KEY, properties.getCharset());
-
-        Endpoint endpoint = new Endpoint(properties.getEndpoint(), properties.getIp(), properties.getPort(), config);
-        TServerProtocol protocol = new TServerProtocol(endpoint);
-        protocol.setClientName(properties.getClientName());
-        try {
-            protocol.open();
-            log.info("T-Server 연결 성공: {}:{}", properties.getIp(), properties.getPort());
-            return protocol;
-        } catch (ProtocolException | IllegalStateException | InterruptedException ex) {
-            throw new GenesysUnavailableException("T-Server 연결 실패", ex);
-        }
+        return config;
     }
 
-    private Map<String, Object> buildEndpoint(String role) {
-        Map<String, Object> endpoint = new LinkedHashMap<>();
-        endpoint.put("role", role);
-        endpoint.put("endpoint", properties.getEndpoint());
-        endpoint.put("ip", properties.getIp());
-        endpoint.put("port", properties.getPort());
-        return endpoint;
+    private Endpoint buildEndpoint(String role, PropertyConfiguration config) {
+        if ("backup".equals(role)) {
+            return new Endpoint(properties.getBackupEndpoint(), properties.getBackupIp(), properties.getBackupPort(), config);
+        }
+        return new Endpoint(properties.getEndpoint(), properties.getIp(), properties.getPort(), config);
+    }
+
+    private List<Map<String, Object>> buildEndpoints() {
+        List<Map<String, Object>> endpoints = new java.util.ArrayList<>();
+        endpoints.add(buildEndpointInfo("primary", properties.getEndpoint(), properties.getIp(), properties.getPort()));
+        if (properties.hasBackup()) {
+            endpoints.add(buildEndpointInfo("backup", properties.getBackupEndpoint(), properties.getBackupIp(), properties.getBackupPort()));
+        }
+        return endpoints;
+    }
+
+    private Map<String, Object> buildEndpointInfo(String role, String endpoint, String ip, int port) {
+        Map<String, Object> info = new LinkedHashMap<>();
+        info.put("role", role);
+        info.put("endpoint", endpoint);
+        info.put("ip", ip);
+        info.put("port", port);
+        return info;
+    }
+
+    private boolean isValidPrimary() {
+        return properties.getIp() != null
+            && !properties.getIp().isBlank()
+            && properties.getPort() > 0;
+    }
+
+    private boolean isValidBackup() {
+        return properties.getBackupIp() != null
+            && !properties.getBackupIp().isBlank()
+            && properties.getBackupPort() > 0;
     }
 
     private Map<String, Object> buildInfo() {

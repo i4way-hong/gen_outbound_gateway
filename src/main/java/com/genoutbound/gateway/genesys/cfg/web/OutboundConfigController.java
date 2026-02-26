@@ -51,7 +51,7 @@ public class OutboundConfigController {
     @GetMapping("/calling-lists")
     @Operation(summary = "콜링리스트 목록", description = "콜링리스트 목록을 조회합니다.")
     public ApiResponse<List<CallingListDetailSummary>> listCallingLists(
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("listCallingLists 요청: tenantDbid={}", tenantDbid);
         ApiResponse<List<CallingListDetailSummary>> response = ApiResponse.ok("콜링리스트 목록",
@@ -63,7 +63,7 @@ public class OutboundConfigController {
     @GetMapping("/filters")
     @Operation(summary = "Filter 목록", description = "Filter 목록을 조회합니다.")
     public ApiResponse<List<FilterSummary>> listFilters(
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("listFilters 요청: tenantDbid={}", tenantDbid);
         ApiResponse<List<FilterSummary>> response = ApiResponse.ok("Filter 목록", outboundService.listFilters(tenantDbid));
@@ -87,7 +87,7 @@ public class OutboundConfigController {
     public ApiResponse<FilterSummary> getFilter(
         @Parameter(description = "Filter DBID", example = "4001")
         @PathVariable int filterDbid,
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("getFilter 요청: filterDbid={}, tenantDbid={}", filterDbid, tenantDbid);
         ApiResponse<FilterSummary> response = ApiResponse.ok("Filter 조회", outboundService.getFilter(filterDbid, tenantDbid));
@@ -111,7 +111,7 @@ public class OutboundConfigController {
     public ApiResponse<FilterSummary> getFilterByName(
         @Parameter(description = "Filter 이름", example = "FILTER_A")
         @RequestParam String name,
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("getFilterByName 요청: name={}, tenantDbid={}", name, tenantDbid);
         ApiResponse<FilterSummary> response = ApiResponse.ok("Filter 조회", outboundService.getFilterByName(name, tenantDbid));
@@ -122,7 +122,7 @@ public class OutboundConfigController {
     @GetMapping("/formats")
     @Operation(summary = "Format 목록", description = "Format 목록을 조회합니다.")
     public ApiResponse<List<FormatSummary>> listFormats(
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("listFormats 요청: tenantDbid={}", tenantDbid);
         ApiResponse<List<FormatSummary>> response = ApiResponse.ok("Format 목록", outboundService.listFormats(tenantDbid));
@@ -135,7 +135,7 @@ public class OutboundConfigController {
     public ApiResponse<FormatSummary> getFormat(
         @Parameter(description = "Format DBID", example = "12001")
         @PathVariable int formatDbid,
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("getFormat 요청: formatDbid={}, tenantDbid={}", formatDbid, tenantDbid);
         ApiResponse<FormatSummary> response = ApiResponse.ok("Format 조회", outboundService.getFormat(formatDbid, tenantDbid));
@@ -148,7 +148,7 @@ public class OutboundConfigController {
     public ApiResponse<FormatSummary> getFormatByName(
         @Parameter(description = "Format 이름", example = "FORMAT_A")
         @RequestParam String name,
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("getFormatByName 요청: name={}, tenantDbid={}", name, tenantDbid);
         ApiResponse<FormatSummary> response = ApiResponse.ok("Format 조회", outboundService.getFormatByName(name, tenantDbid));
@@ -228,7 +228,7 @@ public class OutboundConfigController {
     public ApiResponse<Void> deleteFilter(
         @Parameter(description = "Filter DBID", example = "4001")
         @PathVariable int filterDbid,
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("deleteFilter 요청: filterDbid={}, tenantDbid={}", filterDbid, tenantDbid);
         outboundService.deleteFilter(filterDbid, tenantDbid);
@@ -253,7 +253,7 @@ public class OutboundConfigController {
     public ApiResponse<CallingListDetailSummary> getCallingList(
         @Parameter(description = "콜링리스트 DBID", example = "5001")
         @PathVariable int callingListDbid,
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("getCallingList 요청: callingListDbid={}, tenantDbid={}", callingListDbid, tenantDbid);
         ApiResponse<CallingListDetailSummary> response = ApiResponse.ok("콜링리스트 조회",
@@ -278,7 +278,7 @@ public class OutboundConfigController {
     public ApiResponse<CallingListDetailSummary> getCallingListByName(
         @Parameter(description = "콜링리스트 이름", example = "LIST_A")
         @RequestParam String name,
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("getCallingListByName 요청: name={}, tenantDbid={}", name, tenantDbid);
         ApiResponse<CallingListDetailSummary> response = ApiResponse.ok("콜링리스트 조회",
@@ -360,7 +360,7 @@ public class OutboundConfigController {
     public ApiResponse<Void> deleteCallingList(
         @Parameter(description = "콜링리스트 DBID", example = "5001")
         @PathVariable int callingListDbid,
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("deleteCallingList 요청: callingListDbid={}, tenantDbid={}", callingListDbid, tenantDbid);
         outboundService.deleteCallingList(callingListDbid, tenantDbid);
@@ -372,7 +372,7 @@ public class OutboundConfigController {
     @GetMapping("/table-access")
     @Operation(summary = "TableAccess 목록", description = "TableAccess 목록을 조회합니다.")
     public ApiResponse<List<TableAccessSummary>> listTableAccess(
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("listTableAccess 요청: tenantDbid={}", tenantDbid);
         ApiResponse<List<TableAccessSummary>> response = ApiResponse.ok("TableAccess 목록",
@@ -386,7 +386,7 @@ public class OutboundConfigController {
     public ApiResponse<TableAccessSummary> getTableAccess(
         @Parameter(description = "TableAccess DBID", example = "13001")
         @PathVariable int tableAccessDbid,
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("getTableAccess 요청: tableAccessDbid={}, tenantDbid={}", tableAccessDbid, tenantDbid);
         ApiResponse<TableAccessSummary> response = ApiResponse.ok("TableAccess 조회",
@@ -400,7 +400,7 @@ public class OutboundConfigController {
     public ApiResponse<TableAccessSummary> getTableAccessByName(
         @Parameter(description = "TableAccess 이름", example = "TABLE_A")
         @RequestParam String name,
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("getTableAccessByName 요청: name={}, tenantDbid={}", name, tenantDbid);
         ApiResponse<TableAccessSummary> response = ApiResponse.ok("TableAccess 조회",
@@ -412,7 +412,7 @@ public class OutboundConfigController {
     @GetMapping("/treatment")
     @Operation(summary = "treatment 목록", description = "treatment 목록을 조회합니다.")
     public ApiResponse<List<TreatmentSummary>> listtreatment(
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("treatment 요청: tenantDbid={}", tenantDbid);
         ApiResponse<List<TreatmentSummary>> response = ApiResponse.ok("treatment 목록",
@@ -426,7 +426,7 @@ public class OutboundConfigController {
     public ApiResponse<TreatmentSummary> getTreatment(
         @Parameter(description = "Treatment DBID", example = "13001")
         @PathVariable int treatmentDbid,
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("getTreatment 요청: treatmentDbid={}, tenantDbid={}", treatmentDbid, tenantDbid);
         ApiResponse<TreatmentSummary> response = ApiResponse.ok("Treatment 조회",
@@ -440,7 +440,7 @@ public class OutboundConfigController {
     public ApiResponse<TreatmentSummary> getTreatmentByName(
         @Parameter(description = "Treatment 이름", example = "TREATMENT_A")
         @RequestParam String name,
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("getTreatmentByName 요청: name={}, tenantDbid={}", name, tenantDbid);
         ApiResponse<TreatmentSummary> response = ApiResponse.ok("Treatment 조회",
@@ -452,7 +452,7 @@ public class OutboundConfigController {
     @GetMapping("/campaigns")
     @Operation(summary = "캠페인 목록", description = "캠페인 목록을 조회합니다.")
     public ApiResponse<List<CampaignSummary>> listCampaigns(
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("listCampaigns 요청: tenantDbid={}", tenantDbid);
         ApiResponse<List<CampaignSummary>> response = ApiResponse.ok("캠페인 목록", outboundService.listCampaigns(tenantDbid));
@@ -463,7 +463,7 @@ public class OutboundConfigController {
     @GetMapping("/campaign-groups")
     @Operation(summary = "CampaignGroup 목록", description = "캠페인 그룹 목록을 조회합니다.")
     public ApiResponse<List<CampaignGroupSummary>> listCampaignGroups(
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("listCampaignGroups 요청: tenantDbid={}", tenantDbid);
         ApiResponse<List<CampaignGroupSummary>> response = ApiResponse.ok("CampaignGroup 목록",
@@ -488,7 +488,7 @@ public class OutboundConfigController {
     public ApiResponse<CampaignGroupSummary> getCampaignGroup(
         @Parameter(description = "CampaignGroup DBID", example = "6001")
         @PathVariable int groupDbid,
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("getCampaignGroup 요청: groupDbid={}, tenantDbid={}", groupDbid, tenantDbid);
         ApiResponse<CampaignGroupSummary> response = ApiResponse.ok("CampaignGroup 조회",
@@ -513,7 +513,7 @@ public class OutboundConfigController {
     public ApiResponse<CampaignGroupSummary> getCampaignGroupByName(
         @Parameter(description = "CampaignGroup 이름", example = "GROUP_A")
         @RequestParam String name,
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("getCampaignGroupByName 요청: name={}, tenantDbid={}", name, tenantDbid);
         ApiResponse<CampaignGroupSummary> response = ApiResponse.ok("CampaignGroup 조회",
@@ -596,7 +596,7 @@ public class OutboundConfigController {
     public ApiResponse<Void> deleteCampaignGroup(
         @Parameter(description = "CampaignGroup DBID", example = "6001")
         @PathVariable int groupDbid,
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("deleteCampaignGroup 요청: groupDbid={}, tenantDbid={}", groupDbid, tenantDbid);
         outboundService.deleteCampaignGroup(groupDbid, tenantDbid);
@@ -621,7 +621,7 @@ public class OutboundConfigController {
     public ApiResponse<CampaignSummary> getCampaign(
         @Parameter(description = "캠페인 DBID", example = "7001")
         @PathVariable int campaignDbid,
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("getCampaign 요청: campaignDbid={}, tenantDbid={}", campaignDbid, tenantDbid);
         ApiResponse<CampaignSummary> response = ApiResponse.ok("캠페인 조회", outboundService.getCampaign(campaignDbid, tenantDbid));
@@ -634,7 +634,7 @@ public class OutboundConfigController {
     public ApiResponse<CampaignSummary> getCampaignByName(
         @Parameter(description = "캠페인 이름", example = "CMP_A")
         @RequestParam String name,
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("getCampaignByName 요청: name={}, tenantDbid={}", name, tenantDbid);
         ApiResponse<CampaignSummary> response = ApiResponse.ok("캠페인 조회", outboundService.getCampaignByName(name, tenantDbid));
@@ -751,7 +751,7 @@ public class OutboundConfigController {
     public ApiResponse<Void> deleteCampaign(
         @Parameter(description = "캠페인 DBID", example = "7001")
         @PathVariable int campaignDbid,
-        @Parameter(description = "테넌트 DBID", example = "101")
+        @Parameter(description = "테넌트 DBID", example = "1")
         @RequestParam(required = false) Integer tenantDbid) {
         log.debug("deleteCampaign 요청: campaignDbid={}, tenantDbid={}", campaignDbid, tenantDbid);
         outboundService.deleteCampaign(campaignDbid, tenantDbid);

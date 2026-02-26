@@ -2,7 +2,7 @@ package com.genoutbound.gateway.genesys.stat;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "app.genesys.stat")
+@ConfigurationProperties(prefix = "app.stat")
 public class StatServerProperties {
 
     private boolean enabled = true;

@@ -26,6 +26,9 @@ if "%CCC_SERVICE_ENC_ENABLED%"=="" set CCC_SERVICE_ENC_ENABLED=true
 if "%CCC_SERVICE_ENC_KEY%"=="" set CCC_SERVICE_ENC_KEY=12345678901234567890123456789012
 if "%CCC_SERVICE_ENC_IV%"=="" set CCC_SERVICE_ENC_IV=1234567890123456
 
+
+if "%JWT_SECRET%"=="" set JWT_SECRET=CHANGE_ME_32_BYTE_SECRET_FOR_PROD
+
 set MISSING=
 for %%V in (DB_URL DB_USERNAME DB_PASSWORD ADMIN_USERNAME ADMIN_PASSWORD GENESYS_CFG_USERNAME GENESYS_CFG_PASSWORD) do (
   if "!%%V!"=="" set MISSING=!MISSING! %%V
@@ -36,6 +39,14 @@ if not "%MISSING%"=="" (
   echo 실행 전에 환경변수를 설정하세요.
   endlocal
   exit /b 1
+)
+
+if /i "%SPRING_PROFILES_ACTIVE%"=="prod" (
+  if "%JWT_SECRET%"=="" (
+    echo prod 프로파일에서는 JWT_SECRET 환경변수가 필요합니다.
+    endlocal
+    exit /b 1
+  )
 )
 
 if /i "%CCC_SERVICE_ENC_ENABLED%"=="true" (

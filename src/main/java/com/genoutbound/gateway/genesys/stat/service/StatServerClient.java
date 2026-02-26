@@ -104,12 +104,18 @@ public class StatServerClient {
     }
 
     private StatServerProtocol openProtocol(AtomicReference<EventInfo> eventInfoRef) {
+        if (!isValidServer(properties.getPrimary()) && !isValidServer(properties.getBackup())) {
+            throw new GenesysUnavailableException("Stat Server 접속 설정이 필요합니다.");
+        }
         StatServerProtocol protocol = buildProtocol(properties.getPrimary(), eventInfoRef);
         try {
             protocol.open();
             log.info("Stat Server 연결 성공: {}:{}", properties.getPrimary().getIp(), properties.getPrimary().getPort());
             return protocol;
         } catch (ProtocolException | IllegalStateException | InterruptedException ex) {
+            if (!isValidServer(properties.getBackup())) {
+                throw new GenesysUnavailableException("Stat Server 연결 실패", ex);
+            }
             log.warn("Primary Stat Server 연결 실패. Backup으로 재시도합니다.", ex);
             closeProtocol(protocol);
             StatServerProtocol backup = buildProtocol(properties.getBackup(), eventInfoRef);
@@ -127,15 +133,22 @@ public class StatServerClient {
     public Map<String, Object> getConnectionStatus() {
         Map<String, Object> status = new LinkedHashMap<>();
         status.put("enabled", properties.isEnabled());
-        //status.put("endpoints", List.of(
-        //    buildEndpoint("primary", properties.getPrimary()),
-        //    buildEndpoint("backup", properties.getBackup())));
+        status.put("endpoints", List.of(
+            buildEndpoint("primary", properties.getPrimary()),
+            buildEndpoint("backup", properties.getBackup())));
         status.put("connectionPool", buildPoolStatus(false, "per-request"));
-        //status.put("info", buildInfo());
+        status.put("info", buildInfo());
 
         if (!properties.isEnabled()) {
             status.put("connected", false);
             status.put("state", "disabled");
+            return status;
+        }
+
+        if (!isValidServer(properties.getPrimary()) && !isValidServer(properties.getBackup())) {
+            status.put("connected", false);
+            status.put("state", "unconfigured");
+            status.put("error", "Stat Server 접속 설정이 필요합니다.");
             return status;
         }
 
@@ -196,6 +209,9 @@ public class StatServerClient {
 
     private StatServerProtocol buildProtocol(StatServerProperties.Server server,
                                              AtomicReference<EventInfo> eventInfoRef) {
+        if (!isValidServer(server)) {
+            throw new GenesysUnavailableException("Stat Server 접속 설정이 필요합니다.");
+        }
         PropertyConfiguration config = new PropertyConfiguration();
         config.setUseAddp(properties.isAddpEnabled());
         config.setAddpClientTimeout(properties.getAddpClientTimeout());
@@ -219,11 +235,11 @@ public class StatServerClient {
         StatisticObject object = StatisticObject.create();
         object.setObjectId(groupName);
         object.setObjectType(StatisticObjectType.GroupAgents);
-    object.setTenantName(properties.getTenantName());
+        object.setTenantName(properties.getTenantName());
         object.setTenantPassword("");
 
         StatisticMetric metric = StatisticMetric.create();
-    metric.setStatisticType(properties.getDefaultStatistic());
+        metric.setStatisticType(properties.getDefaultStatistic());
         metric.setTimeProfile("Default");
         metric.setTimeRange("");
         metric.setFilter("");
@@ -250,5 +266,12 @@ public class StatServerClient {
         } catch (ProtocolException | IllegalStateException | InterruptedException ex) {
             log.warn("Stat Server 종료 실패", ex);
         }
+    }
+
+    private boolean isValidServer(StatServerProperties.Server server) {
+        return server != null
+            && server.getIp() != null
+            && !server.getIp().isBlank()
+            && server.getPort() > 0;
     }
 }

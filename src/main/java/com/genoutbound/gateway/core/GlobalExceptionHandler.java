@@ -4,10 +4,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
+import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import com.genoutbound.gateway.genesys.common.GenesysUnavailableException;
 
 @RestControllerAdvice
@@ -39,6 +43,29 @@ public class GlobalExceptionHandler {
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(message));
+    }
+
+    @ExceptionHandler(AsyncRequestTimeoutException.class)
+    public ResponseEntity<Void> handleAsyncTimeout(AsyncRequestTimeoutException ex) {
+        log.debug("Async 요청 타임아웃 발생: {}", ex.getMessage());
+        return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(AsyncRequestNotUsableException.class)
+    public ResponseEntity<Void> handleAsyncNotUsable(AsyncRequestNotUsableException ex) {
+        log.debug("Async 요청 종료: {}", ex.getMessage());
+        return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(HttpMessageNotWritableException.class)
+    public ResponseEntity<Void> handleMessageNotWritable(HttpMessageNotWritableException ex) {
+        log.debug("응답 쓰기 실패: {}", ex.getMessage());
+        return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Void> handleNoResourceFound(NoResourceFoundException ex) {
+        return ResponseEntity.notFound().build();
     }
 
     @ExceptionHandler(Exception.class)

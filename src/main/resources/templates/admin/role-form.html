@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title th:text="${form.id} == null ? '역할 생성' : '역할 편집'">역할</title>
+    <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h1 th:text="${form.id} == null ? '역할 생성' : '역할 편집'"></h1>
+            <p class="subtitle">역할 이름과 권한을 설정합니다.</p>
+        </div>
+        <div class="actions">
+            <a class="btn ghost" href="/admin/roles">목록</a>
+        </div>
+    </div>
+
+    <nav class="admin-nav">
+        <a href="/admin/users">사용자</a>
+        <a class="active" href="/admin/roles">역할</a>
+        <a href="/admin/permissions">권한</a>
+        <a href="/">홈</a>
+        <a href="/admin/logout">로그아웃</a>
+    </nav>
+
+    <div class="alert" th:if="${error}" th:text="${error}"></div>
+
+    <form class="form" th:action="${form.id} == null ? '/admin/roles' : @{/admin/roles/{id}(id=${form.id})}" method="post">
+        <input type="hidden" name="id" th:value="${form.id}" />
+
+        <label class="field">
+            <span>역할명</span>
+            <input type="text" name="name" th:value="${form.name}" />
+        </label>
+
+        <label class="field">
+            <span>설명</span>
+            <input type="text" name="description" th:value="${form.description}" />
+        </label>
+
+        <label class="field checkbox">
+            <input type="checkbox" name="enabled" th:checked="${form.enabled}" />
+            <span>활성 상태</span>
+        </label>
+
+        <div class="field">
+            <span>권한 선택</span>
+            <div class="checkbox-grid">
+                <label class="checkbox" th:each="perm : ${permissions}">
+                    <input type="checkbox" name="permissionIds" th:value="${perm.id}" th:checked="${form.permissionIds.contains(perm.id)}" />
+                    <span th:text="${perm.code}"></span>
+                </label>
+            </div>
+            <small th:if="${#lists.isEmpty(permissions)}">등록된 권한이 없습니다. 먼저 권한을 생성하세요.</small>
+        </div>
+
+        <div class="actions">
+            <button class="btn" type="submit">저장</button>
+            <a class="btn ghost" href="/admin/roles">취소</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

@@ -253,11 +253,6 @@
                 </dependency>
                 <dependency>
                     <groupId>com.genesyslab.platform</groupId>
-                    <artifactId>contactsprotocol</artifactId>
-                    <version>${genesys.sdk.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.genesyslab.platform</groupId>
                     <artifactId>jackson2-module</artifactId>
                     <version>${genesys.sdk.version}</version>
                 </dependency>
@@ -278,17 +273,7 @@
                 </dependency>
                 <dependency>
                     <groupId>com.genesyslab.platform</groupId>
-                    <artifactId>managementprotocol</artifactId>
-                    <version>${genesys.sdk.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.genesyslab.platform</groupId>
                     <artifactId>messagebrokerappblock</artifactId>
-                    <version>${genesys.sdk.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.genesyslab.platform</groupId>
-                    <artifactId>openmediaprotocol</artifactId>
                     <version>${genesys.sdk.version}</version>
                 </dependency>
                 <dependency>
@@ -308,16 +293,6 @@
                 </dependency>
                 <dependency>
                     <groupId>com.genesyslab.platform</groupId>
-                    <artifactId>reportingprotocol</artifactId>
-                    <version>${genesys.sdk.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.genesyslab.platform</groupId>
-                    <artifactId>routingprotocol</artifactId>
-                    <version>${genesys.sdk.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.genesyslab.platform</groupId>
                     <artifactId>system</artifactId>
                     <version>${genesys.sdk.version}</version>
                 </dependency>
@@ -329,11 +304,6 @@
                 <dependency>
                     <groupId>com.genesyslab.platform</groupId>
                     <artifactId>warmstandbyappblock</artifactId>
-                    <version>${genesys.sdk.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.genesyslab.platform</groupId>
-                    <artifactId>webmediaprotocol</artifactId>
                     <version>${genesys.sdk.version}</version>
                 </dependency>
             </dependencies>

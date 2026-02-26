@@ -10,6 +10,7 @@ public class OutboundProperties {
 
     private boolean enabled;
     private String uri;
+    private String backupUri;
     private String clientName = "default";
     private String clientPassword = "";
     private String appName = "ocserver";
@@ -29,6 +30,14 @@ public class OutboundProperties {
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public String getBackupUri() {
+        return backupUri;
+    }
+
+    public void setBackupUri(String backupUri) {
+        this.backupUri = backupUri;
     }
 
     public String getClientName() {
@@ -61,5 +70,9 @@ public class OutboundProperties {
 
     public void setAppPassword(String appPassword) {
         this.appPassword = appPassword;
+    }
+
+    public boolean hasBackup() {
+        return backupUri != null && !backupUri.isBlank();
     }
 }

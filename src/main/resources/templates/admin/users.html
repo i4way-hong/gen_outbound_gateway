@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>사용자 관리</title>
+    <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+<div class="container wide">
+    <div class="page-header">
+        <div>
+            <h1>사용자 관리</h1>
+            <p class="subtitle">운영자 권한으로 사용자와 역할을 관리합니다.</p>
+        </div>
+        <div class="actions">
+            <a class="btn" href="/admin/users/new">새 사용자</a>
+        </div>
+    </div>
+
+    <nav class="admin-nav">
+        <a class="active" href="/admin/users">사용자</a>
+        <a href="/admin/roles">역할</a>
+        <a href="/admin/permissions">권한</a>
+        <a href="/">홈</a>
+        <a href="/admin/logout">로그아웃</a>
+    </nav>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>사용자명</th>
+            <th>활성</th>
+            <th>역할</th>
+            <th>작업</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${#lists.isEmpty(users)}">
+            <td colspan="5" class="empty">등록된 사용자가 없습니다.</td>
+        </tr>
+        <tr th:each="user : ${users}">
+            <td th:text="${user.id}"></td>
+            <td th:text="${user.username}"></td>
+            <td>
+                <span th:class="${user.enabled} ? 'badge success' : 'badge danger'"
+                      th:text="${user.enabled} ? '활성' : '비활성'"></span>
+            </td>
+            <td th:text="${user.roles}"></td>
+            <td>
+                <a class="link" th:href="@{/admin/users/{id}(id=${user.id})}">편집</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

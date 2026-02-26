@@ -2,13 +2,16 @@ package com.genoutbound.gateway.genesys.tserver;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "app.genesys.tserver")
+@ConfigurationProperties(prefix = "app.tserver")
 public class TServerProperties {
 
     private boolean enabled = true;
     private String endpoint;
     private String ip;
     private int port;
+    private String backupEndpoint;
+    private String backupIp;
+    private int backupPort;
     private String clientName = "tserver-client";
     private boolean addpEnabled = true;
     private int addpClientTimeout = 10;
@@ -45,6 +48,30 @@ public class TServerProperties {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public String getBackupEndpoint() {
+        return backupEndpoint;
+    }
+
+    public void setBackupEndpoint(String backupEndpoint) {
+        this.backupEndpoint = backupEndpoint;
+    }
+
+    public String getBackupIp() {
+        return backupIp;
+    }
+
+    public void setBackupIp(String backupIp) {
+        this.backupIp = backupIp;
+    }
+
+    public int getBackupPort() {
+        return backupPort;
+    }
+
+    public void setBackupPort(int backupPort) {
+        this.backupPort = backupPort;
     }
 
     public String getClientName() {
@@ -85,5 +112,9 @@ public class TServerProperties {
 
     public void setCharset(String charset) {
         this.charset = charset;
+    }
+
+    public boolean hasBackup() {
+        return backupIp != null && !backupIp.isBlank() && backupPort > 0;
     }
 }

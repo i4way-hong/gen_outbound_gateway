@@ -37,6 +37,8 @@ $env:CCC_SERVICE_ENC_ENABLED = "false"
 $env:CCC_SERVICE_ENC_KEY = "12345678901234567890123456789012"
 $env:CCC_SERVICE_ENC_IV = "1234567890123456"
 
+if "%JWT_SECRET%"=="" set JWT_SECRET=CHANGE_ME_32_BYTE_SECRET_FOR_PROD
+
 $required = @(
     "DB_URL",
     "DB_USERNAME",
@@ -46,6 +48,10 @@ $required = @(
     "GENESYS_CFG_USERNAME",
     "GENESYS_CFG_PASSWORD"
 )
+
+if ($env:SPRING_PROFILES_ACTIVE -eq "prod") {
+    $required += "JWT_SECRET"
+}
 
 $missing = @()
 foreach ($name in $required) {
@@ -57,6 +63,11 @@ foreach ($name in $required) {
 if ($missing.Count -gt 0) {
     Write-Host "필수 환경변수가 없습니다: $($missing -join ', ')" -ForegroundColor Yellow
     Write-Host "실행 전에 환경변수를 설정하세요" -ForegroundColor Yellow
+    exit 1
+}
+
+if ($env:SPRING_PROFILES_ACTIVE -eq "prod" -and (-not $env:JWT_SECRET)) {
+    Write-Host "prod 프로파일에서는 JWT_SECRET 환경변수가 필요합니다." -ForegroundColor Yellow
     exit 1
 }
 

@@ -3,14 +3,17 @@ package com.genoutbound.gateway.web;
 import com.genoutbound.gateway.core.ApiResponse;
 import com.genoutbound.gateway.security.AuthService;
 import com.genoutbound.gateway.security.dto.AuthRequest;
+import com.genoutbound.gateway.security.dto.LogoutRequest;
 import com.genoutbound.gateway.security.dto.RefreshRequest;
 import com.genoutbound.gateway.security.dto.TokenResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,5 +40,19 @@ public class AuthController {
     @Operation(summary = "토큰 갱신", description = "리프레시 토큰으로 새로운 액세스/리프레시 토큰을 발급합니다.")
     public ApiResponse<TokenResponse> refresh(@Valid @RequestBody RefreshRequest request) {
         return ApiResponse.ok("토큰 갱신", authService.refresh(request));
+    }
+
+    @PostMapping("/logout")
+    @Operation(summary = "토큰 폐기", description = "현재 액세스 토큰과 선택한 리프레시 토큰을 폐기합니다.")
+    public ApiResponse<Void> logout(@RequestBody(required = false) LogoutRequest request,
+                                    @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false)
+                                    String authorization) {
+        String accessToken = null;
+        if (authorization != null && authorization.startsWith("Bearer ")) {
+            accessToken = authorization.substring(7);
+        }
+        String refreshToken = request != null ? request.refreshToken() : null;
+        authService.logout(accessToken, refreshToken);
+        return ApiResponse.ok("토큰 폐기", null);
     }
 }

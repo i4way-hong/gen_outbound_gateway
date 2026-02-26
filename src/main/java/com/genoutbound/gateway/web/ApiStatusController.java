@@ -3,6 +3,7 @@ package com.genoutbound.gateway.web;
 import com.genoutbound.gateway.core.ApiResponse;
 import com.genoutbound.gateway.genesys.cfg.service.GenesysConfigClient;
 import com.genoutbound.gateway.genesys.outbound.service.OutboundClient;
+import com.genoutbound.gateway.genesys.scs.service.ScsEventService;
 import com.genoutbound.gateway.genesys.stat.service.StatServerClient;
 import com.genoutbound.gateway.genesys.tserver.service.TServerClient;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,13 +26,16 @@ public class ApiStatusController {
     private final OutboundClient outboundClient;
     private final StatServerClient statServerClient;
     private final TServerClient tServerClient;
+    private final ScsEventService scsEventService;
 
     public ApiStatusController(GenesysConfigClient genesysConfigClient, OutboundClient outboundClient,
-                               StatServerClient statServerClient, TServerClient tServerClient) {
+                               StatServerClient statServerClient, TServerClient tServerClient,
+                               ScsEventService scsEventService) {
         this.genesysConfigClient = genesysConfigClient;
         this.outboundClient = outboundClient;
         this.statServerClient = statServerClient;
         this.tServerClient = tServerClient;
+        this.scsEventService = scsEventService;
     }
 
     @Operation(summary = "상태 조회", description = "애플리케이션 및 Genesys 연동 상태를 확인합니다.")
@@ -48,8 +52,9 @@ public class ApiStatusController {
         Map<String, Object> genesys = new LinkedHashMap<>();
         genesys.put("configServer", genesysConfigClient.getConnectionStatus());
         genesys.put("outboundServer", outboundClient.getConnectionStatus());
-    genesys.put("statServer", statServerClient.getConnectionStatus());
-    genesys.put("tserver", tServerClient.getConnectionStatus());
+        genesys.put("statServer", statServerClient.getConnectionStatus());
+        genesys.put("tserver", tServerClient.getConnectionStatus());
+        genesys.put("scs", scsEventService.getConnectionStatus());
         payload.put("status", "ok");
         payload.put("time", OffsetDateTime.now());
         payload.put("genesys", genesys);

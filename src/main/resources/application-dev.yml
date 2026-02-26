@@ -1,0 +1,20 @@
+app:
+  security:
+    auth-enabled: false
+    jwt-enabled: false
+    allow-insecure: true
+    allow-swagger: true
+    allow-crypto-test: true
+    admin-username: ${ADMIN_USERNAME:}
+    admin-password: "${ADMIN_PASSWORD:}"
+    jwt:
+      issuer: ${JWT_ISSUER:gen-outbound-gateway}
+      secret: ${JWT_SECRET:}
+      access-token-minutes: ${JWT_ACCESS_TOKEN_MINUTES:15}
+      refresh-token-days: ${JWT_REFRESH_TOKEN_DAYS:7}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

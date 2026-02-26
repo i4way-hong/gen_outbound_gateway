@@ -20,10 +20,17 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider tokenProvider;
+    private final TokenRevocationService tokenRevocationService;
+    private final TokenVersionService tokenVersionService;
     private final ObjectMapper objectMapper;
 
-    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider, ObjectMapper objectMapper) {
+    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider,
+                                   TokenRevocationService tokenRevocationService,
+                                   TokenVersionService tokenVersionService,
+                                   ObjectMapper objectMapper) {
         this.tokenProvider = tokenProvider;
+        this.tokenRevocationService = tokenRevocationService;
+        this.tokenVersionService = tokenVersionService;
         this.objectMapper = objectMapper;
     }
 
@@ -42,7 +49,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 sendUnauthorized(response, "유효하지 않은 토큰입니다.");
                 return;
             }
+            if (tokenRevocationService.isRevoked(token)) {
+                sendUnauthorized(response, "폐기된 토큰입니다.");
+                return;
+            }
             Authentication authentication = tokenProvider.getAuthentication(token);
+            long tokenVersion = tokenProvider.getTokenVersion(token);
+            long currentVersion = tokenVersionService.getCurrentVersion(authentication.getName());
+            if (tokenVersion != currentVersion) {
+                sendUnauthorized(response, "폐기된 토큰입니다.");
+                return;
+            }
             SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException ex) {

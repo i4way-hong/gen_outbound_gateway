@@ -62,9 +62,9 @@ public class OutboundClient {
     public Map<String, Object> getConnectionStatus() {
         Map<String, Object> status = new LinkedHashMap<>();
         status.put("enabled", properties.isEnabled());
-        //status.put("endpoints", buildEndpoints());
+        status.put("endpoints", buildEndpoints());
         status.put("connectionPool", buildPoolStatus(false, "per-request"));
-        //status.put("info", buildInfo());
+    status.put("info", buildInfo());
 
         if (!properties.isEnabled()) {
             status.put("connected", false);
@@ -98,10 +98,16 @@ public class OutboundClient {
     }
 
     private List<Map<String, Object>> buildEndpoints() {
-        Map<String, Object> endpoint = new LinkedHashMap<>();
-        endpoint.put("role", "primary");
-        endpoint.put("uri", properties.getUri());
-        return List.of(endpoint);
+        Map<String, Object> primary = new LinkedHashMap<>();
+        primary.put("role", "primary");
+        primary.put("uri", properties.getUri());
+        if (!properties.hasBackup()) {
+            return List.of(primary);
+        }
+        Map<String, Object> backup = new LinkedHashMap<>();
+        backup.put("role", "backup");
+        backup.put("uri", properties.getBackupUri());
+        return List.of(primary, backup);
     }
 
     private Map<String, Object> buildInfo() {
@@ -125,19 +131,31 @@ public class OutboundClient {
      */
     private OutboundServerProtocol openProtocol() {
         try {
-            URI uri = new URI(properties.getUri());
+            return openProtocol(properties.getUri(), "primary");
+        } catch (GenesysUnavailableException primaryError) {
+            if (!properties.hasBackup()) {
+                throw primaryError;
+            }
+            log.warn("Primary Outbound 연결 실패. Backup으로 재시도합니다.", primaryError);
+            return openProtocol(properties.getBackupUri(), "backup");
+        }
+    }
+
+    private OutboundServerProtocol openProtocol(String uriValue, String role) {
+        try {
+            URI uri = new URI(uriValue);
             OutboundServerProtocol protocol = new OutboundServerProtocol(new Endpoint(uri));
             protocol.setClientName(properties.getClientName());
             protocol.setClientPassword(properties.getClientPassword());
             protocol.setUserName(properties.getAppName());
             protocol.setUserPassword(properties.getAppPassword());
             protocol.open();
-            log.info("Outbound 서버 연결 성공: {}", properties.getUri());
+            log.info("Outbound 서버 연결 성공({}): {}", role, uriValue);
             return protocol;
         } catch (URISyntaxException ex) {
-            throw new GenesysUnavailableException("Outbound 서버 URI가 올바르지 않습니다.", ex);
+            throw new GenesysUnavailableException("Outbound 서버 URI가 올바르지 않습니다. (" + role + ")", ex);
         } catch (ProtocolException | IllegalStateException | InterruptedException ex) {
-            throw new GenesysUnavailableException("Outbound 서버 연결 실패", ex);
+            throw new GenesysUnavailableException("Outbound 서버 연결 실패(" + role + ")", ex);
         }
     }
 

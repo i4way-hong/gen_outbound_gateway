@@ -1,0 +1,59 @@
+    <!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title th:text="${form.id} == null ? '권한 생성' : '권한 편집'">권한</title>
+    <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h1 th:text="${form.id} == null ? '권한 생성' : '권한 편집'"></h1>
+            <p class="subtitle">권한 코드를 등록합니다.</p>
+        </div>
+        <div class="actions">
+            <a class="btn ghost" href="/admin/permissions">목록</a>
+        </div>
+    </div>
+
+    <nav class="admin-nav">
+        <a href="/admin/users">사용자</a>
+        <a href="/admin/roles">역할</a>
+        <a class="active" href="/admin/permissions">권한</a>
+        <a href="/">홈</a>
+        <a href="/admin/logout">로그아웃</a>
+    </nav>
+
+    <div class="alert" th:if="${error}" th:text="${error}"></div>
+    <div class="alert" th:if="${readOnly}">권한 관리는 읽기 전용입니다.</div>
+
+    <form class="form" th:action="${form.id} == null ? '/admin/permissions' : @{/admin/permissions/{id}(id=${form.id})}" method="post">
+        <input type="hidden" name="id" th:value="${form.id}" />
+
+        <label class="field">
+            <span>권한 코드</span>
+            <select name="code" required th:disabled="${readOnly}">
+                <option value="" disabled="disabled" th:selected="${form.code} == null">권한 코드 선택</option>
+                <option th:each="code : ${allowedCodes}"
+                        th:value="${code}"
+                        th:text="${code}"
+                        th:selected="${code} == ${form.code}"></option>
+            </select>
+        </label>
+
+        <label class="field">
+            <span>설명</span>
+            <input type="text" name="description" th:value="${form.description}" th:disabled="${readOnly}" />
+        </label>
+
+        <div class="actions">
+            <button class="btn" type="submit" th:if="${!readOnly}">저장</button>
+            <a class="btn ghost" href="/admin/permissions">목록</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

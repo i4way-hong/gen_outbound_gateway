@@ -2,6 +2,7 @@ package com.genoutbound.gateway.security;
 
 import com.genoutbound.gateway.config.JwtProperties;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -14,6 +15,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Profiles;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,19 +32,29 @@ public class JwtTokenProvider {
     private final JwtProperties properties;
     private final UserDetailsService userDetailsService;
     private final Key signingKey;
+    private final Environment environment;
 
-    public JwtTokenProvider(JwtProperties properties, UserDetailsService userDetailsService) {
+    public JwtTokenProvider(JwtProperties properties, UserDetailsService userDetailsService, Environment environment) {
         this.properties = properties;
         this.userDetailsService = userDetailsService;
+        this.environment = environment;
         this.signingKey = createSigningKey(properties.getSecret());
     }
 
     public String createAccessToken(UserDetails userDetails) {
-        return createToken(userDetails, "access", properties.getAccessTokenMinutes() * 60);
+        return createToken(userDetails, "access", properties.getAccessTokenMinutes() * 60, 0L);
     }
 
     public String createRefreshToken(UserDetails userDetails) {
-        return createToken(userDetails, "refresh", properties.getRefreshTokenDays() * 24 * 60 * 60);
+        return createToken(userDetails, "refresh", properties.getRefreshTokenDays() * 24 * 60 * 60, 0L);
+    }
+
+    public String createAccessToken(UserDetails userDetails, long tokenVersion) {
+        return createToken(userDetails, "access", properties.getAccessTokenMinutes() * 60, tokenVersion);
+    }
+
+    public String createRefreshToken(UserDetails userDetails, long tokenVersion) {
+        return createToken(userDetails, "refresh", properties.getRefreshTokenDays() * 24 * 60 * 60, tokenVersion);
     }
 
     public Authentication getAuthentication(String token) {
@@ -67,7 +80,31 @@ public class JwtTokenProvider {
         return properties.getRefreshTokenDays() * 24 * 60 * 60;
     }
 
-    private String createToken(UserDetails userDetails, String type, long expiresInSeconds) {
+    public long getTokenVersion(String token) {
+        Claims claims = parseClaims(token);
+        Object value = claims.get("ver");
+        if (value instanceof Number number) {
+            return number.longValue();
+        }
+        if (value instanceof String text) {
+            try {
+                return Long.parseLong(text);
+            } catch (NumberFormatException ex) {
+                return 0L;
+            }
+        }
+        return 0L;
+    }
+
+    public Instant getExpiration(String token) {
+        try {
+            return parseClaims(token).getExpiration().toInstant();
+        } catch (ExpiredJwtException ex) {
+            return ex.getClaims().getExpiration().toInstant();
+        }
+    }
+
+    private String createToken(UserDetails userDetails, String type, long expiresInSeconds, long tokenVersion) {
         Instant now = Instant.now();
         Instant expiry = now.plusSeconds(expiresInSeconds);
         List<String> roles = userDetails.getAuthorities().stream()
@@ -81,6 +118,7 @@ public class JwtTokenProvider {
             .setExpiration(Date.from(expiry))
             .claim("typ", type)
             .claim("roles", roles)
+        .claim("ver", tokenVersion)
             .signWith(signingKey, SignatureAlgorithm.HS256)
             .compact();
     }
@@ -106,6 +144,9 @@ public class JwtTokenProvider {
 
     private Key createSigningKey(String secret) {
         if (secret == null || secret.isBlank()) {
+            if (environment.acceptsProfiles(Profiles.of("prod"))) {
+                throw new IllegalStateException("운영 환경에서는 JWT_SECRET을 반드시 설정해야 합니다.");
+            }
             log.warn("JWT 시크릿이 비어 있어 임시 키를 생성합니다. 운영 환경에서는 JWT_SECRET을 설정하세요.");
             return Keys.secretKeyFor(SignatureAlgorithm.HS256);
         }
