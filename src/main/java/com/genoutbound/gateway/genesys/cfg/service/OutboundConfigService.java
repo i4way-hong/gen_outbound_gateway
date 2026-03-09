@@ -950,7 +950,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
     }
 
     private CallingListDetailRequest withFilterDbidIfMissing(CallingListDetailRequest request, int filterDbid) {
-        if (request == null || request.filterDbid() != null) {
+        if (request == null || request.filterDbid() == null) {
             return request;
         }
         return new CallingListDetailRequest(
@@ -986,7 +986,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
     }
 
     private CampaignGroupRequest withCampaignDbidIfMissing(CampaignGroupRequest request, int campaignDbid) {
-        if (request == null || request.campaignDbid() != null) {
+        if (request == null || request.campaignDbid() == null) {
             return request;
         }
         return new CampaignGroupRequest(

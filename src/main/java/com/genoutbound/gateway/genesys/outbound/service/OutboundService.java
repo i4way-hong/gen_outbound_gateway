@@ -148,6 +148,12 @@ public class OutboundService {
         if (message == null) {
             throw new ApiException(HttpStatus.BAD_GATEWAY, "Outbound 서버 응답이 없습니다.");
         }
+        String messageName = message.messageName();
+        if (messageName != null && ("EventError".equals(messageName)
+            || "EventRequestError".equals(messageName)
+            || "EventRequestRejected".equals(messageName))) {
+            throw new ApiException(HttpStatus.BAD_GATEWAY, resolveErrorDescription(message, messageName));
+        }
         if (message.messageId() == EventCampaignLoaded.ID) {
             return ((EventCampaignLoaded) message).getGroupCampaignStatus().toString();
         }
@@ -163,7 +169,35 @@ public class OutboundService {
         if (message.messageId() == EventCampaignStatus.ID) {
             return ((EventCampaignStatus) message).getGroupCampaignStatus().toString();
         }
-        return "UNKNOWN";
+        log.debug("Outbound 응답 미매칭: messageName={}, messageId={}", messageName, message.messageId());
+        return messageName == null ? "UNKNOWN" : messageName;
+    }
+
+    private String resolveErrorDescription(Message message, String fallback) {
+        String description = null;
+        String errorCode = null;
+        try {
+            Object value = message.getClass().getMethod("getDescription").invoke(message);
+            description = value == null ? null : value.toString();
+        } catch (ReflectiveOperationException ignored) {
+            // ignore
+        }
+        try {
+            Object value = message.getClass().getMethod("getErrorCode").invoke(message);
+            errorCode = value == null ? null : value.toString();
+        } catch (ReflectiveOperationException ignored) {
+            // ignore
+        }
+        if (description == null && errorCode == null) {
+            return String.format("%s: %s", fallback, message);
+        }
+        if (errorCode == null) {
+            return String.format("%s: %s", fallback, description);
+        }
+        if (description == null) {
+            return String.format("%s(code=%s)", fallback, errorCode);
+        }
+        return String.format("%s(code=%s): %s", fallback, errorCode, description);
     }
 
     private DialMode resolveDialMode(String mode) {

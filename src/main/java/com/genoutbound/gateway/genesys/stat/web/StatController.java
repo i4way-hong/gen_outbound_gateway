@@ -7,6 +7,7 @@ import com.genoutbound.gateway.web.annotation.CccEncryptedController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * 스킬그룹 현황조회 컨트롤러.
  */
 @CccEncryptedController
+@SecurityRequirement(name = "bearerAuth")
 public class StatController {
 
     private static final Logger log = LoggerFactory.getLogger(StatController.class);

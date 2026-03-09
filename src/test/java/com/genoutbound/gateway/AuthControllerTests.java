@@ -119,16 +119,16 @@ class AuthControllerTests {
         String refreshToken = loginJson.path("data").path("refreshToken").asText();
         assertThat(accessToken).isNotBlank();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-
         ResponseEntity<String> logoutResponse = restTemplate.exchange(
             baseUrl + "/auth/logout",
             HttpMethod.POST,
-            new HttpEntity<>(new com.genoutbound.gateway.security.dto.LogoutRequest(refreshToken), headers),
+            new HttpEntity<>(new com.genoutbound.gateway.security.dto.LogoutRequest(accessToken, refreshToken)),
             String.class
         );
         assertThat(logoutResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
 
         ResponseEntity<String> revokedResponse = restTemplate.exchange(
             baseUrl + "/api/status",
@@ -199,12 +199,10 @@ class AuthControllerTests {
         JsonNode secondJson = objectMapper.readTree(secondLogin.getBody());
         String currentAccessToken = secondJson.path("data").path("accessToken").asText();
 
-        HttpHeaders logoutHeaders = new HttpHeaders();
-        logoutHeaders.setBearerAuth(currentAccessToken);
         ResponseEntity<String> logoutResponse = restTemplate.exchange(
             baseUrl + "/auth/logout",
             HttpMethod.POST,
-            new HttpEntity<>(new com.genoutbound.gateway.security.dto.LogoutRequest(refreshToken), logoutHeaders),
+            new HttpEntity<>(new com.genoutbound.gateway.security.dto.LogoutRequest(currentAccessToken, refreshToken)),
             String.class
         );
         assertThat(logoutResponse.getStatusCode()).isEqualTo(HttpStatus.OK);

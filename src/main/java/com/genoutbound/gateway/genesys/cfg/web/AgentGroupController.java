@@ -1,25 +1,27 @@
 package com.genoutbound.gateway.genesys.cfg.web;
 
 import com.genoutbound.gateway.core.ApiResponse;
-import com.genoutbound.gateway.genesys.cfg.dto.AgentGroupAssignEmployeeRequest;
-import com.genoutbound.gateway.genesys.cfg.dto.AgentGroupAssignPersonRequest;
+import com.genoutbound.gateway.genesys.cfg.dto.AgentGroupAssignEmployeeCommand;
+import com.genoutbound.gateway.genesys.cfg.dto.AgentGroupAssignPersonCommand;
+import com.genoutbound.gateway.genesys.cfg.dto.AgentGroupByNameRequest;
+import com.genoutbound.gateway.genesys.cfg.dto.AgentGroupDeleteRequest;
+import com.genoutbound.gateway.genesys.cfg.dto.AgentGroupGetRequest;
+import com.genoutbound.gateway.genesys.cfg.dto.AgentGroupQueryRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.AgentGroupRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.AgentGroupSummary;
+import com.genoutbound.gateway.genesys.cfg.dto.AgentGroupUpdateCommand;
 import com.genoutbound.gateway.genesys.cfg.service.AgentGroupConfigService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
@@ -35,49 +37,75 @@ public class AgentGroupController {
         this.agentGroupService = agentGroupService;
     }
 
-    @GetMapping("/agent-groups")
+    @PostMapping("/agent-groups")
     @Operation(summary = "그룹 목록", description = "상담사 그룹 목록을 조회합니다.")
     public ApiResponse<List<AgentGroupSummary>> listAgentGroups(
-        @Parameter(description = "테넌트 DBID", example = "101")
-        @RequestParam(required = false) Integer tenantDbid) {
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "그룹 목록 요청",
+            required = false,
+            content = @Content(
+                schema = @Schema(implementation = AgentGroupQueryRequest.class),
+                examples = @ExampleObject(name = "agentGroupList", value = "{\"tenantDbid\":101}")
+            )
+        )
+        @RequestBody(required = false) AgentGroupQueryRequest request) {
+        Integer tenantDbid = request == null ? null : request.tenantDbid();
         log.debug("listAgentGroups 요청: tenantDbid={}", tenantDbid);
         ApiResponse<List<AgentGroupSummary>> response = ApiResponse.ok("그룹 목록", agentGroupService.listAgentGroups(tenantDbid));
         log.debug("listAgentGroups 응답: count={}", response.data() == null ? 0 : response.data().size());
         return response;
     }
 
-    @GetMapping("/agent-groups/{groupDbid}")
+    @PostMapping("/agent-groups/get")
     @Operation(summary = "그룹 조회", description = "상담사 그룹을 DBID로 조회합니다.")
     public ApiResponse<AgentGroupSummary> getAgentGroup(
-        @Parameter(description = "그룹 DBID", example = "2001")
-        @PathVariable int groupDbid,
-        @Parameter(description = "테넌트 DBID", example = "101")
-        @RequestParam(required = false) Integer tenantDbid) {
-        log.debug("getAgentGroup 요청: groupDbid={}, tenantDbid={}", groupDbid, tenantDbid);
-        ApiResponse<AgentGroupSummary> response = ApiResponse.ok("그룹 조회", agentGroupService.getAgentGroup(groupDbid, tenantDbid));
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "그룹 조회 요청",
+            required = true,
+            content = @Content(
+                schema = @Schema(implementation = AgentGroupGetRequest.class),
+                examples = @ExampleObject(name = "agentGroupGet", value = "{\"groupDbid\":10,\"tenantDbid\":101}")
+            )
+        )
+        @Valid @RequestBody AgentGroupGetRequest request) {
+        log.debug("getAgentGroup 요청: groupDbid={}, tenantDbid={}", request.groupDbid(), request.tenantDbid());
+        ApiResponse<AgentGroupSummary> response = ApiResponse.ok("그룹 조회",
+            agentGroupService.getAgentGroup(request.groupDbid(), request.tenantDbid()));
         log.debug("getAgentGroup 응답: {}", response);
         return response;
     }
 
-    @GetMapping("/agent-groups/by-name")
+    @PostMapping("/agent-groups/by-name")
     @Operation(summary = "그룹 조회(이름)", description = "상담사 그룹을 이름으로 조회합니다.")
     public ApiResponse<List<AgentGroupSummary>> getAgentGroupByName(
-        @Parameter(description = "그룹 이름", example = "AGENT_GROUP_A")
-        @RequestParam String name,
-        @Parameter(description = "테넌트 DBID", example = "101")
-        @RequestParam(required = false) Integer tenantDbid) {
-        log.debug("getAgentGroupByName 요청: name={}, tenantDbid={}", name, tenantDbid);
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "그룹 조회 요청",
+            required = true,
+            content = @Content(
+                schema = @Schema(implementation = AgentGroupByNameRequest.class),
+                examples = @ExampleObject(name = "agentGroupByName", value = "{\"name\":\"Sales\",\"tenantDbid\":101}")
+            )
+        )
+        @Valid @RequestBody AgentGroupByNameRequest request) {
+        log.debug("getAgentGroupByName 요청: name={}, tenantDbid={}", request.name(), request.tenantDbid());
         ApiResponse<List<AgentGroupSummary>> response = ApiResponse.ok("그룹 조회",
-            agentGroupService.listAgentGroupsByName(name, tenantDbid));
+            agentGroupService.listAgentGroupsByName(request.name(), request.tenantDbid()));
         log.debug("getAgentGroupByName 응답: count={}", response.data() == null ? 0 : response.data().size());
         return response;
     }
 
-    @PostMapping("/agent-groups")
+    @PostMapping("/agent-groups/create")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "그룹 생성", description = "상담사 그룹을 생성합니다.")
     public ApiResponse<AgentGroupSummary> createAgentGroup(
-        @Parameter(description = "그룹 생성 요청")
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "그룹 생성 요청",
+            required = true,
+            content = @Content(
+                schema = @Schema(implementation = AgentGroupRequest.class),
+                examples = @ExampleObject(name = "agentGroupCreate", value = "{\"tenantDbid\":101,\"name\":\"Sales\",\"description\":\"Sales Group\",\"enabled\":true}")
+            )
+        )
         @Valid @RequestBody AgentGroupRequest request) {
         log.debug("createAgentGroup 요청: {}", request);
         ApiResponse<AgentGroupSummary> response = ApiResponse.ok("그룹 생성", agentGroupService.createAgentGroup(request));
@@ -85,85 +113,120 @@ public class AgentGroupController {
         return response;
     }
 
-    @PutMapping("/agent-groups/{groupDbid}")
+    @PostMapping("/agent-groups/update")
     @Operation(summary = "그룹 수정", description = "상담사 그룹 정보를 수정합니다.")
     public ApiResponse<AgentGroupSummary> updateAgentGroup(
-        @Parameter(description = "그룹 DBID", example = "2001")
-        @PathVariable int groupDbid,
-        @Parameter(description = "그룹 수정 요청")
-        @Valid @RequestBody AgentGroupRequest request) {
-        log.debug("updateAgentGroup 요청: groupDbid={}, request={}", groupDbid, request);
-        ApiResponse<AgentGroupSummary> response = ApiResponse.ok("그룹 수정", agentGroupService.updateAgentGroup(groupDbid, request));
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "그룹 수정 요청",
+            required = true,
+            content = @Content(
+                schema = @Schema(implementation = AgentGroupUpdateCommand.class),
+                examples = @ExampleObject(name = "agentGroupUpdate", value = "{\"groupDbid\":10,\"payload\":{\"tenantDbid\":101,\"name\":\"Sales\",\"description\":\"Sales Group\",\"enabled\":true}}")
+            )
+        )
+        @Valid @RequestBody AgentGroupUpdateCommand command) {
+        log.debug("updateAgentGroup 요청: groupDbid={}, request={}", command.groupDbid(), command.payload());
+        ApiResponse<AgentGroupSummary> response = ApiResponse.ok("그룹 수정",
+            agentGroupService.updateAgentGroup(command.groupDbid(), command.payload()));
         log.debug("updateAgentGroup 응답: {}", response);
         return response;
     }
 
-    @DeleteMapping("/agent-groups/{groupDbid}")
+    @PostMapping("/agent-groups/delete")
     @Operation(summary = "그룹 삭제", description = "상담사 그룹을 삭제합니다.")
     public ApiResponse<Void> deleteAgentGroup(
-        @Parameter(description = "그룹 DBID", example = "2001")
-        @PathVariable int groupDbid,
-        @Parameter(description = "테넌트 DBID", example = "101")
-        @RequestParam(required = false) Integer tenantDbid) {
-        log.debug("deleteAgentGroup 요청: groupDbid={}, tenantDbid={}", groupDbid, tenantDbid);
-        agentGroupService.deleteAgentGroup(groupDbid, tenantDbid);
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "그룹 삭제 요청",
+            required = true,
+            content = @Content(
+                schema = @Schema(implementation = AgentGroupDeleteRequest.class),
+                examples = @ExampleObject(name = "agentGroupDelete", value = "{\"groupDbid\":10,\"tenantDbid\":101}")
+            )
+        )
+        @Valid @RequestBody AgentGroupDeleteRequest request) {
+        log.debug("deleteAgentGroup 요청: groupDbid={}, tenantDbid={}", request.groupDbid(), request.tenantDbid());
+        agentGroupService.deleteAgentGroup(request.groupDbid(), request.tenantDbid());
         ApiResponse<Void> response = ApiResponse.ok("그룹 삭제", null);
         log.debug("deleteAgentGroup 응답: {}", response);
         return response;
     }
 
-    @PostMapping("/agent-groups/{groupDbid}/assign-employee-ids")
+    @PostMapping("/agent-groups/assign-employee-ids")
     @Operation(summary = "그룹 배치(사번)", description = "사번 기준으로 그룹 배치를 합니다.")
     public ApiResponse<AgentGroupSummary> assignAgentGroupByEmployeeIds(
-        @Parameter(description = "그룹 DBID", example = "2001")
-        @PathVariable int groupDbid,
-        @Parameter(description = "사번 목록")
-        @Valid @RequestBody AgentGroupAssignEmployeeRequest request) {
-        log.debug("assignAgentGroupByEmployeeIds 요청: groupDbid={}, request={}", groupDbid, request);
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "그룹 배치 요청",
+            required = true,
+            content = @Content(
+                schema = @Schema(implementation = AgentGroupAssignEmployeeCommand.class),
+                examples = @ExampleObject(name = "assignByEmployee", value = "{\"groupDbid\":10,\"payload\":{\"tenantDbid\":101,\"employeeIds\":[\"E001\",\"E002\"]}}")
+            )
+        )
+        @Valid @RequestBody AgentGroupAssignEmployeeCommand command) {
+        log.debug("assignAgentGroupByEmployeeIds 요청: groupDbid={}, request={}",
+            command.groupDbid(), command.payload());
         ApiResponse<AgentGroupSummary> response = ApiResponse.ok("그룹 배치",
-            agentGroupService.assignAgentGroupByEmployeeIds(groupDbid, request));
+            agentGroupService.assignAgentGroupByEmployeeIds(command.groupDbid(), command.payload()));
         log.debug("assignAgentGroupByEmployeeIds 응답: {}", response);
         return response;
     }
 
-    @PostMapping("/agent-groups/{groupDbid}/assign-person-dbids")
+    @PostMapping("/agent-groups/assign-person-dbids")
     @Operation(summary = "그룹 배치(DBID)", description = "상담사 DBID 기준으로 그룹 배치를 합니다.")
     public ApiResponse<AgentGroupSummary> assignAgentGroupByPersonDbids(
-        @Parameter(description = "그룹 DBID", example = "2001")
-        @PathVariable int groupDbid,
-        @Parameter(description = "상담사 DBID 목록")
-        @Valid @RequestBody AgentGroupAssignPersonRequest request) {
-        log.debug("assignAgentGroupByPersonDbids 요청: groupDbid={}, request={}", groupDbid, request);
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "그룹 배치 요청",
+            required = true,
+            content = @Content(
+                schema = @Schema(implementation = AgentGroupAssignPersonCommand.class),
+                examples = @ExampleObject(name = "assignByPersonDbid", value = "{\"groupDbid\":10,\"payload\":{\"tenantDbid\":101,\"personDbids\":[2001,2002]}}")
+            )
+        )
+        @Valid @RequestBody AgentGroupAssignPersonCommand command) {
+        log.debug("assignAgentGroupByPersonDbids 요청: groupDbid={}, request={}",
+            command.groupDbid(), command.payload());
         ApiResponse<AgentGroupSummary> response = ApiResponse.ok("그룹 배치",
-            agentGroupService.assignAgentGroupByPersonDbids(groupDbid, request));
+            agentGroupService.assignAgentGroupByPersonDbids(command.groupDbid(), command.payload()));
         log.debug("assignAgentGroupByPersonDbids 응답: {}", response);
         return response;
     }
 
-    @PostMapping("/agent-groups/{groupDbid}/unassign-employee-ids")
+    @PostMapping("/agent-groups/unassign-employee-ids")
     @Operation(summary = "그룹 배치 해제(사번)", description = "사번 기준으로 그룹 배치를 해제합니다.")
     public ApiResponse<AgentGroupSummary> unassignAgentGroupByEmployeeIds(
-        @Parameter(description = "그룹 DBID", example = "2001")
-        @PathVariable int groupDbid,
-        @Parameter(description = "사번 목록")
-        @Valid @RequestBody AgentGroupAssignEmployeeRequest request) {
-        log.debug("unassignAgentGroupByEmployeeIds 요청: groupDbid={}, request={}", groupDbid, request);
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "그룹 배치 해제 요청",
+            required = true,
+            content = @Content(
+                schema = @Schema(implementation = AgentGroupAssignEmployeeCommand.class),
+                examples = @ExampleObject(name = "unassignByEmployee", value = "{\"groupDbid\":10,\"payload\":{\"tenantDbid\":101,\"employeeIds\":[\"E001\"]}}")
+            )
+        )
+        @Valid @RequestBody AgentGroupAssignEmployeeCommand command) {
+        log.debug("unassignAgentGroupByEmployeeIds 요청: groupDbid={}, request={}",
+            command.groupDbid(), command.payload());
         ApiResponse<AgentGroupSummary> response = ApiResponse.ok("그룹 배치 해제",
-            agentGroupService.unassignAgentGroupByEmployeeIds(groupDbid, request));
+            agentGroupService.unassignAgentGroupByEmployeeIds(command.groupDbid(), command.payload()));
         log.debug("unassignAgentGroupByEmployeeIds 응답: {}", response);
         return response;
     }
 
-    @PostMapping("/agent-groups/{groupDbid}/unassign-person-dbids")
+    @PostMapping("/agent-groups/unassign-person-dbids")
     @Operation(summary = "그룹 배치 해제(DBID)", description = "상담사 DBID 기준으로 그룹 배치를 해제합니다.")
     public ApiResponse<AgentGroupSummary> unassignAgentGroupByPersonDbids(
-        @Parameter(description = "그룹 DBID", example = "2001")
-        @PathVariable int groupDbid,
-        @Parameter(description = "상담사 DBID 목록")
-        @Valid @RequestBody AgentGroupAssignPersonRequest request) {
-        log.debug("unassignAgentGroupByPersonDbids 요청: groupDbid={}, request={}", groupDbid, request);
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "그룹 배치 해제 요청",
+            required = true,
+            content = @Content(
+                schema = @Schema(implementation = AgentGroupAssignPersonCommand.class),
+                examples = @ExampleObject(name = "unassignByPersonDbid", value = "{\"groupDbid\":10,\"payload\":{\"tenantDbid\":101,\"personDbids\":[2001]}}")
+            )
+        )
+        @Valid @RequestBody AgentGroupAssignPersonCommand command) {
+        log.debug("unassignAgentGroupByPersonDbids 요청: groupDbid={}, request={}",
+            command.groupDbid(), command.payload());
         ApiResponse<AgentGroupSummary> response = ApiResponse.ok("그룹 배치 해제",
-            agentGroupService.unassignAgentGroupByPersonDbids(groupDbid, request));
+            agentGroupService.unassignAgentGroupByPersonDbids(command.groupDbid(), command.payload()));
         log.debug("unassignAgentGroupByPersonDbids 응답: {}", response);
         return response;
     }

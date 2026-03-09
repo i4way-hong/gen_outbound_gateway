@@ -7,12 +7,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
 import com.genoutbound.gateway.security.JwtAuthenticationFilter;
 import com.genoutbound.gateway.security.admin.AdminSessionAuthenticationFilter;
 import com.genoutbound.gateway.security.permission.PermissionCodes;
@@ -47,6 +47,23 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable());
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
 
+        http.exceptionHandling(exception -> exception
+            .authenticationEntryPoint((request, response, authException) -> {
+                log.warn("인증 실패: path={}, message={}", request.getRequestURI(), authException.getMessage());
+                response.sendError(org.springframework.http.HttpStatus.UNAUTHORIZED.value(), "Unauthorized");
+            })
+            .accessDeniedHandler((request, response, accessDeniedException) -> {
+                Authentication authentication = org.springframework.security.core.context.SecurityContextHolder
+                    .getContext().getAuthentication();
+                if (authentication == null) {
+                    log.warn("접근 거부(인증 없음): path={}", request.getRequestURI());
+                } else {
+                    log.warn("접근 거부: path={}, username={}, authorities={}",
+                        request.getRequestURI(), authentication.getName(), authentication.getAuthorities());
+                }
+                response.sendError(org.springframework.http.HttpStatus.FORBIDDEN.value(), "Forbidden");
+            }));
+
         if (!securityProperties.isAuthEnabled() || !securityProperties.isJwtEnabled()) {
             if (!securityProperties.isAuthEnabled()) {
                 log.warn("인증이 비활성화되어 모든 요청을 허용합니다. app.security.auth-enabled=true 설정 필요.");
@@ -63,7 +80,7 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(auth -> {
         auth.requestMatchers("/", "/favicon.ico", "/css/**", "/js/**", "/images/**", "/actuator/health",
-            "/auth/login", "/auth/refresh", "/admin/login", "/admin/logout")
+            "/auth/login", "/auth/refresh", "/auth/logout", "/admin/login", "/admin/logout")
                 .permitAll();
 
             auth.requestMatchers("/api/status")
@@ -93,23 +110,11 @@ public class SecurityConfig {
                     "/admin/permissions/*")
                 .denyAll();
 
-            auth.requestMatchers(HttpMethod.GET, "/api/v1/configuration/**")
+            auth.requestMatchers("/api/v1/configuration/**")
                 .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.CONFIG_READ, PermissionCodes.CONFIG_WRITE);
-            auth.requestMatchers(HttpMethod.POST, "/api/v1/configuration/**")
-                .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.CONFIG_WRITE);
-            auth.requestMatchers(HttpMethod.PUT, "/api/v1/configuration/**")
-                .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.CONFIG_WRITE);
-            auth.requestMatchers(HttpMethod.DELETE, "/api/v1/configuration/**")
-                .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.CONFIG_WRITE);
 
-            auth.requestMatchers(HttpMethod.GET, "/api/v1/outbound/**")
+            auth.requestMatchers("/api/v1/outbound/**")
                 .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.OUTBOUND_READ, PermissionCodes.OUTBOUND_WRITE);
-            auth.requestMatchers(HttpMethod.POST, "/api/v1/outbound/**")
-                .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.OUTBOUND_WRITE);
-            auth.requestMatchers(HttpMethod.PUT, "/api/v1/outbound/**")
-                .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.OUTBOUND_WRITE);
-            auth.requestMatchers(HttpMethod.DELETE, "/api/v1/outbound/**")
-                .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.OUTBOUND_WRITE);
 
             auth.requestMatchers("/api/v1/stat/**")
                 .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.STAT_READ);

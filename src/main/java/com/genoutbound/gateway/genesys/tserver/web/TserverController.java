@@ -7,6 +7,7 @@ import com.genoutbound.gateway.web.annotation.CccEncryptedController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * T-Server 연동 컨트롤러.
  */
 @CccEncryptedController
+@SecurityRequirement(name = "bearerAuth")
 public class TserverController {
 
     private static final Logger log = LoggerFactory.getLogger(TserverController.class);
@@ -167,18 +169,18 @@ public class TserverController {
             if (dn.isBlank()) {
                 return new ApiResponse<>(false, "INLINE_NUM 값이 필요합니다.", null, OffsetDateTime.now());
             }
-            tserverClient.executeWithProtocol(protocol -> {
-                tserverClient.register(protocol, dn);
+            String loginId = tserverClient.executeWithProtocol(protocol -> {
+                String agentId = tserverClient.register(protocol, dn);
                 switch (type) {
                     case LOGOUT -> tserverClient.logout(protocol, dn);
                     case READY -> tserverClient.ready(protocol, dn);
                     case NOT_READY -> tserverClient.notReady(protocol, dn, reason);
                 }
                 tserverClient.unregister(protocol, dn);
-                return null;
+                return agentId;
             });
             payload.put("RESULT", "T");
-            payload.put("LOGIN_ID", "");
+            payload.put("LOGIN_ID", loginId == null ? "" : loginId);
             payload.put("RESULT_MSG", "");
             return ApiResponse.ok(type.getMessage(), payload);
         } catch (GenesysUnavailableException ex) {

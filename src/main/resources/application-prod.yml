@@ -10,7 +10,7 @@ app:
     jwt:
       issuer: ${JWT_ISSUER:gen-outbound-gateway}
       secret: ${JWT_SECRET:}
-      access-token-minutes: ${JWT_ACCESS_TOKEN_MINUTES:15}
+      access-token-minutes: ${JWT_ACCESS_TOKEN_MINUTES:120}
       refresh-token-days: ${JWT_REFRESH_TOKEN_DAYS:7}
 
 management:

@@ -4,6 +4,7 @@ import com.genesyslab.platform.commons.protocol.ChannelState;
 import com.genesyslab.platform.commons.protocol.Endpoint;
 import com.genesyslab.platform.commons.protocol.ProtocolException;
 import com.genesyslab.platform.outbound.protocol.OutboundServerProtocol;
+import com.genoutbound.gateway.core.ApiException;
 import com.genoutbound.gateway.genesys.outbound.OutboundProperties;
 import com.genoutbound.gateway.genesys.common.GenesysUnavailableException;
 import java.net.URI;
@@ -49,6 +50,8 @@ public class OutboundClient {
         OutboundServerProtocol protocol = openProtocol();
         try {
             return action.apply(protocol);
+        } catch (ApiException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new GenesysUnavailableException("Outbound 요청 처리 실패", ex);
         } finally {
