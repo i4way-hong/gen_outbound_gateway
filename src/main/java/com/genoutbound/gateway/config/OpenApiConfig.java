@@ -26,7 +26,7 @@ public class OpenApiConfig {
         "/api/v1/outbound/health",
         "/api/v1/outbound/desktop",
         "/api/status",
-        "/api/v1/crypto",
+        //"/api/v1/crypto",
         "/api/v1/scs",
         "/api/v1/stat",
         "/api/v1/voice",
@@ -36,7 +36,7 @@ public class OpenApiConfig {
     private static final List<String> BLOCKED_TAGS = List.of(
         "Api Status",
         "Crypto Secure",
-        "Crypto Test",
+        //"Crypto Test",
         "SCS SSE",
         "Stat",
         "Tserver",

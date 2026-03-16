@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# Gen Outbound Gateway 디버깅 실행 스크립트 (Linux/macOS)
+# 필요 환경변수는 README.md 참고
+
+set -euo pipefail
+
+export SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
+
+export LOGBACK_CONFIG_PATH=${LOGBACK_CONFIG_PATH:-./scripts/config/logback-spring.xml}
+export LOG_DIR=${LOG_DIR:-./logs}
+
+export DB_URL=${DB_URL:-"jdbc:sqlserver://172.168.30.61:1433;databaseName=RND_TEST;encrypt=true;trustServerCertificate=true"}
+export DB_USERNAME=${DB_USERNAME:-RND_USER}
+
+# DB_PASSWORD는 환경변수로 반드시 주입하세요.
+# ADMIN_PASSWORD는 환경변수로 반드시 주입하세요.
+# GENESYS_CFG_PASSWORD는 환경변수로 반드시 주입하세요.
+
+export ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+export JWT_ENABLED=${JWT_ENABLED:-true}
+
+export GENESYS_CFG_USERNAME=${GENESYS_CFG_USERNAME:-default}
+
+export CCC_SERVICE_ENC_ENABLED=${CCC_SERVICE_ENC_ENABLED:-true}
+export CCC_SERVICE_ENC_KEY=${CCC_SERVICE_ENC_KEY:-12345678901234567890123456789012}
+export CCC_SERVICE_ENC_IV=${CCC_SERVICE_ENC_IV:-1234567890123456}
+
+export JWT_SECRET=${JWT_SECRET:-CHANGE_ME_32_BYTE_SECRET_FOR_PROD}
+
+MISSING=""
+for var in DB_URL DB_USERNAME DB_PASSWORD ADMIN_USERNAME ADMIN_PASSWORD GENESYS_CFG_USERNAME GENESYS_CFG_PASSWORD; do
+  if [[ -z "${!var:-}" ]]; then
+    MISSING+=" ${var}"
+  fi
+done
+
+if [[ -n "$MISSING" ]]; then
+  echo "필수 환경변수가 없습니다:${MISSING}"
+  echo "실행 전에 환경변수를 설정하세요."
+  exit 1
+fi
+
+if [[ "${SPRING_PROFILES_ACTIVE}" == "prod" ]]; then
+  if [[ -z "${JWT_SECRET:-}" ]]; then
+    echo "prod 프로파일에서는 JWT_SECRET 환경변수가 필요합니다."
+    exit 1
+  fi
+fi
+
+if [[ "${CCC_SERVICE_ENC_ENABLED}" == "true" ]]; then
+  if [[ -z "${CCC_SERVICE_ENC_KEY:-}" ]]; then
+    echo "암호화가 활성화 되었지만 CCC_SERVICE_ENC_KEY가 없습니다."
+    exit 1
+  fi
+  if [[ -z "${CCC_SERVICE_ENC_IV:-}" ]]; then
+    echo "암호화가 활성화 되었지만 CCC_SERVICE_ENC_IV가 없습니다."
+    exit 1
+  fi
+fi
+
+echo "프로파일 ${SPRING_PROFILES_ACTIVE}"
+echo "앱을 디버그 모드로 시작합니다.."
+
+echo "JDWP 포트: 5005"
+mvn spring-boot:run -Dspring-boot.run.jvmArguments="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
