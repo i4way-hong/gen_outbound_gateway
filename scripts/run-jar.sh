@@ -31,19 +31,21 @@ fi
 
 : "${DB_URL:=jdbc:sqlserver://172.168.30.61:1433;databaseName=RND_TEST;encrypt=true;trustServerCertificate=true}"
 : "${DB_USERNAME:=RND_USER}"
-: "${DB_PASSWORD:=RND_USER}"
+# DB_PASSWORD는 환경변수로 반드시 주입하세요.
 
 : "${ADMIN_USERNAME:=admin}"
-: "${ADMIN_PASSWORD:=admin123}"
+# ADMIN_PASSWORD는 환경변수로 반드시 주입하세요.
 
 : "${JWT_ENABLED:=false}"
 
 : "${GENESYS_CFG_USERNAME:=default}"
-: "${GENESYS_CFG_PASSWORD:=password}"
+# GENESYS_CFG_PASSWORD는 환경변수로 반드시 주입하세요.
 
 : "${CCC_SERVICE_ENC_ENABLED:=false}"
 : "${CCC_SERVICE_ENC_KEY:=12345678901234567890123456789012}"
 : "${CCC_SERVICE_ENC_IV:=1234567890123456}"
+
+: "${JWT_SECRET:=CHANGE_ME_32_BYTE_SECRET_FOR_PROD}"
 
 if [[ -z "${JAR_PATH:-}" ]]; then
   if [[ -f "${BASE_DIR}/gen-outbound-gateway-0.0.1-SNAPSHOT.jar" ]]; then
@@ -74,7 +76,7 @@ if [[ "${JAVA_VERSION}" != 17* ]]; then
 fi
 
 missing=()
-for var in DB_URL DB_USERNAME DB_PASSWORD GENESYS_CFG_USERNAME GENESYS_CFG_PASSWORD; do
+for var in DB_URL DB_USERNAME DB_PASSWORD ADMIN_USERNAME ADMIN_PASSWORD GENESYS_CFG_USERNAME GENESYS_CFG_PASSWORD; do
   if [[ -z "${!var:-}" ]]; then
     missing+=("${var}")
   fi
@@ -84,6 +86,13 @@ if [[ ${#missing[@]} -gt 0 ]]; then
   echo "필수 환경변수가 없습니다: ${missing[*]}"
   echo "config/.env.prod 또는 시스템 환경변수를 설정하세요."
   exit 1
+fi
+
+if [[ "${SPRING_PROFILES_ACTIVE}" == "prod" ]]; then
+  if [[ -z "${JWT_SECRET:-}" ]]; then
+    echo "prod 프로파일에서는 JWT_SECRET 환경변수가 필요합니다."
+    exit 1
+  fi
 fi
 
 if [[ "${CCC_SERVICE_ENC_ENABLED:-}" == "true" ]]; then

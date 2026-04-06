@@ -21,7 +21,9 @@ import com.genoutbound.gateway.genesys.cfg.dto.OutboundBatchCreateRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.OutboundBatchCreateResponse;
 import com.genoutbound.gateway.genesys.cfg.dto.TableAccessSummary;
 import com.genoutbound.gateway.genesys.cfg.dto.TenantDbidRequest;
+import com.genoutbound.gateway.genesys.cfg.dto.TreatmentRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.TreatmentSummary;
+import com.genoutbound.gateway.genesys.cfg.dto.TreatmentUpdateCommand;
 import com.genoutbound.gateway.genesys.cfg.service.OutboundConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -644,6 +646,93 @@ public class OutboundConfigController {
         ApiResponse<TreatmentSummary> response = ApiResponse.ok("Treatment 조회",
             outboundService.getTreatmentByName(name, tenantDbid));
         log.debug("getTreatmentByName 응답: {}", response);
+        return response;
+    }
+
+    @PostMapping("/treatment/create")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Treatment 생성", description = "Treatment를 생성합니다.")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "201",
+            description = "생성 성공",
+            content = @Content(schema = @Schema(implementation = ApiResponse.class),
+                examples = @ExampleObject(
+                    name = "treatmentCreated",
+                    value = "{\"success\":true,\"message\":\"Treatment 생성\",\"data\":{\"dbid\":14001,\"name\":\"TREATMENT_A\",\"tenantDbid\":1,\"description\":\"Treatment 설명\",\"callResult\":\"Answer\",\"recActionCode\":\"CFGRACRetryIn\",\"attempts\":3,\"dateTime\":\"2026-03-20T10:30:00+09:00\",\"cycleAttempt\":5,\"interval\":10,\"increment\":5,\"callActionCode\":\"CFGCACTreatment\",\"destDnDbid\":15001,\"state\":\"CFGEnabled\",\"userProperties\":{\"default\":{\"key\":\"value\"}}},\"timestamp\":\"2026-03-20T10:30:00+09:00\"}"
+                ))
+        )
+    })
+    public ApiResponse<TreatmentSummary> createTreatment(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Treatment 생성 요청",
+            required = true,
+            content = @Content(
+                schema = @Schema(implementation = TreatmentRequest.class),
+                examples = @ExampleObject(
+                    name = "treatmentCreate",
+                    value = "{\"tenantDbid\":1,\"name\":\"TREATMENT_A\",\"description\":\"Treatment 설명\",\"callResult\":\"Answer\",\"recActionCode\":\"CFGRACRetryIn\",\"attempts\":3,\"dateTime\":\"2026-03-20T10:30:00+09:00\",\"cycleAttempt\":5,\"interval\":10,\"increment\":5,\"callActionCode\":\"CFGCACTreatment\",\"destDnDbid\":15001,\"userProperties\":{\"default\":{\"key\":\"value\"}},\"enabled\":true}"
+                )
+            )
+        )
+        @Valid @RequestBody TreatmentRequest request) {
+        log.debug("createTreatment 요청: {}", request);
+        ApiResponse<TreatmentSummary> response = ApiResponse.ok("Treatment 생성", outboundService.createTreatment(request));
+        log.debug("createTreatment 응답: {}", response);
+        return response;
+    }
+
+    @PostMapping("/treatment/update")
+    @Operation(summary = "Treatment 수정", description = "Treatment 정보를 수정합니다.")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "200",
+            description = "성공",
+            content = @Content(schema = @Schema(implementation = ApiResponse.class),
+                examples = @ExampleObject(
+                    name = "treatmentUpdated",
+                    value = "{\"success\":true,\"message\":\"Treatment 수정\",\"data\":{\"dbid\":14001,\"name\":\"TREATMENT_A\",\"tenantDbid\":1,\"description\":\"Treatment 설명(수정)\",\"callResult\":\"Answer\",\"recActionCode\":\"CFGRACRetryIn\",\"attempts\":3,\"dateTime\":\"2026-03-20T10:30:00+09:00\",\"cycleAttempt\":5,\"interval\":10,\"increment\":5,\"callActionCode\":\"CFGCACTreatment\",\"destDnDbid\":15001,\"state\":\"CFGEnabled\",\"userProperties\":{\"default\":{\"key\":\"value\"}}},\"timestamp\":\"2026-03-20T10:30:00+09:00\"}"
+                ))
+        )
+    })
+    public ApiResponse<TreatmentSummary> updateTreatment(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Treatment 수정 요청",
+            required = true,
+            content = @Content(
+                schema = @Schema(implementation = TreatmentUpdateCommand.class),
+                examples = @ExampleObject(
+                    name = "treatmentUpdate",
+                    value = "{\"treatmentDbid\":14001,\"payload\":{\"tenantDbid\":1,\"name\":\"TREATMENT_A\",\"description\":\"Treatment 설명(수정)\",\"callResult\":\"Answer\",\"recActionCode\":\"CFGRACRetryIn\",\"attempts\":3,\"dateTime\":\"2026-03-20T10:30:00+09:00\",\"cycleAttempt\":5,\"interval\":10,\"increment\":5,\"callActionCode\":\"CFGCACTreatment\",\"destDnDbid\":15001,\"userProperties\":{\"default\":{\"key\":\"value\"}},\"enabled\":true}}"
+                )
+            )
+        )
+        @Valid @RequestBody TreatmentUpdateCommand command) {
+        log.debug("updateTreatment 요청: treatmentDbid={}, request={}", command.treatmentDbid(), command.payload());
+        ApiResponse<TreatmentSummary> response = ApiResponse.ok("Treatment 수정",
+            outboundService.updateTreatment(command.treatmentDbid(), command.payload()));
+        log.debug("updateTreatment 응답: {}", response);
+        return response;
+    }
+
+    @PostMapping("/treatment/delete")
+    @Operation(summary = "Treatment 삭제", description = "Treatment를 삭제합니다.")
+    public ApiResponse<Void> deleteTreatment(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Treatment 삭제 요청",
+            required = true,
+            content = @Content(
+                schema = @Schema(implementation = DbidTenantRequest.class),
+                examples = @ExampleObject(name = "treatmentDelete", value = "{\"dbid\":14001,\"tenantDbid\":1}")
+            )
+        )
+        @RequestBody DbidTenantRequest request) {
+        int treatmentDbid = request.dbid();
+        Integer tenantDbid = request.tenantDbid();
+        log.debug("deleteTreatment 요청: treatmentDbid={}, tenantDbid={}", treatmentDbid, tenantDbid);
+        outboundService.deleteTreatment(treatmentDbid, tenantDbid);
+        ApiResponse<Void> response = ApiResponse.ok("Treatment 삭제", null);
+        log.debug("deleteTreatment 응답: {}", response);
         return response;
     }
 

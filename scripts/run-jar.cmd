@@ -33,19 +33,21 @@ if not "!ENV_FILE!"=="" (
 
 if "!DB_URL!"=="" set "DB_URL=jdbc:sqlserver://172.168.30.61:1433;databaseName=RND_TEST;encrypt=true;trustServerCertificate=true"
 if "!DB_USERNAME!"=="" set "DB_USERNAME=RND_USER"
-if "!DB_PASSWORD!"=="" set "DB_PASSWORD=RND_USER"
+REM DB_PASSWORD는 환경변수로 반드시 주입하세요.
 
 if "!ADMIN_USERNAME!"=="" set "ADMIN_USERNAME=admin"
-if "!ADMIN_PASSWORD!"=="" set "ADMIN_PASSWORD=admin123"
+REM ADMIN_PASSWORD는 환경변수로 반드시 주입하세요.
 
 if "!JWT_ENABLED!"=="" set "JWT_ENABLED=false"
 
 if "!GENESYS_CFG_USERNAME!"=="" set "GENESYS_CFG_USERNAME=default"
-if "!GENESYS_CFG_PASSWORD!"=="" set "GENESYS_CFG_PASSWORD=password"
+REM GENESYS_CFG_PASSWORD는 환경변수로 반드시 주입하세요.
 
 if "!CCC_SERVICE_ENC_ENABLED!"=="" set "CCC_SERVICE_ENC_ENABLED=false"
 if "!CCC_SERVICE_ENC_KEY!"=="" set "CCC_SERVICE_ENC_KEY=12345678901234567890123456789012"
 if "!CCC_SERVICE_ENC_IV!"=="" set "CCC_SERVICE_ENC_IV=1234567890123456"
+
+if "!JWT_SECRET!"=="" set "JWT_SECRET=CHANGE_ME_32_BYTE_SECRET_FOR_PROD"
 
 if "!JAR_PATH!"=="" (
   if exist "!BASE_DIR!\gen-outbound-gateway-0.0.1-SNAPSHOT.jar" set "JAR_PATH=!BASE_DIR!\gen-outbound-gateway-0.0.1-SNAPSHOT.jar"
@@ -72,7 +74,7 @@ echo Java 버전 확인 중...
 "%JAVA_EXE%" -version
 
 set MISSING=
-for %%V in (DB_URL DB_USERNAME DB_PASSWORD GENESYS_CFG_USERNAME GENESYS_CFG_PASSWORD) do (
+for %%V in (DB_URL DB_USERNAME DB_PASSWORD ADMIN_USERNAME ADMIN_PASSWORD GENESYS_CFG_USERNAME GENESYS_CFG_PASSWORD) do (
   if "!%%V!"=="" set MISSING=!MISSING! %%V
 )
 
@@ -81,6 +83,14 @@ if not "%MISSING%"=="" (
   echo config\.env.prod 또는 시스템 환경변수를 설정하세요.
   endlocal
   exit /b 1
+)
+
+if /i "!SPRING_PROFILES_ACTIVE!"=="prod" (
+  if "!JWT_SECRET!"=="" (
+    echo prod 프로파일에서는 JWT_SECRET 환경변수가 필요합니다.
+    endlocal
+    exit /b 1
+  )
 )
 
 if /i "!CCC_SERVICE_ENC_ENABLED!"=="true" (

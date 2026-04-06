@@ -20,11 +20,14 @@ import com.genesyslab.platform.applicationblocks.com.queries.CfgFilterQuery;
 import com.genesyslab.platform.applicationblocks.com.queries.CfgFormatQuery;
 import com.genesyslab.platform.applicationblocks.com.queries.CfgTableAccessQuery;
 import com.genesyslab.platform.applicationblocks.com.queries.CfgTreatmentQuery;
+import com.genesyslab.platform.configuration.protocol.types.CfgCallActionCode;
 import com.genesyslab.platform.configuration.protocol.types.CfgDialMode;
 import com.genesyslab.platform.configuration.protocol.types.CfgObjectState;
 import com.genesyslab.platform.configuration.protocol.types.CfgObjectType;
 import com.genesyslab.platform.configuration.protocol.types.CfgOptimizationMethod;
 import com.genesyslab.platform.configuration.protocol.types.CfgOperationMode;
+import com.genesyslab.platform.configuration.protocol.types.CfgRecActionCode;
+import com.genesyslab.platform.configuration.protocol.types.GctiCallState;
 import com.genesyslab.platform.commons.collections.KeyValueCollection;
 import com.genesyslab.platform.commons.collections.KeyValuePair;
 import com.genoutbound.gateway.core.ApiException;
@@ -43,6 +46,7 @@ import com.genoutbound.gateway.genesys.cfg.dto.OutboundBatchCreateResponse;
 import com.genoutbound.gateway.genesys.cfg.dto.OutboundBatchCreateSummary;
 import com.genoutbound.gateway.genesys.cfg.dto.ServerSummary;
 import com.genoutbound.gateway.genesys.cfg.dto.TableAccessSummary;
+import com.genoutbound.gateway.genesys.cfg.dto.TreatmentRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.TreatmentSummary;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -598,6 +602,76 @@ public class OutboundConfigService extends GenesysConfigSupport {
         return result;
     }
 
+    public TreatmentSummary createTreatment(TreatmentRequest request) {
+        log.debug("createTreatment 요청: {}", request);
+        int resolvedTenant = resolveTenantDbid(request.tenantDbid());
+        TreatmentSummary result = configClient.withConfService(service -> {
+            try {
+                CfgTreatmentQuery duplicateQuery = new CfgTreatmentQuery();
+                duplicateQuery.setTenantDbid(resolvedTenant);
+                duplicateQuery.setName(request.name());
+                CfgTreatment existing = service.retrieveObject(CfgTreatment.class, duplicateQuery);
+                ensureNotExists(existing, "이미 존재하는 Treatment입니다.");
+
+                CfgTreatment treatment = new CfgTreatment(service);
+                treatment.setTenantDBID(resolvedTenant);
+                applyTreatmentRequest(treatment, request, true);
+                treatment.setState(request.isEnabled() ? CfgObjectState.CFGEnabled : CfgObjectState.CFGDisabled);
+                treatment.save();
+                return toTreatmentSummary(treatment);
+            } catch (ConfigException ex) {
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Treatment 생성 실패");
+            }
+        });
+        log.debug("createTreatment 응답: {}", result);
+        return result;
+    }
+
+    public TreatmentSummary updateTreatment(int treatmentDbid, TreatmentRequest request) {
+        log.debug("updateTreatment 요청: treatmentDbid={}, request={}", treatmentDbid, request);
+        int resolvedTenant = resolveTenantDbid(request.tenantDbid());
+        TreatmentSummary result = configClient.withConfService(service -> {
+            try {
+                CfgTreatmentQuery query = new CfgTreatmentQuery();
+                query.setTenantDbid(resolvedTenant);
+                query.setDbid(treatmentDbid);
+                CfgTreatment treatment = service.retrieveObject(CfgTreatment.class, query);
+                if (treatment == null) {
+                    throw new ApiException(HttpStatus.NOT_FOUND, "Treatment을 찾을 수 없습니다.");
+                }
+                applyTreatmentRequest(treatment, request, false);
+                treatment.setState(request.isEnabled() ? CfgObjectState.CFGEnabled : CfgObjectState.CFGDisabled);
+                treatment.save();
+                return toTreatmentSummary(treatment);
+            } catch (ConfigException ex) {
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Treatment 수정 실패");
+            }
+        });
+        log.debug("updateTreatment 응답: {}", result);
+        return result;
+    }
+
+    public void deleteTreatment(int treatmentDbid, Integer tenantDbid) {
+        log.debug("deleteTreatment 요청: treatmentDbid={}, tenantDbid={}", treatmentDbid, tenantDbid);
+        int resolvedTenant = resolveTenantDbid(tenantDbid);
+        configClient.withConfService(service -> {
+            try {
+                CfgTreatmentQuery query = new CfgTreatmentQuery();
+                query.setTenantDbid(resolvedTenant);
+                query.setDbid(treatmentDbid);
+                CfgTreatment treatment = service.retrieveObject(CfgTreatment.class, query);
+                if (treatment == null) {
+                    throw new ApiException(HttpStatus.NOT_FOUND, "Treatment을 찾을 수 없습니다.");
+                }
+                treatment.delete();
+                return null;
+            } catch (ConfigException ex) {
+                throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Treatment 삭제 실패");
+            }
+        });
+        log.debug("deleteTreatment 응답: 완료");
+    }
+
     public List<CampaignSummary> listCampaigns(Integer tenantDbid) {
         log.debug("listCampaigns 요청: tenantDbid={}", tenantDbid);
         int resolvedTenant = resolveTenantDbid(tenantDbid);
@@ -1123,6 +1197,20 @@ public class OutboundConfigService extends GenesysConfigSupport {
         return OffsetDateTime.ofInstant(calendar.toInstant(), ZoneId.systemDefault()).toString();
     }
 
+    private Calendar parseDateTime(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            OffsetDateTime parsed = OffsetDateTime.parse(value);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(parsed.toInstant().toEpochMilli());
+            return calendar;
+        } catch (Exception ex) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "dateTime 값이 올바르지 않습니다.");
+        }
+    }
+
     private FilterSummary toFilterSummary(CfgFilter filter) {
         String formatName = filter.getFormat() == null ? null : filter.getFormat().getName();
         return new FilterSummary(
@@ -1251,6 +1339,54 @@ public class OutboundConfigService extends GenesysConfigSupport {
         }
         if (request.userProperties() != null && !request.userProperties().isEmpty()) {
             group.setUserProperties(toUserProperties(request.userProperties()));
+        }
+    }
+
+    private void applyTreatmentRequest(CfgTreatment treatment, TreatmentRequest request, boolean isCreate) {
+        if (request.name() != null && !request.name().isBlank()) {
+            treatment.setName(request.name());
+        }
+        if (request.description() != null) {
+            treatment.setDescription(request.description());
+        }
+        if (request.callResult() != null && !request.callResult().isBlank()) {
+            GctiCallState callResult = parseEnum(request.callResult(), GctiCallState.class, "callResult");
+            if (callResult != null) {
+                treatment.setCallResult(callResult);
+            }
+        }
+        if (request.recActionCode() != null && !request.recActionCode().isBlank()) {
+            CfgRecActionCode recActionCode = parseEnum(request.recActionCode(), CfgRecActionCode.class, "recActionCode");
+            if (recActionCode != null) {
+                treatment.setRecActionCode(recActionCode);
+            }
+        }
+        if (request.attempts() != null) {
+            treatment.setAttempts(request.attempts());
+        }
+        if (request.dateTime() != null) {
+            treatment.setDateTime(parseDateTime(request.dateTime()));
+        }
+        if (request.cycleAttempt() != null) {
+            treatment.setCycleAttempt(request.cycleAttempt());
+        }
+        if (request.interval() != null) {
+            treatment.setInterval(request.interval());
+        }
+        if (request.increment() != null) {
+            treatment.setIncrement(request.increment());
+        }
+        if (request.callActionCode() != null && !request.callActionCode().isBlank()) {
+            CfgCallActionCode callActionCode = parseEnum(request.callActionCode(), CfgCallActionCode.class, "callActionCode");
+            if (callActionCode != null) {
+                treatment.setCallActionCode(callActionCode);
+            }
+        }
+        if (request.destDnDbid() != null) {
+            treatment.setDestDNDBID(request.destDnDbid());
+        }
+        if (request.userProperties() != null && !request.userProperties().isEmpty()) {
+            treatment.setUserProperties(toUserProperties(request.userProperties()));
         }
     }
 
