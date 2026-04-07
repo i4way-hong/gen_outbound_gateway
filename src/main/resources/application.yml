@@ -89,7 +89,7 @@ app:
     addp-enabled: ${GENESYS_CFG_ADDP_ENABLED:true}
     addp-client-timeout: ${GENESYS_CFG_ADDP_CLIENT_TIMEOUT:5}
     addp-server-timeout: ${GENESYS_CFG_ADDP_SERVER_TIMEOUT:5}
-    health-check-interval-ms: ${GENESYS_CFG_HEALTH_CHECK_INTERVAL_MS:300000}
+    health-check-interval-ms: ${GENESYS_CFG_HEALTH_CHECK_INTERVAL_MS:600000}
   stat:
     enabled: ${GENESYS_STAT_ENABLED:true}
     primary:

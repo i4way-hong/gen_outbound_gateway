@@ -1,0 +1,38 @@
+# 오프라인 VSIX 반입 목록 (생성일: 2026-04-06)
+# 형식: <extension-id>@<version> | <marketplace-url>
+# 참고: 아래 버전은 현재 개발 PC 기준(code --list-extensions --show-versions)
+
+vscjava.vscode-java-pack@0.30.5 | https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack
+vmware.vscode-boot-dev-pack@0.2.2 | https://marketplace.visualstudio.com/items?itemName=vmware.vscode-boot-dev-pack
+vscjava.vscode-maven@0.45.1 | https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-maven
+redhat.java@1.53.0 | https://marketplace.visualstudio.com/items?itemName=redhat.java
+vscjava.vscode-java-debug@0.58.5 | https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-debug
+vscjava.vscode-java-dependency@0.27.1 | https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-dependency
+vscjava.vscode-java-test@0.44.0 | https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-test
+vscjava.vscode-spring-boot-dashboard@0.14.0 | https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-spring-boot-dashboard
+vmware.vscode-spring-boot@2.1.1 | https://marketplace.visualstudio.com/items?itemName=vmware.vscode-spring-boot
+vscjava.vscode-gradle@3.17.2 | https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-gradle
+
+# 선택(현재 PC에 있음, 폐쇄망 운영/편의 목적)
+ms-vscode.powershell@2025.4.0 | https://marketplace.visualstudio.com/items?itemName=ms-vscode.powershell
+ms-ceintl.vscode-language-pack-ko@1.104.2025091009 | https://marketplace.visualstudio.com/items?itemName=MS-CEINTL.vscode-language-pack-ko
+ms-vscode-remote.remote-ssh@0.120.0 | https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh
+ms-vscode-remote.remote-ssh-edit@0.87.0 | https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh-edit
+ms-vscode.remote-explorer@0.5.0 | https://marketplace.visualstudio.com/items?itemName=ms-vscode.remote-explorer
+
+# Python 확장(본 프로젝트는 Java 중심이므로 선택)
+ms-python.python@2026.4.0 | https://marketplace.visualstudio.com/items?itemName=ms-python.python
+ms-python.vscode-pylance@2025.10.2 | https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance
+ms-python.debugpy@2025.18.0 | https://marketplace.visualstudio.com/items?itemName=ms-python.debugpy
+ms-python.vscode-python-envs@1.12.0 | https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-python-envs
+
+# AI 확장(폐쇄망 정책에 따라 사용 여부 결정)
+github.copilot@1.388.0 | https://marketplace.visualstudio.com/items?itemName=GitHub.copilot
+github.copilot-chat@0.31.5 | https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat
+
+# 추가 권장(현재 PC에는 미설치, Java/Spring 프로젝트 품질 향상)
+EditorConfig.EditorConfig@0.18.1 | https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig
+shengchen.vscode-checkstyle@1.4.2 | https://marketplace.visualstudio.com/items?itemName=shengchen.vscode-checkstyle
+sonarsource.sonarlint-vscode@5.0.0 | https://marketplace.visualstudio.com/items?itemName=sonarsource.sonarlint-vscode
+humao.rest-client@0.25.1 | https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+redhat.vscode-yaml@1.22.2026040308 | https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml

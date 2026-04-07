@@ -1,84 +1,98 @@
-# Gen Outbound Gateway 개발 계획
+# Gen Outbound Gateway 개발 계획 (최신)
 
-## 1. 프로젝트 개요
-- **목적**: Genesys Engage OCS와 외부 시스템 간 Outbound Gateway를 구축해 캠페인 자원/대상 관리, 실행, 모니터링을 REST API와 Thymeleaf UI로 제공.
-- **범위**: 공통(로그인, 대시보드, 알림), 관리자(사용자/권한, 캠페인/자원 설정, 모니터링), 운영자(캠페인 실행, 실시간 모니터링, 리포트).
-- **레퍼런스**: "lib/doc/en-PSDK-9.0.x-Developer-book.pdf"를 기반으로 OCS 연동 규격 확인.
-- **구현 방향**: 단일 Spring Boot 4.0.1 애플리케이션에서 REST API와 Thymeleaf UI를 함께 제공.
+최종 업데이트: 2026-04-06
 
-## 2. 목표 및 성공 기준
-1. 최신 Spring Boot 4.0.1 기반의 안정적인 REST API 제공.
-2. 캠페인 자원/대상/실행 흐름 전체를 UI & API로 관리 가능.
-3. RBAC, 입력 검증, 로깅 등 보안·운영 요건 충족.
-4. Swagger/OpenAPI 문서 및 /docs/works에 작업기록 기록 최신 유지.
+## 1) 프로젝트 목표
 
-## 3. 아키텍처 방향
-| 계층 | 주요 내용 |
+- Genesys Engage OCS 연동 게이트웨이를 안정적으로 운영한다.
+- Config/Outbound/Stat/T-Server/SCS 기능을 REST API로 제공한다.
+- JWT 인증 + CCC 암복호화 정책을 운영 환경에서 안전하게 유지한다.
+- 문서(`README.md`, `docs/works`, `DEV_PLAN.md`)를 코드 변경과 함께 최신 상태로 유지한다.
+
+## 2) 현재 아키텍처 요약
+
+| 영역 | 현재 상태 |
 | --- | --- |
-| 애플리케이션 | Spring Boot 4.0.1 (Java 17+) 단일 프로젝트: REST Controller + Thymeleaf MVC, Service, Repository 3계층. |
-| 통합 | Genesys OCS API 클라이언트 모듈(Platform SDK for Java 9.0 @ "C:\\Program Files\\GCTI\\Platform SDK for Java 9.0"), 외부 REST 연동, 메시지 큐(필요 시). |
-| 데이터 | RDB (MS SQL Server) - 캠페인, 자원, 대상, 실행 로그 테이블 및 인덱스 설계. |
-| 운영 | Spring Actuator, centralized logging, Prometheus exporter, RBAC(Security Config). |
+| 애플리케이션 | Spring Boot 4.0.1 + Java 17 단일 애플리케이션 |
+| API/UI | REST API + Thymeleaf 관리자 UI 공존 |
+| 보안 | Spring Security + JWT + 권한 코드 기반 접근 제어 |
+| 암복호화 | `@ConfigurationApiController` / `@CccEncryptedController` 경로에 encData 파이프라인 적용 |
+| Genesys Config | 싱글톤 연결 + 스케줄 기반 health check + failover |
+| Outbound/Stat/T-Server | 요청 시 연결(per-request) + failover |
+| 데이터 | 기본 MS SQL Server, local 프로파일에서 H2 |
 
-## 4. 환경 변수 관리
-운영 환경에서는 민감 정보 하드코딩을 금지하고 환경 변수로 주입합니다.
+## 3) 최근 완료된 작업
 
-### DB
-- `DB_URL`
-- `DB_USERNAME`
-- `DB_PASSWORD`
+### 보안/실행 스크립트
 
-### 관리자 계정
-- `ADMIN_USERNAME`
-- `ADMIN_PASSWORD`
+- `run-app`, `debugging-app`, `run-jar`의 CMD/SH 스크립트 보안 기준 정리
+  - 비밀번호 계열 기본값 제거/주입 강제
+  - 필수 환경변수 누락 시 실행 차단
+  - prod 프로파일에서 `JWT_SECRET` 검증 강화
+- JAR 실행 스크립트의 환경파일 로딩/경로 처리 정리
 
-### 응답/요청 암호화
-- `CCC_SERVICE_ENC_ENABLED`
-- `CCC_SERVICE_ENC_KEY`
-- `CCC_SERVICE_ENC_IV`
+### API/기능
 
-### Genesys Config
-- `GENESYS_CFG_ENDPOINT_P`
-- `GENESYS_CFG_IP_P`
-- `GENESYS_CFG_PORT_P`
-- `GENESYS_CFG_ENDPOINT_B`
-- `GENESYS_CFG_IP_B`
-- `GENESYS_CFG_PORT_B`
-- `GENESYS_CFG_CLIENT_NAME_B`
-- `GENESYS_CFG_USERNAME`
-- `GENESYS_CFG_PASSWORD`
-- `GENESYS_TENANT_DBID`
-- `GENESYS_SWITCH_DBID_PRIMARY`
-- `GENESYS_SWITCH_DBID_SECONDARY`
-- `GENESYS_CHARSET`
+- `POST /auth/logout`를 요청 바디 기반으로 정리
+- Outbound Config의 Treatment CRUD(`create/update/delete`) 반영
+- Swagger 응답 예시/요청 예시 다수 정리
 
-### Outbound
-- `OUTBOUND_URI`
-- `OUTBOUND_CLIENT_NAME`
-- `OUTBOUND_CLIENT_PASSWORD`
-- `OUTBOUND_APP_NAME`
-- `OUTBOUND_APP_PASSWORD`
+### 운영/문서
 
-## 5. 추후 계획 (JWT 확장)
-JWT 전환 완료 이후 확장해야 할 보안 기능을 정리합니다.
+- OpenAPI 노출 필터링 정책(`OpenApiConfig`) 반영
+- 클래스 역할 문서화(`package-info.java`) 추가
+- `README.md` 최신화(실행 방법, 환경변수, API 요약, 운영 주의사항)
 
-### 5.1 Refresh 토큰 저장소 (Redis/DB)
-- **목표**: 리프레시 토큰 회수/만료/세션 관리 가능하도록 저장소 도입.
-- **선택지**
-	- Redis: TTL 자동 만료, 성능 우수 (권장)
-	- DB: 감사 이력/장기 보관에 유리, 만료 정리 배치 필요
-- **핵심 구현 항목**
-	- JWT에 `jti`(토큰 ID) 클레임 추가
-	- 로그인 시 `jti`를 저장소에 저장
-	- `/auth/refresh`에서 저장소 유효성 검사 + 토큰 회전
-	- 로그아웃/강제 만료 시 저장소 삭제
+## 4) 진행 중/후속 우선순위
 
-### 5.2 Role 기반 API 접근 제어
-- **목표**: API별 접근 권한을 역할로 구분 (ADMIN/OPERATOR 등)
-- **접근 방식**
-	- URL 매핑: `requestMatchers().hasRole/hasAnyRole` 적용
-	- 메서드 단위: `@PreAuthorize("hasRole('ADMIN')")` 적용
-- **핵심 구현 항목**
-	- JWT `roles` 클레임 기반 권한 매핑
-	- 컨트롤러별 권한 정책 정의 및 문서화
-	- Swagger 보안 요구사항 표기 (권장)
+### P1 (운영 안정성)
+
+1. `run-app.ps1` / `run-jar.ps1` 보안 정책 정합성 개선
+	- 현재 CMD/SH 대비 민감값 기본값 처리 기준이 다름
+	- 동일한 필수 변수 검증 정책으로 통일 필요
+2. 운영 환경 변수 템플릿 정리
+	- `scripts/config/.env.prod.example`와 `src/main/resources/application*.yml` 매핑 표 보강
+
+### P2 (품질/테스트)
+
+1. 인증/권한 회귀 테스트 보강
+	- `/auth/login`, `/auth/refresh`, `/auth/logout`
+	- `/api/v1/stat/**`, `/api/v1/voice/**` 권한 케이스
+2. Genesys 연결 장애 시나리오 테스트 정리
+	- primary 실패 → backup failover 확인
+	- Config health-check 복구 동작 확인
+
+### P3 (문서/개발 경험)
+
+1. API 그룹별 사용 예시(JSON) 문서 분리
+2. Swagger에 노출되지 않는 경로와 정책 사유 문서화
+3. 배포 시나리오(소스 실행 vs JAR 실행) 체크리스트화
+
+## 5) 기술 부채 및 리스크
+
+- 스크립트(OS별) 보안 정책 불일치 가능성
+- 민감값이 잘못된 기본값으로 실행될 위험
+- Swagger 노출 정책과 실제 운영 정책 간 괴리 가능성
+- Genesys SDK/Java 버전 의존성 유지 부담
+
+## 6) 완료 기준 (Definition of Done)
+
+- 기능 변경 시 다음을 모두 만족해야 완료로 간주
+  1. 코드 반영 + 문서 반영(`README.md`, 필요 시 `docs/works`)
+  2. 최소 컴파일 검증 통과(`mvn compile`)
+  3. 영향 테스트 통과(최소 단위/통합 스모크)
+  4. 보안 변수/운영 변수 체크 누락 없음
+
+## 7) 실행/검증 기본 명령
+
+```powershell
+mvn compile
+mvn verify
+```
+
+필요 시 로컬 실행:
+
+```powershell
+$env:SPRING_PROFILES_ACTIVE="local"
+./scripts/run-app.ps1
+```
