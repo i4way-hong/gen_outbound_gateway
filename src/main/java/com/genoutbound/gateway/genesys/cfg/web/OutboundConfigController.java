@@ -135,7 +135,7 @@ public class OutboundConfigController {
             required = false,
             content = @Content(
                 schema = @Schema(implementation = TenantDbidRequest.class),
-                examples = @ExampleObject(name = "callingListList", value = "{\"tenantDbid\":1}")
+                examples = @ExampleObject(name = "callingList", value = "{\"tenantDbid\":1}")
             )
         )
         @RequestBody TenantDbidRequest request) {

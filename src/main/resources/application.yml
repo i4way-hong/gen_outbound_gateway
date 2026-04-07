@@ -50,7 +50,7 @@ app:
     allow-insecure: ${ALLOW_INSECURE:true}
     allow-swagger: ${ALLOW_SWAGGER:true}
 
-    allow-crypto-test: ${ALLOW_CRYPTO_TEST:false}
+    allow-crypto-test: ${ALLOW_CRYPTO_TEST:true}
     allow-admin-ui: ${ALLOW_ADMIN_UI:false}
     jwt:
       issuer: ${JWT_ISSUER:gen-outbound-gateway}

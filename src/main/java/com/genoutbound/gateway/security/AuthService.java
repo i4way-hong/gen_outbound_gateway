@@ -4,7 +4,10 @@ import com.genoutbound.gateway.core.ApiException;
 import com.genoutbound.gateway.security.dto.AuthRequest;
 import com.genoutbound.gateway.security.dto.RefreshRequest;
 import com.genoutbound.gateway.security.dto.TokenResponse;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
@@ -62,24 +67,36 @@ public class AuthService {
     public void logout(String accessToken, String refreshToken) {
         String username = null;
         if (accessToken != null && !accessToken.isBlank()) {
-            if (!tokenProvider.isAccessToken(accessToken)) {
+            try {
+                if (!tokenProvider.isAccessToken(accessToken)) {
+                    throw new ApiException(HttpStatus.UNAUTHORIZED, "유효하지 않은 액세스 토큰입니다.");
+                }
+                username = tokenProvider.getAuthentication(accessToken).getName();
+                tokenRevocationService.revoke(accessToken);
+            } catch (ExpiredJwtException ex) {
+                log.debug("logout 요청에서 만료된 액세스 토큰은 무시합니다.");
+            } catch (JwtException ex) {
                 throw new ApiException(HttpStatus.UNAUTHORIZED, "유효하지 않은 액세스 토큰입니다.");
             }
-            username = tokenProvider.getAuthentication(accessToken).getName();
-            tokenRevocationService.revoke(accessToken);
         }
+
         if (refreshToken != null && !refreshToken.isBlank()) {
-            if (!tokenProvider.isRefreshToken(refreshToken)) {
+            try {
+                if (!tokenProvider.isRefreshToken(refreshToken)) {
+                    throw new ApiException(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다.");
+                }
+                if (tokenRevocationService.isRevoked(refreshToken)) {
+                    throw new ApiException(HttpStatus.UNAUTHORIZED, "폐기된 리프레시 토큰입니다.");
+                }
+                if (username == null) {
+                    username = tokenProvider.getAuthentication(refreshToken).getName();
+                }
+                tokenRevocationService.revoke(refreshToken);
+            } catch (JwtException ex) {
                 throw new ApiException(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다.");
             }
-            if (tokenRevocationService.isRevoked(refreshToken)) {
-                throw new ApiException(HttpStatus.UNAUTHORIZED, "폐기된 리프레시 토큰입니다.");
-            }
-            if (username == null) {
-                username = tokenProvider.getAuthentication(refreshToken).getName();
-            }
-            tokenRevocationService.revoke(refreshToken);
         }
+
         if (username != null && !username.isBlank()) {
             tokenVersionService.bumpVersion(username);
         }
@@ -96,10 +113,38 @@ public class AuthService {
         } catch (Exception ex) {
             throw new ApiException(HttpStatus.UNAUTHORIZED, "인증 실패");
         }
-        if (!passwordEncoder.matches(request.password(), userDetails.getPassword())) {
+
+        String normalizedRequestPassword = normalizeBcryptPrefix(request.password());
+        String normalizedStoredPassword = normalizeBcryptPrefix(userDetails.getPassword());
+
+        boolean authenticated;
+        if (isEncodedPassword(normalizedRequestPassword)) {
+            authenticated = normalizedRequestPassword.equals(normalizedStoredPassword);
+        } else {
+            authenticated = passwordEncoder.matches(request.password(), normalizedStoredPassword);
+        }
+
+        if (!authenticated) {
             throw new ApiException(HttpStatus.UNAUTHORIZED, "인증 실패");
         }
         return userDetails;
+    }
+
+    private boolean isEncodedPassword(String password) {
+        return password != null && password.startsWith("{") && password.contains("}");
+    }
+
+    private String normalizeBcryptPrefix(String password) {
+        if (password == null || password.isBlank()) {
+            return password;
+        }
+        if (password.startsWith("{")) {
+            return password;
+        }
+        if (password.startsWith("$2a$") || password.startsWith("$2b$") || password.startsWith("$2y$")) {
+            return "{bcrypt}" + password;
+        }
+        return password;
     }
 
     private TokenResponse issueTokens(UserDetails userDetails, long tokenVersion) {

@@ -41,7 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         throws ServletException, IOException {
         String header = request.getHeader("Authorization");
         if (header == null || !header.startsWith("Bearer ")) {
-            log.debug("JWT Authorization 헤더가 없어 인증을 건너뜁니다. path={}", request.getRequestURI());
+            log.trace("JWT Authorization 헤더가 없어 인증을 건너뜁니다. path={}", request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
         }

@@ -79,8 +79,8 @@ public class SecurityConfig {
         }
 
         http.authorizeHttpRequests(auth -> {
-        auth.requestMatchers("/", "/favicon.ico", "/css/**", "/js/**", "/images/**", "/actuator/health",
-            "/auth/login", "/auth/refresh", "/auth/logout", "/admin/login", "/admin/logout")
+        auth.requestMatchers("/", "/favicon.ico", "/css/**", "/js/**", "/images/**", "/actuator/health", "/error",
+            "/auth/login", "/auth/refresh", "/auth/logout")
                 .permitAll();
 
             auth.requestMatchers("/api/status")
@@ -99,10 +99,10 @@ public class SecurityConfig {
             }
 
             if (securityProperties.isAllowAdminUi()) {
-                auth.requestMatchers("/admin/**").permitAll();
+                auth.requestMatchers("/admin/login", "/admin/logout", "/admin/**").permitAll();
             } else {
-                auth.requestMatchers("/admin/**")
-                    .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.ADMIN_UI);
+                auth.requestMatchers("/admin/login", "/admin/logout", "/admin/**")
+                    .denyAll();
             }
 
             auth.requestMatchers(
