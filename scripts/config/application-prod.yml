@@ -1,0 +1,55 @@
+spring:
+  datasource:
+    url: jdbc:sqlserver://172.168.30.61:1433;databaseName=RND_TEST;encrypt=true;trustServerCertificate=true
+    username: RND_USER
+    password: RND_USER
+
+server:
+  port: 8080
+
+app:
+  security:
+    admin-username: admin
+    admin-password: admin123
+    auth-enabled: true
+    jwt-enabled: true
+    allow-insecure: false
+    allow-swagger: true
+    allow-admin-ui: false
+    jwt:
+      issuer: gen-outbound-gateway
+      secret: CHANGE_ME_32_BYTE_SECRET_FOR_PROD
+      access-token-minutes: 1
+      refresh-token-days: 1
+    encryption:
+      enabled: false
+      key: 12345678901234567890123456789012
+      iv: 1234567890123456
+  outbound:
+    enabled: true
+    uri: tcp://172.168.20.233:2130
+    client-name: default
+    client-password: ""
+    app-name: ocserver
+    app-password: ""
+  genesys:
+    enabled: true
+    primary:
+      endpoint: Cfg_EP_P
+      ip: 172.168.20.233
+      port: 2020
+    backup:
+      endpoint: Cfg_EP_B
+      ip: 172.168.20.233
+      port: 2020
+    client-name: default
+    username: default
+    password: password
+    tenant-dbid: 1
+    switch-dbid-primary: 101
+    switch-dbid-secondary: 101
+    charset: MS949
+    addp-enabled: true
+    addp-client-timeout: 5
+    addp-server-timeout: 5
+    health-check-interval-ms: 30000

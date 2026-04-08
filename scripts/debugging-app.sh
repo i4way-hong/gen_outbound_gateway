@@ -4,10 +4,31 @@
 
 set -euo pipefail
 
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+BASE_DIR="${SCRIPT_DIR}"
+
 export SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
 
 export LOGBACK_CONFIG_PATH=${LOGBACK_CONFIG_PATH:-./scripts/config/logback-spring.xml}
 export LOG_DIR=${LOG_DIR:-./logs}
+
+if [[ -z "${SPRING_CONFIG_ADDITIONAL_LOCATION:-}" && -d "${BASE_DIR}/config" ]]; then
+  export SPRING_CONFIG_ADDITIONAL_LOCATION="${BASE_DIR}/config/"
+fi
+
+if [[ -z "${ENV_FILE:-}" ]]; then
+  if [[ -f "${BASE_DIR}/config/.env.prod" ]]; then
+    ENV_FILE="${BASE_DIR}/config/.env.prod"
+  elif [[ -f "${BASE_DIR}/config/.env" ]]; then
+    ENV_FILE="${BASE_DIR}/config/.env"
+  fi
+fi
+
+if [[ -n "${ENV_FILE:-}" && -f "${ENV_FILE}" ]]; then
+  set -a
+  source "${ENV_FILE}"
+  set +a
+fi
 
 export DB_URL=${DB_URL:-"jdbc:sqlserver://172.168.30.61:1433;databaseName=RND_TEST;encrypt=true;trustServerCertificate=true"}
 export DB_USERNAME=${DB_USERNAME:-RND_USER}
@@ -17,15 +38,23 @@ export DB_USERNAME=${DB_USERNAME:-RND_USER}
 # GENESYS_CFG_PASSWORD는 환경변수로 반드시 주입하세요.
 
 export ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+export ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
 export JWT_ENABLED=${JWT_ENABLED:-true}
+export AUTH_ENABLED=${AUTH_ENABLED:-true}
+export ALLOW_INSECURE=${ALLOW_INSECURE:-false}
+export ALLOW_SWAGGER=${ALLOW_SWAGGER:-true}
+export ALLOW_ADMIN_UI=${ALLOW_ADMIN_UI:-false}
 
 export GENESYS_CFG_USERNAME=${GENESYS_CFG_USERNAME:-default}
+export GENESYS_CFG_PASSWORD=${GENESYS_CFG_PASSWORD:-password}
 
-export CCC_SERVICE_ENC_ENABLED=${CCC_SERVICE_ENC_ENABLED:-true}
+export CCC_SERVICE_ENC_ENABLED=${CCC_SERVICE_ENC_ENABLED:-false}
 export CCC_SERVICE_ENC_KEY=${CCC_SERVICE_ENC_KEY:-12345678901234567890123456789012}
 export CCC_SERVICE_ENC_IV=${CCC_SERVICE_ENC_IV:-1234567890123456}
 
 export JWT_SECRET=${JWT_SECRET:-CHANGE_ME_32_BYTE_SECRET_FOR_PROD}
+export JWT_ACCESS_TOKEN_MINUTES=${JWT_ACCESS_TOKEN_MINUTES:-1}
+export JWT_REFRESH_TOKEN_DAYS=${JWT_REFRESH_TOKEN_DAYS:-1}
 
 MISSING=""
 for var in DB_URL DB_USERNAME DB_PASSWORD ADMIN_USERNAME ADMIN_PASSWORD GENESYS_CFG_USERNAME GENESYS_CFG_PASSWORD; do

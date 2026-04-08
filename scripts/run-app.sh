@@ -4,10 +4,31 @@
 
 set -euo pipefail
 
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+BASE_DIR="${SCRIPT_DIR}"
+
 export SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
 
 export LOGBACK_CONFIG_PATH=${LOGBACK_CONFIG_PATH:-./scripts/config/logback-spring.xml}
 export LOG_DIR=${LOG_DIR:-./logs}
+
+if [[ -z "${SPRING_CONFIG_ADDITIONAL_LOCATION:-}" && -d "${BASE_DIR}/config" ]]; then
+  export SPRING_CONFIG_ADDITIONAL_LOCATION="${BASE_DIR}/config/"
+fi
+
+if [[ -z "${ENV_FILE:-}" ]]; then
+  if [[ -f "${BASE_DIR}/config/.env.prod" ]]; then
+    ENV_FILE="${BASE_DIR}/config/.env.prod"
+  elif [[ -f "${BASE_DIR}/config/.env" ]]; then
+    ENV_FILE="${BASE_DIR}/config/.env"
+  fi
+fi
+
+if [[ -n "${ENV_FILE:-}" && -f "${ENV_FILE}" ]]; then
+  set -a
+  source "${ENV_FILE}"
+  set +a
+fi
 
 export DB_URL=${DB_URL:-"jdbc:sqlserver://172.168.30.61:1433;databaseName=RND_TEST;encrypt=true;trustServerCertificate=true"}
 export DB_USERNAME=${DB_USERNAME:-RND_USER}
