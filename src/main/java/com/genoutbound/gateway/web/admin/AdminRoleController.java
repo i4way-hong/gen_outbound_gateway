@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/admin/roles")
+@RequestMapping("/console/roles")
 public class AdminRoleController {
 
     private final AppRoleRepository roleRepository;
@@ -79,7 +79,7 @@ public class AdminRoleController {
         AppRole role = new AppRole();
         applyForm(role, form);
         roleRepository.save(role);
-        return "redirect:/admin/roles";
+    return "redirect:/console/roles";
     }
 
     @PostMapping("/{id}")
@@ -93,7 +93,7 @@ public class AdminRoleController {
             .orElseThrow(() -> new IllegalArgumentException("역할을 찾을 수 없습니다."));
         applyForm(role, form);
         roleRepository.save(role);
-        return "redirect:/admin/roles";
+    return "redirect:/console/roles";
     }
 
     private String renderForm(Model model, RoleForm form, String error) {

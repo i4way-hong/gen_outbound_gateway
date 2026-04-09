@@ -10,6 +10,9 @@ export SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
 
 export LOGBACK_CONFIG_PATH=${LOGBACK_CONFIG_PATH:-./scripts/config/logback-spring.xml}
 export LOG_DIR=${LOG_DIR:-./logs}
+export RUN_AS_DAEMON=${RUN_AS_DAEMON:-false}
+export PID_FILE=${PID_FILE:-${LOG_DIR}/gen-outbound-gateway.pid}
+export CONSOLE_LOG_FILE=${CONSOLE_LOG_FILE:-${LOG_DIR}/gen-outbound-gateway.console.log}
 
 if [[ -z "${SPRING_CONFIG_ADDITIONAL_LOCATION:-}" && -d "${BASE_DIR}/config" ]]; then
   export SPRING_CONFIG_ADDITIONAL_LOCATION="${BASE_DIR}/config/"
@@ -70,6 +73,8 @@ if [[ -n "${JAVA_HOME:-}" && -x "${JAVA_HOME}/bin/java" ]]; then
   JAVA_EXE="${JAVA_HOME}/bin/java"
 fi
 
+export JAVA_OPTS=${JAVA_OPTS:-"-Xms512m -Xmx1024m"}
+
 JAVA_VERSION=$(${JAVA_EXE} -version 2>&1 | awk -F '"' '/version/ {print $2}')
 if [[ "${JAVA_VERSION}" != 17* ]]; then
   echo "Java 17이 필요합니다. 현재 버전: ${JAVA_VERSION}"
@@ -105,4 +110,123 @@ fi
 echo "프로파일 ${SPRING_PROFILES_ACTIVE}"
 echo "JAR 실행: ${JAR_PATH}"
 
-${JAVA_EXE} ${JAVA_OPTS:-} ${LOADER_ARG} -jar "${JAR_PATH}"
+is_running() {
+  if [[ -f "${PID_FILE}" ]]; then
+    local pid
+    pid=$(cat "${PID_FILE}" 2>/dev/null || true)
+    if [[ -n "${pid}" ]] && kill -0 "${pid}" 2>/dev/null; then
+      return 0
+    fi
+  fi
+  return 1
+}
+
+get_pid() {
+  cat "${PID_FILE}" 2>/dev/null || true
+}
+
+start_app() {
+  mkdir -p "${LOG_DIR}"
+
+  if is_running; then
+    echo "이미 실행 중입니다. PID=$(get_pid)"
+    return 0
+  fi
+
+  nohup ${JAVA_EXE} ${JAVA_OPTS:-} ${LOADER_ARG} -jar "${JAR_PATH}" >> "${CONSOLE_LOG_FILE}" 2>&1 < /dev/null &
+  local app_pid=$!
+  echo "${app_pid}" > "${PID_FILE}"
+  disown "${app_pid}" 2>/dev/null || true
+
+  echo "백그라운드 실행 시작: PID=${app_pid}"
+  echo "PID 파일: ${PID_FILE}"
+  echo "콘솔 로그: ${CONSOLE_LOG_FILE}"
+}
+
+stop_app() {
+  if ! is_running; then
+    echo "실행 중이 아닙니다."
+    rm -f "${PID_FILE}"
+    return 0
+  fi
+
+  local pid
+  pid=$(get_pid)
+  echo "종료 중... PID=${pid}"
+  kill "${pid}" 2>/dev/null || true
+
+  for _ in {1..10}; do
+    if ! kill -0 "${pid}" 2>/dev/null; then
+      rm -f "${PID_FILE}"
+      echo "정상 종료되었습니다."
+      return 0
+    fi
+    sleep 1
+  done
+
+  echo "강제 종료(SIGKILL) 수행..."
+  kill -9 "${pid}" 2>/dev/null || true
+  rm -f "${PID_FILE}"
+  echo "강제 종료되었습니다."
+}
+
+status_app() {
+  if is_running; then
+    local pid
+    pid=$(get_pid)
+    echo "RUNNING (PID=${pid})"
+    return 0
+  fi
+
+  echo "STOPPED"
+  return 1
+}
+
+usage() {
+  cat <<EOF
+사용법: $(basename "$0") [start|stop|atop|restart|status|run|--daemon]
+
+  start     백그라운드 시작
+  stop      중지
+  atop      stop 별칭
+  restart   재시작
+  status    상태 확인
+  run       포그라운드 실행 (콘솔 종속)
+  --daemon  start와 동일
+
+기본값: 인자 미지정 시 start
+EOF
+}
+
+command="${1:-start}"
+
+if [[ "${RUN_AS_DAEMON,,}" == "true" && "${command}" == "run" ]]; then
+  command="start"
+fi
+
+case "${command}" in
+  start|--daemon)
+    start_app
+    ;;
+  stop|atop)
+    stop_app
+    ;;
+  restart)
+    stop_app
+    start_app
+    ;;
+  status)
+    status_app
+    ;;
+  run)
+    ${JAVA_EXE} ${JAVA_OPTS:-} ${LOADER_ARG} -jar "${JAR_PATH}"
+    ;;
+  -h|--help|help)
+    usage
+    ;;
+  *)
+    echo "알 수 없는 인자: ${command}"
+    usage
+    exit 1
+    ;;
+esac

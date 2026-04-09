@@ -15,6 +15,8 @@ if "%SPRING_PROFILES_ACTIVE%"=="" set SPRING_PROFILES_ACTIVE=prod
 
 if "!LOGBACK_CONFIG_PATH!"=="" set "LOGBACK_CONFIG_PATH=./scripts/config/logback-spring.xml"
 if "!LOG_DIR!"=="" set "LOG_DIR=./logs"
+if "!PID_FILE!"=="" set "PID_FILE=!LOG_DIR!\gen-outbound-gateway.pid"
+if "!CONSOLE_LOG_FILE!"=="" set "CONSOLE_LOG_FILE=!LOG_DIR!\gen-outbound-gateway.console.log"
 
 if "!SPRING_CONFIG_ADDITIONAL_LOCATION!"=="" (
   if exist "!BASE_DIR!\config" set "SPRING_CONFIG_ADDITIONAL_LOCATION=!BASE_DIR!\config\"
@@ -109,6 +111,97 @@ if /i "!CCC_SERVICE_ENC_ENABLED!"=="true" (
 echo 프로파일 !SPRING_PROFILES_ACTIVE!
 echo JAR 실행: !JAR_PATH!
 
+set "COMMAND=%~1"
+if "%COMMAND%"=="" set "COMMAND=start"
+
+if /i "%COMMAND%"=="start" goto :start
+if /i "%COMMAND%"=="stop" goto :stop
+if /i "%COMMAND%"=="atop" goto :stop
+if /i "%COMMAND%"=="restart" goto :restart
+if /i "%COMMAND%"=="status" goto :status
+if /i "%COMMAND%"=="run" goto :run
+if /i "%COMMAND%"=="--daemon" goto :start
+if /i "%COMMAND%"=="help" goto :usage
+if /i "%COMMAND%"=="-h" goto :usage
+if /i "%COMMAND%"=="--help" goto :usage
+
+echo 알 수 없는 인자: %COMMAND%
+goto :usage
+
+:isRunning
+if not exist "!PID_FILE!" exit /b 1
+set "RUN_PID="
+for /f "usebackq delims=" %%P in ("!PID_FILE!") do set "RUN_PID=%%P"
+if "!RUN_PID!"=="" exit /b 1
+powershell -NoProfile -Command "if (Get-Process -Id !RUN_PID! -ErrorAction SilentlyContinue) { exit 0 } else { exit 1 }"
+exit /b %errorlevel%
+
+:start
+if not exist "!LOG_DIR!" mkdir "!LOG_DIR!"
+call :isRunning
+if %errorlevel%==0 (
+  echo 이미 실행 중입니다. PID=!RUN_PID!
+  endlocal
+  exit /b 0
+)
+
+set "ENV_JAVA_EXE=!JAVA_EXE!"
+set "ENV_JAVA_OPTS=!JAVA_OPTS!"
+set "ENV_LOADER_ARG=!LOADER_ARG!"
+set "ENV_JAR_PATH=!JAR_PATH!"
+set "ENV_CONSOLE_LOG_FILE=!CONSOLE_LOG_FILE!"
+
+set "APP_PID="
+for /f "usebackq delims=" %%P in (`powershell -NoProfile -Command "$argsList = @(); if ($env:ENV_JAVA_OPTS) { $argsList += ($env:ENV_JAVA_OPTS -split '\s+') }; if ($env:ENV_LOADER_ARG) { $argsList += $env:ENV_LOADER_ARG }; $argsList += '-jar'; $argsList += $env:ENV_JAR_PATH; $p = Start-Process -FilePath $env:ENV_JAVA_EXE -ArgumentList $argsList -RedirectStandardOutput $env:ENV_CONSOLE_LOG_FILE -RedirectStandardError $env:ENV_CONSOLE_LOG_FILE -PassThru; $p.Id"`) do set "APP_PID=%%P"
+
+if "!APP_PID!"=="" (
+  echo 백그라운드 시작에 실패했습니다.
+  endlocal
+  exit /b 1
+)
+
+> "!PID_FILE!" echo !APP_PID!
+echo 백그라운드 실행 시작: PID=!APP_PID!
+echo PID 파일: !PID_FILE!
+echo 콘솔 로그: !CONSOLE_LOG_FILE!
+endlocal
+exit /b 0
+
+:stop
+call :isRunning
+if not %errorlevel%==0 (
+  echo 실행 중이 아닙니다.
+  if exist "!PID_FILE!" del /q "!PID_FILE!"
+  endlocal
+  exit /b 0
+)
+
+echo 종료 중... PID=!RUN_PID!
+powershell -NoProfile -Command "try { Stop-Process -Id !RUN_PID! -ErrorAction Stop } catch {}"
+powershell -NoProfile -Command "Start-Sleep -Seconds 2; if (Get-Process -Id !RUN_PID! -ErrorAction SilentlyContinue) { try { Stop-Process -Id !RUN_PID! -Force -ErrorAction Stop } catch {} }"
+
+if exist "!PID_FILE!" del /q "!PID_FILE!"
+echo 종료되었습니다.
+endlocal
+exit /b 0
+
+:status
+call :isRunning
+if %errorlevel%==0 (
+  echo RUNNING (PID=!RUN_PID!)
+  endlocal
+  exit /b 0
+)
+echo STOPPED
+endlocal
+exit /b 1
+
+:restart
+call :stop
+setlocal EnableDelayedExpansion
+goto :start
+
+:run
 if not defined JAVA_OPTS (
   "%JAVA_EXE%" !LOADER_ARG! -jar "!JAR_PATH!"
 ) else (
@@ -116,3 +209,19 @@ if not defined JAVA_OPTS (
 )
 
 endlocal
+exit /b %errorlevel%
+
+:usage
+echo 사용법: %~nx0 [start^|stop^|atop^|restart^|status^|run^|--daemon]
+echo.
+echo   start    백그라운드 시작
+echo   stop     중지
+echo   atop     stop 별칭
+echo   restart  재시작
+echo   status   상태 확인
+echo   run      포그라운드 실행
+echo.
+echo 기본값: 인자 미지정 시 start
+endlocal
+exit /b 1
+

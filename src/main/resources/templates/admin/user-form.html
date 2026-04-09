@@ -15,21 +15,21 @@
             <p class="subtitle">사용자 계정과 역할을 설정합니다.</p>
         </div>
         <div class="actions">
-            <a class="btn ghost" href="/admin/users">목록</a>
+            <a class="btn ghost" href="/console/users">목록</a>
         </div>
     </div>
 
     <nav class="admin-nav">
-        <a class="active" href="/admin/users">사용자</a>
-        <a href="/admin/roles">역할</a>
-        <a href="/admin/permissions">권한</a>
+    <a class="active" href="/console/users">사용자</a>
+    <a href="/console/roles">역할</a>
+    <a href="/console/permissions">권한</a>
         <a href="/">홈</a>
-        <a href="/admin/logout">로그아웃</a>
+    <a href="/console/session/end">로그아웃</a>
     </nav>
 
     <div class="alert" th:if="${error}" th:text="${error}"></div>
 
-    <form class="form" th:action="${form.id} == null ? '/admin/users' : @{/admin/users/{id}(id=${form.id})}" method="post">
+    <form class="form" th:action="${form.id} == null ? '/console/users' : @{/console/users/{id}(id=${form.id})}" method="post">
         <input type="hidden" name="id" th:value="${form.id}" />
 
         <label class="field">
@@ -61,7 +61,7 @@
 
         <div class="actions">
             <button class="btn" type="submit">저장</button>
-            <a class="btn ghost" href="/admin/users">취소</a>
+            <a class="btn ghost" href="/console/users">취소</a>
         </div>
     </form>
 </div>

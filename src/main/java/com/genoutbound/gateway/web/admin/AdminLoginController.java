@@ -19,7 +19,7 @@ public class AdminLoginController {
         this.securityProperties = securityProperties;
     }
 
-    @GetMapping("/admin/login")
+    @GetMapping("/console/session/new")
     public String login(@RequestParam Optional<String> error,
                         @RequestParam Optional<String> logout,
                         Model model) {
@@ -29,7 +29,7 @@ public class AdminLoginController {
         return "admin/login";
     }
 
-    @PostMapping("/admin/login")
+    @PostMapping("/console/session/new")
     public String doLogin(@RequestParam String username,
                           @RequestParam String password,
                           HttpSession session,
@@ -46,15 +46,15 @@ public class AdminLoginController {
             return "admin/login";
         }
         session.setAttribute(AdminSessionAuthenticationFilter.SESSION_KEY, Boolean.TRUE);
-        return "redirect:/admin/users";
+        return "redirect:/console/users";
     }
 
-    @GetMapping("/admin/logout")
+    @GetMapping("/console/session/end")
     public String logout(HttpSession session) {
         if (session != null) {
             session.invalidate();
         }
-        return "redirect:/admin/login?logout=true";
+        return "redirect:/console/session/new?logout=true";
     }
 
     private boolean isAdminConfigured() {

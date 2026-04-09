@@ -44,9 +44,9 @@ public class AdminSessionAuthenticationFilter extends OncePerRequestFilter {
         if (path == null) {
             return false;
         }
-        if (!path.startsWith("/admin")) {
+        if (!path.startsWith("/console")) {
             return false;
         }
-        return !path.startsWith("/admin/login") && !path.startsWith("/admin/logout");
+        return !path.startsWith("/console/session/new") && !path.startsWith("/console/session/end");
     }
 }

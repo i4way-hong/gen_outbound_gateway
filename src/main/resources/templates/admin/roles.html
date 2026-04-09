@@ -15,16 +15,16 @@
             <p class="subtitle">역할별 권한 묶음을 관리합니다.</p>
         </div>
         <div class="actions">
-            <a class="btn" href="/admin/roles/new">새 역할</a>
+            <a class="btn" href="/console/roles/new">새 역할</a>
         </div>
     </div>
 
     <nav class="admin-nav">
-        <a href="/admin/users">사용자</a>
-        <a class="active" href="/admin/roles">역할</a>
-        <a href="/admin/permissions">권한</a>
+    <a href="/console/users">사용자</a>
+    <a class="active" href="/console/roles">역할</a>
+    <a href="/console/permissions">권한</a>
         <a href="/">홈</a>
-        <a href="/admin/logout">로그아웃</a>
+    <a href="/console/session/end">로그아웃</a>
     </nav>
 
     <table class="table">
@@ -50,7 +50,7 @@
             </td>
             <td th:text="${role.permissionCount}"></td>
             <td>
-                <a class="link" th:href="@{/admin/roles/{id}(id=${role.id})}">편집</a>
+                <a class="link" th:href="@{/console/roles/{id}(id=${role.id})}">편집</a>
             </td>
         </tr>
         </tbody>

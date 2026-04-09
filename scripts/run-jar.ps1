@@ -1,6 +1,11 @@
 # Gen Outbound Gateway JAR 실행 스크립트 (PowerShell)
 # Java 17 필요, JAR 이름: gen-outbound-gateway-0.0.1-SNAPSHOT.jar
 
+param(
+    [Parameter(Position = 0)]
+    [string]$Command = "start"
+)
+
 chcp 65001 | Out-Null
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 [Console]::InputEncoding = [System.Text.Encoding]::UTF8
@@ -21,6 +26,14 @@ if (-not $env:LOGBACK_CONFIG_PATH) {
 
 if (-not $env:LOG_DIR) {
     $env:LOG_DIR = "./logs"
+}
+
+if (-not $env:PID_FILE) {
+    $env:PID_FILE = Join-Path $env:LOG_DIR "gen-outbound-gateway.pid"
+}
+
+if (-not $env:CONSOLE_LOG_FILE) {
+    $env:CONSOLE_LOG_FILE = Join-Path $env:LOG_DIR "gen-outbound-gateway.console.log"
 }
 
 if (-not $env:SPRING_CONFIG_ADDITIONAL_LOCATION) {
@@ -171,4 +184,132 @@ if ($loaderPath) {
 Write-Host "프로파일 $env:SPRING_PROFILES_ACTIVE" -ForegroundColor Cyan
 Write-Host "JAR 실행: $jarPath" -ForegroundColor Cyan
 
-& $javaExe @javaArgs -jar $jarPath
+function Get-RunningPid {
+    if (-not (Test-Path $env:PID_FILE)) {
+        return $null
+    }
+
+    $pidText = (Get-Content $env:PID_FILE -ErrorAction SilentlyContinue | Select-Object -First 1).Trim()
+    if (-not $pidText) {
+        return $null
+    }
+
+    $pidValue = 0
+    if (-not [int]::TryParse($pidText, [ref]$pidValue)) {
+        return $null
+    }
+
+    $proc = Get-Process -Id $pidValue -ErrorAction SilentlyContinue
+    if ($proc) {
+        return $pidValue
+    }
+
+    return $null
+}
+
+function Start-App {
+    $runningPid = Get-RunningPid
+    if ($runningPid) {
+        Write-Host "이미 실행 중입니다. PID=$runningPid" -ForegroundColor Yellow
+        return
+    }
+
+    New-Item -ItemType Directory -Path $env:LOG_DIR -Force | Out-Null
+
+    $proc = Start-Process -FilePath $javaExe -ArgumentList (@javaArgs + @("-jar", $jarPath)) -RedirectStandardOutput $env:CONSOLE_LOG_FILE -RedirectStandardError $env:CONSOLE_LOG_FILE -PassThru
+    Set-Content -Path $env:PID_FILE -Value $proc.Id
+
+    Write-Host "백그라운드 실행 시작: PID=$($proc.Id)" -ForegroundColor Green
+    Write-Host "PID 파일: $($env:PID_FILE)" -ForegroundColor Green
+    Write-Host "콘솔 로그: $($env:CONSOLE_LOG_FILE)" -ForegroundColor Green
+}
+
+function Stop-App {
+    $runningPid = Get-RunningPid
+    if (-not $runningPid) {
+        Write-Host "실행 중이 아닙니다." -ForegroundColor Yellow
+        if (Test-Path $env:PID_FILE) {
+            Remove-Item $env:PID_FILE -Force -ErrorAction SilentlyContinue
+        }
+        return
+    }
+
+    Write-Host "종료 중... PID=$runningPid" -ForegroundColor Cyan
+    Stop-Process -Id $runningPid -ErrorAction SilentlyContinue
+    Start-Sleep -Seconds 2
+
+    if (Get-Process -Id $runningPid -ErrorAction SilentlyContinue) {
+        Stop-Process -Id $runningPid -Force -ErrorAction SilentlyContinue
+    }
+
+    if (Test-Path $env:PID_FILE) {
+        Remove-Item $env:PID_FILE -Force -ErrorAction SilentlyContinue
+    }
+
+    Write-Host "종료되었습니다." -ForegroundColor Green
+}
+
+function Status-App {
+    $runningPid = Get-RunningPid
+    if ($runningPid) {
+        Write-Host "RUNNING (PID=$runningPid)" -ForegroundColor Green
+        return $true
+    }
+
+    Write-Host "STOPPED" -ForegroundColor Yellow
+    return $false
+}
+
+function Show-Usage {
+    Write-Host "사용법: .\run-jar.ps1 [start|stop|atop|restart|status|run|--daemon]"
+    Write-Host ""
+    Write-Host "  start    백그라운드 시작"
+    Write-Host "  stop     중지"
+    Write-Host "  atop     stop 별칭"
+    Write-Host "  restart  재시작"
+    Write-Host "  status   상태 확인"
+    Write-Host "  run      포그라운드 실행"
+    Write-Host ""
+    Write-Host "기본값: 인자 미지정 시 start"
+}
+
+switch ($Command.ToLowerInvariant()) {
+    "start" {
+        Start-App
+    }
+    "--daemon" {
+        Start-App
+    }
+    "stop" {
+        Stop-App
+    }
+    "atop" {
+        Stop-App
+    }
+    "restart" {
+        Stop-App
+        Start-App
+    }
+    "status" {
+        if (-not (Status-App)) {
+            exit 1
+        }
+    }
+    "run" {
+        & $javaExe @javaArgs -jar $jarPath
+    }
+    "help" {
+        Show-Usage
+    }
+    "-h" {
+        Show-Usage
+    }
+    "--help" {
+        Show-Usage
+    }
+    default {
+        Write-Host "알 수 없는 인자: $Command" -ForegroundColor Yellow
+        Show-Usage
+        exit 1
+    }
+}

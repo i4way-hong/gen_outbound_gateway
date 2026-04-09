@@ -26,7 +26,7 @@
         관리자 계정이 설정되지 않았습니다. 환경변수 `ADMIN_USERNAME`, `ADMIN_PASSWORD`를 설정하세요.
     </div>
 
-    <form class="form" method="post" action="/admin/login" th:if="${adminConfigured}">
+    <form class="form" method="post" action="/console/session/new" th:if="${adminConfigured}">
         <label class="field">
             <span>아이디</span>
             <input type="text" name="username" />

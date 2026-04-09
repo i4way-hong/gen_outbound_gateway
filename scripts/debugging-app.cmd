@@ -26,7 +26,7 @@ REM JWT인증 필요시 JWT_ENABLED=true, AUTH_ENABLED=true, ALLOW_INSECURE=fals
 
 if "%ALLOW_SWAGGER%"=="" set ALLOW_SWAGGER=true
 REM Swagger UI는 개발 편의를 위해 기본적으로 활성화되어 있습니다. 보안이 필요한 환경에서는 ALLOW_SWAGGER=false로 설정하세요.
-if "%ALLOW_ADMIN_UI%"=="" set ALLOW_ADMIN_UI=false
+if "%ALLOW_ADMIN_UI%"=="" set ALLOW_ADMIN_UI=true
 REM ADMIN UI는 기본적으로 비활성화되어 있습니다. 필요시 ALLOW_ADMIN_UI=true로 설정하세요.
 
 if "%GENESYS_CFG_USERNAME%"=="" set GENESYS_CFG_USERNAME=default

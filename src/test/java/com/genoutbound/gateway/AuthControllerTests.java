@@ -49,13 +49,13 @@ class AuthControllerTests {
         String accessToken = json.path("data").path("accessToken").asText();
         assertThat(accessToken).isNotBlank();
 
-        ResponseEntity<String> unauthorizedResponse = restTemplate.getForEntity(baseUrl + "/api/status", String.class);
+    ResponseEntity<String> unauthorizedResponse = restTemplate.getForEntity(baseUrl + "/api/v1/scs/metrics", String.class);
         assertThat(unauthorizedResponse.getStatusCode()).isIn(HttpStatus.UNAUTHORIZED, HttpStatus.FORBIDDEN);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
         ResponseEntity<String> authorizedResponse = restTemplate.exchange(
-            baseUrl + "/api/status",
+            baseUrl + "/api/v1/scs/metrics",
             HttpMethod.GET,
             new HttpEntity<>(headers),
             String.class
@@ -131,7 +131,7 @@ class AuthControllerTests {
         headers.setBearerAuth(accessToken);
 
         ResponseEntity<String> revokedResponse = restTemplate.exchange(
-            baseUrl + "/api/status",
+            baseUrl + "/api/v1/scs/metrics",
             HttpMethod.GET,
             new HttpEntity<>(headers),
             String.class
@@ -165,7 +165,7 @@ class AuthControllerTests {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(firstAccessToken);
         ResponseEntity<String> revokedResponse = restTemplate.exchange(
-            baseUrl + "/api/status",
+            baseUrl + "/api/v1/scs/metrics",
             HttpMethod.GET,
             new HttpEntity<>(headers),
             String.class
@@ -210,7 +210,7 @@ class AuthControllerTests {
         HttpHeaders oldHeaders = new HttpHeaders();
         oldHeaders.setBearerAuth(firstAccessToken);
         ResponseEntity<String> revokedResponse = restTemplate.exchange(
-            baseUrl + "/api/status",
+            baseUrl + "/api/v1/scs/metrics",
             HttpMethod.GET,
             new HttpEntity<>(oldHeaders),
             String.class

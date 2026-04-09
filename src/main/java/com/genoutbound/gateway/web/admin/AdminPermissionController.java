@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ResponseStatusException;
 
 @Controller
-@RequestMapping("/admin/permissions")
+@RequestMapping("/console/permissions")
 public class AdminPermissionController {
 
     private final AppPermissionRepository permissionRepository;

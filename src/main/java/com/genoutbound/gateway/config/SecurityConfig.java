@@ -13,9 +13,15 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.StringUtils;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import com.genoutbound.gateway.security.JwtAuthenticationFilter;
 import com.genoutbound.gateway.security.admin.AdminSessionAuthenticationFilter;
 import com.genoutbound.gateway.security.permission.PermissionCodes;
+
 import jakarta.annotation.PostConstruct;
 
 @Configuration
@@ -23,7 +29,15 @@ import jakarta.annotation.PostConstruct;
 @EnableConfigurationProperties(SecurityProperties.class)
 public class SecurityConfig {
 
+    private static final String[] BLOCKED_PATHS = {
+        "/api/status",
+        "/api/v1/configuration/**",
+        "/api/v1/crypto/**",
+        "/api/v1/outbound/**"
+    };
+
     private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
+    private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
 
     private final SecurityProperties securityProperties;
 
@@ -49,10 +63,18 @@ public class SecurityConfig {
 
         http.exceptionHandling(exception -> exception
             .authenticationEntryPoint((request, response, authException) -> {
+                if (isBlockedPath(request)) {
+                    response.sendError(org.springframework.http.HttpStatus.NOT_FOUND.value(), "Not Found");
+                    return;
+                }
                 log.warn("인증 실패: path={}, message={}", request.getRequestURI(), authException.getMessage());
                 response.sendError(org.springframework.http.HttpStatus.UNAUTHORIZED.value(), "Unauthorized");
             })
             .accessDeniedHandler((request, response, accessDeniedException) -> {
+                if (isBlockedPath(request)) {
+                    response.sendError(org.springframework.http.HttpStatus.NOT_FOUND.value(), "Not Found");
+                    return;
+                }
                 Authentication authentication = org.springframework.security.core.context.SecurityContextHolder
                     .getContext().getAuthentication();
                 if (authentication == null) {
@@ -74,17 +96,19 @@ public class SecurityConfig {
             if (!securityProperties.isAllowInsecure()) {
                 throw new IllegalStateException("보안 설정이 비활성화되었습니다. app.security.allow-insecure=true 설정 시에만 허용됩니다.");
             }
-            http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+            http.authorizeHttpRequests(auth -> auth
+                .requestMatchers(BLOCKED_PATHS).denyAll()
+                .anyRequest().permitAll());
             return http.build();
         }
 
         http.authorizeHttpRequests(auth -> {
+        auth.requestMatchers(BLOCKED_PATHS)
+            .denyAll();
+
         auth.requestMatchers("/", "/favicon.ico", "/css/**", "/js/**", "/images/**", "/actuator/health", "/error",
             "/auth/login", "/auth/refresh", "/auth/logout")
                 .permitAll();
-
-            auth.requestMatchers("/api/status")
-                .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.STATUS_READ);
 
             if (securityProperties.isAllowSwagger()) {
                 auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
@@ -93,28 +117,24 @@ public class SecurityConfig {
             }
 
             if (securityProperties.isAllowCryptoTest()) {
-                auth.requestMatchers("/api/v1/crypto/**").permitAll();
-            } else {
-                auth.requestMatchers("/api/v1/crypto/**").hasRole("ADMIN");
+                log.info("app.security.allow-crypto-test=true 이지만 /api/v1/crypto/** 는 정책에 따라 denyAll 처리됩니다.");
             }
 
             if (securityProperties.isAllowAdminUi()) {
-                auth.requestMatchers("/admin/login", "/admin/logout", "/admin/**").permitAll();
+                auth.requestMatchers("/console/session/new", "/console/session/end").permitAll();
+                auth.requestMatchers("/console/**")
+                    .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.ADMIN_UI);
             } else {
-                auth.requestMatchers("/admin/login", "/admin/logout", "/admin/**")
+                auth.requestMatchers("/console/session/new", "/console/session/end", "/console/**")
                     .denyAll();
             }
 
+            auth.requestMatchers("/admin/**").denyAll();
+
             auth.requestMatchers(
-                    "/admin/permissions/new",
-                    "/admin/permissions/*")
+                    "/console/permissions/new",
+                    "/console/permissions/*")
                 .denyAll();
-
-            auth.requestMatchers("/api/v1/configuration/**")
-                .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.CONFIG_READ, PermissionCodes.CONFIG_WRITE);
-
-            auth.requestMatchers("/api/v1/outbound/**")
-                .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.OUTBOUND_READ, PermissionCodes.OUTBOUND_WRITE);
 
             auth.requestMatchers("/api/v1/stat/**")
                 .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.STAT_READ);
@@ -141,5 +161,32 @@ public class SecurityConfig {
     @Bean
     public AdminSessionAuthenticationFilter adminSessionAuthenticationFilter() {
         return new AdminSessionAuthenticationFilter();
+    }
+
+    private boolean isBlockedPath(HttpServletRequest request) {
+        String requestUri = request.getRequestURI();
+        String contextPath = request.getContextPath();
+
+        if (StringUtils.hasText(contextPath) && requestUri.startsWith(contextPath)) {
+            requestUri = requestUri.substring(contextPath.length());
+        }
+
+        if (!requestUri.startsWith("/")) {
+            requestUri = "/" + requestUri;
+        }
+
+        if ("/api/status".equals(requestUri)
+                || requestUri.startsWith("/api/v1/configuration")
+                || requestUri.startsWith("/api/v1/crypto")
+                || requestUri.startsWith("/api/v1/outbound")) {
+            return true;
+        }
+
+        for (String pattern : BLOCKED_PATHS) {
+            if (PATH_MATCHER.match(pattern, requestUri)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

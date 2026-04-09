@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/admin/users")
+@RequestMapping("/console/users")
 public class AdminUserController {
 
     private final AppUserRepository userRepository;
@@ -86,7 +86,7 @@ public class AdminUserController {
         user.setRoleEntities(roles);
         user.setRoles(toRoleString(roles));
         userRepository.save(user);
-        return "redirect:/admin/users";
+    return "redirect:/console/users";
     }
 
     @PostMapping("/{id}")
@@ -106,7 +106,7 @@ public class AdminUserController {
         user.setRoleEntities(roles);
         user.setRoles(toRoleString(roles));
         userRepository.save(user);
-        return "redirect:/admin/users";
+    return "redirect:/console/users";
     }
 
     private String renderForm(Model model, UserForm form, String error) {

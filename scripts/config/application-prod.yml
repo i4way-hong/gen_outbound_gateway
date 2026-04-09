@@ -1,55 +1,147 @@
 spring:
+  application:
+    name: gen-outbound-gateway
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:prod}
   datasource:
-    url: jdbc:sqlserver://172.168.30.61:1433;databaseName=RND_TEST;encrypt=true;trustServerCertificate=true
-    username: RND_USER
-    password: RND_USER
+    url: ${DB_URL:}
+    username: "${DB_USERNAME:}"
+    password: "${DB_PASSWORD:}"
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+  thymeleaf:
+    cache: false
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
 
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui
+    operations-sorter: alpha
+    tags-sorter: alpha
+
+logging:
+  config: ${LOGBACK_CONFIG_PATH:file:./scripts/config/logback-spring.xml}
+  level:
+    root: INFO
 
 app:
   security:
-    admin-username: admin
-    admin-password: admin123
-    auth-enabled: true
-    jwt-enabled: true
-    allow-insecure: false
-    allow-swagger: true
-    allow-admin-ui: false
+    admin-username: ${ADMIN_USERNAME:}
+    admin-password: "${ADMIN_PASSWORD:}"
+    auth-enabled: ${AUTH_ENABLED:true}
+    jwt-enabled: ${JWT_ENABLED:true}
+    allow-insecure: ${ALLOW_INSECURE:true}
+    allow-swagger: ${ALLOW_SWAGGER:true}
+    allow-crypto-test: ${ALLOW_CRYPTO_TEST:true}
+    allow-admin-ui: ${ALLOW_ADMIN_UI:false}
     jwt:
-      issuer: gen-outbound-gateway
-      secret: CHANGE_ME_32_BYTE_SECRET_FOR_PROD
-      access-token-minutes: 1
-      refresh-token-days: 1
+      issuer: ${JWT_ISSUER:gen-outbound-gateway}
+      secret: ${JWT_SECRET:}
+      access-token-minutes: ${JWT_ACCESS_TOKEN_MINUTES:2}
+      refresh-token-days: ${JWT_REFRESH_TOKEN_DAYS:7}
     encryption:
-      enabled: false
-      key: 12345678901234567890123456789012
-      iv: 1234567890123456
+      enabled: ${CCC_SERVICE_ENC_ENABLED:true}
+      key: "${CCC_SERVICE_ENC_KEY:}"
+      iv: "${CCC_SERVICE_ENC_IV:}"
   outbound:
     enabled: true
-    uri: tcp://172.168.20.233:2130
-    client-name: default
-    client-password: ""
-    app-name: ocserver
-    app-password: ""
+    uri: ${OUTBOUND_URI:tcp://172.168.20.233:2130}
+    backup-uri: ${OUTBOUND_URI_B:tcp://172.168.20.233:2130}
+    client-name: ${OUTBOUND_CLIENT_NAME:default}
+    client-password: "${OUTBOUND_CLIENT_PASSWORD:}"
+    app-name: ${OUTBOUND_APP_NAME:ocserver}
+    app-password: "${OUTBOUND_APP_PASSWORD:}"
   genesys:
     enabled: true
     primary:
-      endpoint: Cfg_EP_P
-      ip: 172.168.20.233
-      port: 2020
+      endpoint: ${GENESYS_CFG_ENDPOINT_P:Cfg_EP_P}
+      ip: ${GENESYS_CFG_IP_P:172.168.20.233}
+      port: ${GENESYS_CFG_PORT_P:2020}
     backup:
-      endpoint: Cfg_EP_B
-      ip: 172.168.20.233
-      port: 2020
-    client-name: default
-    username: default
-    password: password
-    tenant-dbid: 1
-    switch-dbid-primary: 101
-    switch-dbid-secondary: 101
-    charset: MS949
-    addp-enabled: true
-    addp-client-timeout: 5
-    addp-server-timeout: 5
-    health-check-interval-ms: 30000
+      endpoint: ${GENESYS_CFG_ENDPOINT_B:Cfg_EP_B}
+      ip: ${GENESYS_CFG_IP_B:172.168.20.233}
+      port: ${GENESYS_CFG_PORT_B:2020}
+    client-name: ${GENESYS_CFG_CLIENT_NAME_B:default}
+    username: ${GENESYS_CFG_USERNAME:}
+    password: "${GENESYS_CFG_PASSWORD:}"
+    tenant-dbid: ${GENESYS_TENANT_DBID:1}
+    switch-dbid-primary: ${GENESYS_SWITCH_DBID_PRIMARY:101}
+    switch-dbid-secondary: ${GENESYS_SWITCH_DBID_SECONDARY:101}
+    charset: ${GENESYS_CHARSET:MS949}
+    addp-enabled: ${GENESYS_CFG_ADDP_ENABLED:true}
+    addp-client-timeout: ${GENESYS_CFG_ADDP_CLIENT_TIMEOUT:5}
+    addp-server-timeout: ${GENESYS_CFG_ADDP_SERVER_TIMEOUT:5}
+    health-check-interval-ms: ${GENESYS_CFG_HEALTH_CHECK_INTERVAL_MS:600000}
+  stat:
+    enabled: ${GENESYS_STAT_ENABLED:true}
+    primary:
+      endpoint: ${GENESYS_STAT_ENDPOINT_P:Stat_EP_P}
+      ip: ${GENESYS_STAT_IP_P:172.168.20.233}
+      port: ${GENESYS_STAT_PORT_P:2060}
+    backup:
+      endpoint: ${GENESYS_STAT_ENDPOINT_B:Stat_EP_B}
+      ip: ${GENESYS_STAT_IP_B:172.168.20.233}
+      port: ${GENESYS_STAT_PORT_B:2060}
+    client-name: ${GENESYS_STAT_CLIENT_NAME:StatServer_EP}
+    charset: ${GENESYS_STAT_CHARSET:MS949}
+    tenant-name: ${GENESYS_STAT_TENANT_NAME:Environment}
+    default-statistic: ${GENESYS_STAT_DEFAULT_STATISTIC:CurrentAllAgentState}
+    timeout-ms: ${GENESYS_STAT_TIMEOUT_MS:5000}
+    delay-ms: ${GENESYS_STAT_DELAY_MS:200}
+    addp-enabled: ${GENESYS_STAT_ADDP_ENABLED:true}
+    addp-client-timeout: ${GENESYS_STAT_ADDP_CLIENT_TIMEOUT:5}
+    addp-server-timeout: ${GENESYS_STAT_ADDP_SERVER_TIMEOUT:5}
+  tserver:
+    enabled: ${GENESYS_TSERVER_ENABLED:true}
+    endpoint: ${GENESYS_TSERVER_ENDPOINT:TServer_EP_P}
+    ip: ${GENESYS_TSERVER_IP:172.168.20.233}
+    port: ${GENESYS_TSERVER_PORT:3000}
+    backup-endpoint: ${GENESYS_TSERVER_ENDPOINT_B:TServer_EP_B}
+    backup-ip: ${GENESYS_TSERVER_IP_B:172.168.20.233}
+    backup-port: ${GENESYS_TSERVER_PORT_B:3000}
+    client-name: ${GENESYS_TSERVER_CLIENT_NAME:tserver-client}
+    charset: ${GENESYS_TSERVER_CHARSET:MS949}
+    addp-enabled: ${GENESYS_TSERVER_ADDP_ENABLED:true}
+    addp-client-timeout: ${GENESYS_TSERVER_ADDP_CLIENT_TIMEOUT:10}
+    addp-server-timeout: ${GENESYS_TSERVER_ADDP_SERVER_TIMEOUT:10}
+  scs:
+    enabled: ${GENESYS_SCS_ENABLED:true}
+    primary:
+      endpoint: ${GENESYS_SCS_ENDPOINT_P:Scs_EP_P}
+      ip: ${GENESYS_SCS_IP_P:172.168.20.233}
+      port: ${GENESYS_SCS_PORT_P:2050}
+    backup:
+      endpoint: ${GENESYS_SCS_ENDPOINT_B:Scs_EP_B}
+      ip: ${GENESYS_SCS_IP_B:172.168.20.233}
+      port: ${GENESYS_SCS_PORT_B:2050}
+    client-name: ${GENESYS_SCS_CLIENT_NAME:scs-client}
+    client-id: ${GENESYS_SCS_CLIENT_ID:0}
+    username: ${GENESYS_SCS_USERNAME:}
+    charset: ${GENESYS_SCS_CHARSET:MS949}
+    timeout-ms: ${GENESYS_SCS_TIMEOUT_MS:5000}
+    warm-standby-attempts: ${GENESYS_SCS_WARM_ATTEMPTS:5}
+    warm-standby-timeout-ms: ${GENESYS_SCS_WARM_TIMEOUT_MS:2000}
+    addp-enabled: ${GENESYS_SCS_ADDP_ENABLED:true}
+    addp-client-timeout: ${GENESYS_SCS_ADDP_CLIENT_TIMEOUT:10}
+    addp-server-timeout: ${GENESYS_SCS_ADDP_SERVER_TIMEOUT:10}
+    sse:
+      emitter-timeout-ms: ${SCS_SSE_EMITTER_TIMEOUT_MS:0}
+      heartbeat-ms: ${SCS_SSE_HEARTBEAT_MS:25000}
+    applications: [107,108,128]
