@@ -2,6 +2,7 @@ package com.genoutbound.gateway.genesys.cfg.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import java.io.Serializable;
 
 public record DnDialPlanRequest(
         @Schema(description = "테넌트 DBID", example = "101")
@@ -10,5 +11,5 @@ public record DnDialPlanRequest(
         @NotNull Boolean enabled,
         @Schema(description = "DialPlan 이름", example = "DIALPLAN_A")
         String dialPlanName
-) {
+) implements Serializable {
 }

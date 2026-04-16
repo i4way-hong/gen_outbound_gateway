@@ -1,5 +1,6 @@
 package com.genoutbound.gateway.web.admin;
 
+import com.genoutbound.gateway.config.AdminConsolePaths;
 import com.genoutbound.gateway.security.role.AppPermissionRepository;
 import com.genoutbound.gateway.web.admin.dto.PermissionListItem;
 import java.util.List;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ResponseStatusException;
 
 @Controller
-@RequestMapping("/console/permissions")
+@RequestMapping(AdminConsolePaths.PERMISSIONS_BASE)
 public class AdminPermissionController {
 
     private final AppPermissionRepository permissionRepository;

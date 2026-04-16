@@ -9,4 +9,13 @@ public record DnTServerOptionRequest(
         @Schema(description = "TServer 옵션", example = "{\"key\":\"value\"}")
         Map<String, String> options
 ) {
+
+        public DnTServerOptionRequest {
+                options = options == null ? null : Map.copyOf(options);
+        }
+
+        @Override
+        public Map<String, String> options() {
+                return options == null ? null : Map.copyOf(options);
+        }
 }

@@ -9,4 +9,13 @@ public record AgentGroupAssignPersonRequest(
         @Schema(description = "상담사 DBID 목록", example = "[1001,1002]")
         List<Integer> personDbids
 ) {
+
+        public AgentGroupAssignPersonRequest {
+                personDbids = personDbids == null ? List.of() : List.copyOf(personDbids);
+        }
+
+        @Override
+        public List<Integer> personDbids() {
+                return List.copyOf(personDbids);
+        }
 }

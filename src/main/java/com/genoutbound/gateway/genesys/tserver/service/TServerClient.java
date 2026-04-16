@@ -19,8 +19,12 @@ import com.genesyslab.platform.voice.protocol.tserver.requests.agent.RequestAgen
 import com.genesyslab.platform.voice.protocol.tserver.requests.agent.RequestAgentReady;
 import com.genesyslab.platform.voice.protocol.tserver.requests.dn.RequestRegisterAddress;
 import com.genesyslab.platform.voice.protocol.tserver.requests.dn.RequestUnregisterAddress;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.genoutbound.gateway.genesys.common.GenesysConnectionConfigValidator;
 import com.genoutbound.gateway.genesys.common.GenesysUnavailableException;
 import com.genoutbound.gateway.genesys.tserver.TServerProperties;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,8 +41,15 @@ public class TServerClient {
 
     private final TServerProperties properties;
 
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
+        justification = "Spring DI 설정 참조를 연결 구성 조회 용도로만 사용하며 외부 mutable 참조를 재노출하지 않습니다.")
     public TServerClient(TServerProperties properties) {
         this.properties = properties;
+        if (properties.isEnabled()) {
+            GenesysConnectionConfigValidator.validateTServerClientTimeouts(
+                properties.getAddpClientTimeout(),
+                properties.getAddpServerTimeout());
+        }
     }
 
     public String register(String dn) {
@@ -210,25 +221,47 @@ public class TServerClient {
             throw new GenesysUnavailableException("T-Server 접속 설정이 필요합니다.");
         }
         PropertyConfiguration config = buildConfig();
+        int primaryAttempt = 1;
         try {
-            return openProtocol(buildEndpoint("primary", config), "primary");
+            return openProtocol(buildEndpoint("primary", config), "primary", primaryAttempt);
         } catch (GenesysUnavailableException primaryError) {
             if (!isValidBackup()) {
                 throw primaryError;
             }
-            log.warn("Primary T-Server 연결 실패. Backup으로 재시도합니다.", primaryError);
-            return openProtocol(buildEndpoint("backup", config), "backup");
+            int backupAttempt = 2;
+            log.warn("Primary T-Server 연결 실패(attempt={}). Backup으로 재시도합니다.", primaryAttempt, primaryError);
+            return openProtocol(buildEndpoint("backup", config), "backup", backupAttempt);
         }
     }
 
-    private TServerProtocol openProtocol(Endpoint endpoint, String role) {
+    private TServerProtocol openProtocol(Endpoint endpoint, String role, int attempt) {
         TServerProtocol protocol = new TServerProtocol(endpoint);
         protocol.setClientName(properties.getClientName());
+        Instant startedAt = Instant.now();
         try {
+            log.info("T-Server 연결 시도: role={}, attempt={}, endpoint={}:{}, addpClientTimeout={}, addpServerTimeout={}",
+                role,
+                attempt,
+                endpoint.getHost(),
+                endpoint.getPort(),
+                properties.getAddpClientTimeout(),
+                properties.getAddpServerTimeout());
             protocol.open();
-            log.info("T-Server 연결 성공({}): {}:{}", role, endpoint.getHost(), endpoint.getPort());
+            long elapsedMs = Duration.between(startedAt, Instant.now()).toMillis();
+            log.info("T-Server 연결 성공: role={}, endpoint={}:{}, elapsedMs={}",
+                role,
+                endpoint.getHost(),
+                endpoint.getPort(),
+                elapsedMs);
             return protocol;
         } catch (ProtocolException | IllegalStateException | InterruptedException ex) {
+            long elapsedMs = Duration.between(startedAt, Instant.now()).toMillis();
+            log.warn("T-Server 연결 실패: role={}, endpoint={}:{}, elapsedMs={}",
+                role,
+                endpoint.getHost(),
+                endpoint.getPort(),
+                elapsedMs,
+                ex);
             throw new GenesysUnavailableException("T-Server 연결 실패(" + role + ")", ex);
         }
     }

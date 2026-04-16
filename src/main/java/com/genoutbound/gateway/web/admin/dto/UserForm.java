@@ -44,10 +44,10 @@ public class UserForm {
     }
 
     public List<Long> getRoleIds() {
-        return roleIds;
+        return roleIds == null ? null : List.copyOf(roleIds);
     }
 
     public void setRoleIds(List<Long> roleIds) {
-        this.roleIds = roleIds;
+        this.roleIds = roleIds == null ? null : new ArrayList<>(roleIds);
     }
 }

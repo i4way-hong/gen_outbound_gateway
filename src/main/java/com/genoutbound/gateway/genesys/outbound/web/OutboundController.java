@@ -1,6 +1,7 @@
 package com.genoutbound.gateway.genesys.outbound.web;
 
 import com.genoutbound.gateway.core.ApiResponse;
+import com.genoutbound.gateway.core.logging.SensitiveLogMasker;
 import com.genoutbound.gateway.genesys.outbound.dto.OutboundCommandRequest;
 import com.genoutbound.gateway.genesys.outbound.dto.OutboundDialRequest;
 import com.genoutbound.gateway.genesys.outbound.dto.OutboundStatusResponse;
@@ -105,7 +106,7 @@ public class OutboundController {
     public ApiResponse<OutboundStatusResponse> loadCampaign(
             @Parameter(description = "캠페인 제어 요청")
             @Valid @RequestBody OutboundCommandRequest request) {
-        log.debug("Outbound loadCampaign 요청: {}", request);
+    log.debug("Outbound loadCampaign 요청: {}", SensitiveLogMasker.masked(request));
         ApiResponse<OutboundStatusResponse> response = ApiResponse.ok("Campaign load", outboundService.loadCampaign(request));
         log.debug("Outbound loadCampaign 응답: {}", response);
         return response;
@@ -122,7 +123,7 @@ public class OutboundController {
     public ApiResponse<OutboundStatusResponse> unloadCampaign(
             @Parameter(description = "캠페인 제어 요청")
             @Valid @RequestBody OutboundCommandRequest request) {
-        log.debug("Outbound unloadCampaign 요청: {}", request);
+    log.debug("Outbound unloadCampaign 요청: {}", SensitiveLogMasker.masked(request));
         ApiResponse<OutboundStatusResponse> response = ApiResponse.ok("Campaign unload", outboundService.unloadCampaign(request));
         log.debug("Outbound unloadCampaign 응답: {}", response);
         return response;
@@ -139,7 +140,7 @@ public class OutboundController {
     public ApiResponse<OutboundStatusResponse> forceUnloadCampaign(
             @Parameter(description = "캠페인 제어 요청")
             @Valid @RequestBody OutboundCommandRequest request) {
-        log.debug("Outbound forceUnloadCampaign 요청: {}", request);
+    log.debug("Outbound forceUnloadCampaign 요청: {}", SensitiveLogMasker.masked(request));
         ApiResponse<OutboundStatusResponse> response = ApiResponse.ok("Campaign force unload", outboundService.forceUnloadCampaign(request));
         log.debug("Outbound forceUnloadCampaign 응답: {}", response);
         return response;
@@ -156,7 +157,7 @@ public class OutboundController {
     public ApiResponse<OutboundStatusResponse> startDialing(
             @Parameter(description = "다이얼링 요청")
             @Valid @RequestBody OutboundDialRequest request) {
-        log.debug("Outbound startDialing 요청: {}", request);
+    log.debug("Outbound startDialing 요청: {}", SensitiveLogMasker.masked(request));
         ApiResponse<OutboundStatusResponse> response = ApiResponse.ok("Dialing start", outboundService.startDialing(request));
         log.debug("Outbound startDialing 응답: {}", response);
         return response;
@@ -173,7 +174,7 @@ public class OutboundController {
     public ApiResponse<OutboundStatusResponse> stopDialing(
             @Parameter(description = "다이얼 중지 요청")
             @Valid @RequestBody OutboundCommandRequest request) {
-        log.debug("Outbound stopDialing 요청: {}", request);
+    log.debug("Outbound stopDialing 요청: {}", SensitiveLogMasker.masked(request));
         ApiResponse<OutboundStatusResponse> response = ApiResponse.ok("Dialing stop", outboundService.stopDialing(request));
         log.debug("Outbound stopDialing 응답: {}", response);
         return response;
@@ -190,7 +191,7 @@ public class OutboundController {
     public ApiResponse<OutboundStatusResponse> campaignStatus(
             @Parameter(description = "캠페인 상태 요청")
             @Valid @RequestBody OutboundCommandRequest request) {
-        log.debug("Outbound campaignStatus 요청: {}", request);
+    log.debug("Outbound campaignStatus 요청: {}", SensitiveLogMasker.masked(request));
         ApiResponse<OutboundStatusResponse> response = ApiResponse.ok("Campaign status", outboundService.getCampaignStatus(request));
         log.debug("Outbound campaignStatus 응답: {}", response);
         return response;

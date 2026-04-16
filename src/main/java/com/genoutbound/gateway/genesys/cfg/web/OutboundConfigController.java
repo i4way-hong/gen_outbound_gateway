@@ -1,6 +1,7 @@
 package com.genoutbound.gateway.genesys.cfg.web;
 
 import com.genoutbound.gateway.core.ApiResponse;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import com.genoutbound.gateway.genesys.cfg.dto.CallingListDetailRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.CallingListDetailSummary;
 import com.genoutbound.gateway.genesys.cfg.dto.CallingListUpdateCommand;
@@ -17,14 +18,19 @@ import com.genoutbound.gateway.genesys.cfg.dto.FilterUpdateCommand;
 import com.genoutbound.gateway.genesys.cfg.dto.FormatSummary;
 import com.genoutbound.gateway.genesys.cfg.dto.NameTenantRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.OutboundBatchCreateCommand;
-import com.genoutbound.gateway.genesys.cfg.dto.OutboundBatchCreateRequest;
-import com.genoutbound.gateway.genesys.cfg.dto.OutboundBatchCreateResponse;
 import com.genoutbound.gateway.genesys.cfg.dto.TableAccessSummary;
 import com.genoutbound.gateway.genesys.cfg.dto.TenantDbidRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.TreatmentRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.TreatmentSummary;
 import com.genoutbound.gateway.genesys.cfg.dto.TreatmentUpdateCommand;
-import com.genoutbound.gateway.genesys.cfg.service.OutboundConfigService;
+import com.genoutbound.gateway.genesys.cfg.web.support.OutboundBatchCreateUseCaseHandler;
+import com.genoutbound.gateway.genesys.cfg.web.support.OutboundCampaignUseCaseHandler;
+import com.genoutbound.gateway.genesys.cfg.web.support.OutboundCampaignGroupUseCaseHandler;
+import com.genoutbound.gateway.genesys.cfg.web.support.OutboundCallingListUseCaseHandler;
+import com.genoutbound.gateway.genesys.cfg.web.support.OutboundFilterUseCaseHandler;
+import com.genoutbound.gateway.genesys.cfg.web.support.OutboundFormatUseCaseHandler;
+import com.genoutbound.gateway.genesys.cfg.web.support.OutboundTableAccessUseCaseHandler;
+import com.genoutbound.gateway.genesys.cfg.web.support.OutboundTreatmentUseCaseHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -32,8 +38,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -120,11 +124,33 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 })
 public class OutboundConfigController {
 
-    private static final Logger log = LoggerFactory.getLogger(OutboundConfigController.class);
-    private final OutboundConfigService outboundService;
+    private final OutboundFilterUseCaseHandler filterHandler;
+    private final OutboundCallingListUseCaseHandler callingListHandler;
+    private final OutboundCampaignUseCaseHandler campaignHandler;
+    private final OutboundCampaignGroupUseCaseHandler campaignGroupHandler;
+    private final OutboundTreatmentUseCaseHandler treatmentHandler;
+    private final OutboundTableAccessUseCaseHandler tableAccessHandler;
+    private final OutboundFormatUseCaseHandler formatHandler;
+    private final OutboundBatchCreateUseCaseHandler batchCreateHandler;
 
-    public OutboundConfigController(OutboundConfigService outboundService) {
-        this.outboundService = outboundService;
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
+        justification = "Spring DI 핸들러 참조를 라우팅 처리 호출에만 사용하며 외부 mutable 참조를 재노출하지 않습니다.")
+    public OutboundConfigController(OutboundFilterUseCaseHandler filterHandler,
+                                    OutboundCallingListUseCaseHandler callingListHandler,
+                                    OutboundCampaignUseCaseHandler campaignHandler,
+                                    OutboundCampaignGroupUseCaseHandler campaignGroupHandler,
+                                    OutboundTreatmentUseCaseHandler treatmentHandler,
+                                    OutboundTableAccessUseCaseHandler tableAccessHandler,
+                                    OutboundFormatUseCaseHandler formatHandler,
+                                    OutboundBatchCreateUseCaseHandler batchCreateHandler) {
+        this.filterHandler = filterHandler;
+        this.callingListHandler = callingListHandler;
+        this.campaignHandler = campaignHandler;
+        this.campaignGroupHandler = campaignGroupHandler;
+        this.treatmentHandler = treatmentHandler;
+        this.tableAccessHandler = tableAccessHandler;
+        this.formatHandler = formatHandler;
+        this.batchCreateHandler = batchCreateHandler;
     }
 
     @PostMapping("/calling-lists")
@@ -139,12 +165,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody TenantDbidRequest request) {
-        Integer tenantDbid = request == null ? null : request.tenantDbid();
-        log.debug("listCallingLists 요청: tenantDbid={}", tenantDbid);
-        ApiResponse<List<CallingListDetailSummary>> response = ApiResponse.ok("콜링리스트 목록",
-            outboundService.listCallingLists(tenantDbid));
-        log.debug("listCallingLists 응답: count={}", response.data() == null ? 0 : response.data().size());
-        return response;
+        return callingListHandler.listCallingLists(request);
     }
 
     @PostMapping("/filters")
@@ -159,11 +180,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody TenantDbidRequest request) {
-        Integer tenantDbid = request == null ? null : request.tenantDbid();
-        log.debug("listFilters 요청: tenantDbid={}", tenantDbid);
-        ApiResponse<List<FilterSummary>> response = ApiResponse.ok("Filter 목록", outboundService.listFilters(tenantDbid));
-        log.debug("listFilters 응답: count={}", response.data() == null ? 0 : response.data().size());
-        return response;
+    return filterHandler.listFilters(request);
     }
 
     @PostMapping("/filters/get")
@@ -189,12 +206,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody DbidTenantRequest request) {
-        int filterDbid = request.dbid();
-        Integer tenantDbid = request.tenantDbid();
-        log.debug("getFilter 요청: filterDbid={}, tenantDbid={}", filterDbid, tenantDbid);
-        ApiResponse<FilterSummary> response = ApiResponse.ok("Filter 조회", outboundService.getFilter(filterDbid, tenantDbid));
-        log.debug("getFilter 응답: {}", response);
-        return response;
+    return filterHandler.getFilter(request);
     }
 
     @PostMapping("/filters/by-name")
@@ -220,12 +232,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody NameTenantRequest request) {
-        String name = request.name();
-        Integer tenantDbid = request.tenantDbid();
-        log.debug("getFilterByName 요청: name={}, tenantDbid={}", name, tenantDbid);
-        ApiResponse<FilterSummary> response = ApiResponse.ok("Filter 조회", outboundService.getFilterByName(name, tenantDbid));
-        log.debug("getFilterByName 응답: {}", response);
-        return response;
+    return filterHandler.getFilterByName(request);
     }
 
     @PostMapping("/formats")
@@ -240,11 +247,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody TenantDbidRequest request) {
-        Integer tenantDbid = request == null ? null : request.tenantDbid();
-        log.debug("listFormats 요청: tenantDbid={}", tenantDbid);
-        ApiResponse<List<FormatSummary>> response = ApiResponse.ok("Format 목록", outboundService.listFormats(tenantDbid));
-        log.debug("listFormats 응답: count={}", response.data() == null ? 0 : response.data().size());
-        return response;
+        return formatHandler.listFormats(request);
     }
 
     @PostMapping("/formats/get")
@@ -259,12 +262,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody DbidTenantRequest request) {
-        int formatDbid = request.dbid();
-        Integer tenantDbid = request.tenantDbid();
-        log.debug("getFormat 요청: formatDbid={}, tenantDbid={}", formatDbid, tenantDbid);
-        ApiResponse<FormatSummary> response = ApiResponse.ok("Format 조회", outboundService.getFormat(formatDbid, tenantDbid));
-        log.debug("getFormat 응답: {}", response);
-        return response;
+        return formatHandler.getFormat(request);
     }
 
     @PostMapping("/formats/by-name")
@@ -279,12 +277,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody NameTenantRequest request) {
-        String name = request.name();
-        Integer tenantDbid = request.tenantDbid();
-        log.debug("getFormatByName 요청: name={}, tenantDbid={}", name, tenantDbid);
-        ApiResponse<FormatSummary> response = ApiResponse.ok("Format 조회", outboundService.getFormatByName(name, tenantDbid));
-        log.debug("getFormatByName 응답: {}", response);
-        return response;
+        return formatHandler.getFormatByName(request);
     }
 
     @PostMapping("/filters/create")
@@ -314,10 +307,7 @@ public class OutboundConfigController {
             )
         )
         @Valid @RequestBody FilterRequest request) {
-        log.debug("createFilter 요청: {}", request);
-        ApiResponse<FilterSummary> response = ApiResponse.ok("Filter 생성", outboundService.createFilter(request));
-        log.debug("createFilter 응답: {}", response);
-        return response;
+    return filterHandler.createFilter(request);
     }
 
     @PostMapping("/filters/update")
@@ -346,11 +336,7 @@ public class OutboundConfigController {
             )
         )
         @Valid @RequestBody FilterUpdateCommand command) {
-        log.debug("updateFilter 요청: filterDbid={}, request={}", command.filterDbid(), command.payload());
-        ApiResponse<FilterSummary> response = ApiResponse.ok("Filter 수정",
-            outboundService.updateFilter(command.filterDbid(), command.payload()));
-        log.debug("updateFilter 응답: {}", response);
-        return response;
+        return filterHandler.updateFilter(command);
     }
 
     @PostMapping("/filters/delete")
@@ -365,13 +351,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody DbidTenantRequest request) {
-        int filterDbid = request.dbid();
-        Integer tenantDbid = request.tenantDbid();
-        log.debug("deleteFilter 요청: filterDbid={}, tenantDbid={}", filterDbid, tenantDbid);
-        outboundService.deleteFilter(filterDbid, tenantDbid);
-        ApiResponse<Void> response = ApiResponse.ok("Filter 삭제", null);
-        log.debug("deleteFilter 응답: {}", response);
-        return response;
+    return filterHandler.deleteFilter(request);
     }
 
     @PostMapping("/calling-lists/get")
@@ -397,13 +377,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody DbidTenantRequest request) {
-        int callingListDbid = request.dbid();
-        Integer tenantDbid = request.tenantDbid();
-        log.debug("getCallingList 요청: callingListDbid={}, tenantDbid={}", callingListDbid, tenantDbid);
-        ApiResponse<CallingListDetailSummary> response = ApiResponse.ok("콜링리스트 조회",
-            outboundService.getCallingList(callingListDbid, tenantDbid));
-        log.debug("getCallingList 응답: {}", response);
-        return response;
+        return callingListHandler.getCallingList(request);
     }
 
     @PostMapping("/calling-lists/by-name")
@@ -429,13 +403,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody NameTenantRequest request) {
-        String name = request.name();
-        Integer tenantDbid = request.tenantDbid();
-        log.debug("getCallingListByName 요청: name={}, tenantDbid={}", name, tenantDbid);
-        ApiResponse<CallingListDetailSummary> response = ApiResponse.ok("콜링리스트 조회",
-            outboundService.getCallingListByName(name, tenantDbid));
-        log.debug("getCallingListByName 응답: {}", response);
-        return response;
+        return callingListHandler.getCallingListByName(request);
     }
 
     @PostMapping("/calling-lists/create")
@@ -465,10 +433,7 @@ public class OutboundConfigController {
             )
         )
         @Valid @RequestBody CallingListDetailRequest request) {
-        log.debug("createCallingList 요청: {}", request);
-        ApiResponse<CallingListDetailSummary> response = ApiResponse.ok("콜링리스트 생성", outboundService.createCallingList(request));
-        log.debug("createCallingList 응답: {}", response);
-        return response;
+        return callingListHandler.createCallingList(request);
     }
 
     @PostMapping("/calling-lists/update")
@@ -497,11 +462,7 @@ public class OutboundConfigController {
             )
         )
         @Valid @RequestBody CallingListUpdateCommand command) {
-        log.debug("updateCallingList 요청: callingListDbid={}, request={}", command.callingListDbid(), command.payload());
-        ApiResponse<CallingListDetailSummary> response = ApiResponse.ok("콜링리스트 수정",
-            outboundService.updateCallingList(command.callingListDbid(), command.payload()));
-        log.debug("updateCallingList 응답: {}", response);
-        return response;
+        return callingListHandler.updateCallingList(command);
     }
 
     @PostMapping("/calling-lists/delete")
@@ -516,13 +477,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody DbidTenantRequest request) {
-        int callingListDbid = request.dbid();
-        Integer tenantDbid = request.tenantDbid();
-        log.debug("deleteCallingList 요청: callingListDbid={}, tenantDbid={}", callingListDbid, tenantDbid);
-        outboundService.deleteCallingList(callingListDbid, tenantDbid);
-        ApiResponse<Void> response = ApiResponse.ok("콜링리스트 삭제", null);
-        log.debug("deleteCallingList 응답: {}", response);
-        return response;
+        return callingListHandler.deleteCallingList(request);
     }
 
     @PostMapping("/table-access")
@@ -537,12 +492,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody TenantDbidRequest request) {
-        Integer tenantDbid = request == null ? null : request.tenantDbid();
-        log.debug("listTableAccess 요청: tenantDbid={}", tenantDbid);
-        ApiResponse<List<TableAccessSummary>> response = ApiResponse.ok("TableAccess 목록",
-            outboundService.listTableAccess(tenantDbid));
-        log.debug("listTableAccess 응답: count={}", response.data() == null ? 0 : response.data().size());
-        return response;
+        return tableAccessHandler.listTableAccess(request);
     }
 
     @PostMapping("/table-access/get")
@@ -557,13 +507,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody DbidTenantRequest request) {
-        int tableAccessDbid = request.dbid();
-        Integer tenantDbid = request.tenantDbid();
-        log.debug("getTableAccess 요청: tableAccessDbid={}, tenantDbid={}", tableAccessDbid, tenantDbid);
-        ApiResponse<TableAccessSummary> response = ApiResponse.ok("TableAccess 조회",
-            outboundService.getTableAccess(tableAccessDbid, tenantDbid));
-        log.debug("getTableAccess 응답: {}", response);
-        return response;
+        return tableAccessHandler.getTableAccess(request);
     }
 
     @PostMapping("/table-access/by-name")
@@ -578,18 +522,12 @@ public class OutboundConfigController {
             )
         )
         @RequestBody NameTenantRequest request) {
-        String name = request.name();
-        Integer tenantDbid = request.tenantDbid();
-        log.debug("getTableAccessByName 요청: name={}, tenantDbid={}", name, tenantDbid);
-        ApiResponse<TableAccessSummary> response = ApiResponse.ok("TableAccess 조회",
-            outboundService.getTableAccessByName(name, tenantDbid));
-        log.debug("getTableAccessByName 응답: {}", response);
-        return response;
+        return tableAccessHandler.getTableAccessByName(request);
     }
 
     @PostMapping("/treatment")
-    @Operation(summary = "treatment 목록", description = "treatment 목록을 조회합니다.")
-    public ApiResponse<List<TreatmentSummary>> listtreatment(
+    @Operation(summary = "Treatment 목록", description = "Treatment 목록을 조회합니다.")
+    public ApiResponse<List<TreatmentSummary>> listTreatment(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Treatment 조회 요청",
             required = false,
@@ -599,12 +537,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody TenantDbidRequest request) {
-        Integer tenantDbid = request == null ? null : request.tenantDbid();
-        log.debug("treatment 요청: tenantDbid={}", tenantDbid);
-        ApiResponse<List<TreatmentSummary>> response = ApiResponse.ok("treatment 목록",
-            outboundService.listTreatment(tenantDbid));
-        log.debug("listtreatment 응답: count={}", response.data() == null ? 0 : response.data().size());
-        return response;
+        return treatmentHandler.listTreatment(request);
     }
 
     @PostMapping("/treatment/get")
@@ -619,13 +552,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody DbidTenantRequest request) {
-        int treatmentDbid = request.dbid();
-        Integer tenantDbid = request.tenantDbid();
-        log.debug("getTreatment 요청: treatmentDbid={}, tenantDbid={}", treatmentDbid, tenantDbid);
-        ApiResponse<TreatmentSummary> response = ApiResponse.ok("Treatment 조회",
-            outboundService.getTreatment(treatmentDbid, tenantDbid));
-        log.debug("getTreatment 응답: {}", response);
-        return response;
+        return treatmentHandler.getTreatment(request);
     }
 
     @PostMapping("/treatment/by-name")
@@ -640,13 +567,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody NameTenantRequest request) {
-        String name = request.name();
-        Integer tenantDbid = request.tenantDbid();
-        log.debug("getTreatmentByName 요청: name={}, tenantDbid={}", name, tenantDbid);
-        ApiResponse<TreatmentSummary> response = ApiResponse.ok("Treatment 조회",
-            outboundService.getTreatmentByName(name, tenantDbid));
-        log.debug("getTreatmentByName 응답: {}", response);
-        return response;
+        return treatmentHandler.getTreatmentByName(request);
     }
 
     @PostMapping("/treatment/create")
@@ -676,10 +597,7 @@ public class OutboundConfigController {
             )
         )
         @Valid @RequestBody TreatmentRequest request) {
-        log.debug("createTreatment 요청: {}", request);
-        ApiResponse<TreatmentSummary> response = ApiResponse.ok("Treatment 생성", outboundService.createTreatment(request));
-        log.debug("createTreatment 응답: {}", response);
-        return response;
+        return treatmentHandler.createTreatment(request);
     }
 
     @PostMapping("/treatment/update")
@@ -708,11 +626,7 @@ public class OutboundConfigController {
             )
         )
         @Valid @RequestBody TreatmentUpdateCommand command) {
-        log.debug("updateTreatment 요청: treatmentDbid={}, request={}", command.treatmentDbid(), command.payload());
-        ApiResponse<TreatmentSummary> response = ApiResponse.ok("Treatment 수정",
-            outboundService.updateTreatment(command.treatmentDbid(), command.payload()));
-        log.debug("updateTreatment 응답: {}", response);
-        return response;
+        return treatmentHandler.updateTreatment(command);
     }
 
     @PostMapping("/treatment/delete")
@@ -727,13 +641,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody DbidTenantRequest request) {
-        int treatmentDbid = request.dbid();
-        Integer tenantDbid = request.tenantDbid();
-        log.debug("deleteTreatment 요청: treatmentDbid={}, tenantDbid={}", treatmentDbid, tenantDbid);
-        outboundService.deleteTreatment(treatmentDbid, tenantDbid);
-        ApiResponse<Void> response = ApiResponse.ok("Treatment 삭제", null);
-        log.debug("deleteTreatment 응답: {}", response);
-        return response;
+        return treatmentHandler.deleteTreatment(request);
     }
 
     @PostMapping("/campaigns")
@@ -748,11 +656,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody TenantDbidRequest request) {
-        Integer tenantDbid = request == null ? null : request.tenantDbid();
-        log.debug("listCampaigns 요청: tenantDbid={}", tenantDbid);
-        ApiResponse<List<CampaignSummary>> response = ApiResponse.ok("캠페인 목록", outboundService.listCampaigns(tenantDbid));
-        log.debug("listCampaigns 응답: count={}", response.data() == null ? 0 : response.data().size());
-        return response;
+        return campaignHandler.listCampaigns(request);
     }
 
     @PostMapping("/campaign-groups")
@@ -767,12 +671,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody TenantDbidRequest request) {
-        Integer tenantDbid = request == null ? null : request.tenantDbid();
-        log.debug("listCampaignGroups 요청: tenantDbid={}", tenantDbid);
-        ApiResponse<List<CampaignGroupSummary>> response = ApiResponse.ok("CampaignGroup 목록",
-            outboundService.listCampaignGroups(tenantDbid));
-        log.debug("listCampaignGroups 응답: count={}", response.data() == null ? 0 : response.data().size());
-        return response;
+        return campaignGroupHandler.listCampaignGroups(request);
     }
 
     @PostMapping("/campaign-groups/get")
@@ -798,13 +697,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody DbidTenantRequest request) {
-        int groupDbid = request.dbid();
-        Integer tenantDbid = request.tenantDbid();
-        log.debug("getCampaignGroup 요청: groupDbid={}, tenantDbid={}", groupDbid, tenantDbid);
-        ApiResponse<CampaignGroupSummary> response = ApiResponse.ok("CampaignGroup 조회",
-            outboundService.getCampaignGroup(groupDbid, tenantDbid));
-        log.debug("getCampaignGroup 응답: {}", response);
-        return response;
+        return campaignGroupHandler.getCampaignGroup(request);
     }
 
     @PostMapping("/campaign-groups/by-name")
@@ -830,13 +723,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody NameTenantRequest request) {
-        String name = request.name();
-        Integer tenantDbid = request.tenantDbid();
-        log.debug("getCampaignGroupByName 요청: name={}, tenantDbid={}", name, tenantDbid);
-        ApiResponse<CampaignGroupSummary> response = ApiResponse.ok("CampaignGroup 조회",
-            outboundService.getCampaignGroupByName(name, tenantDbid));
-        log.debug("getCampaignGroupByName 응답: {}", response);
-        return response;
+        return campaignGroupHandler.getCampaignGroupByName(request);
     }
 
     @PostMapping("/campaign-groups/create")
@@ -866,11 +753,7 @@ public class OutboundConfigController {
             )
         )
         @Valid @RequestBody CampaignGroupRequest request) {
-        log.debug("createCampaignGroup 요청: {}", request);
-        ApiResponse<CampaignGroupSummary> response = ApiResponse.ok("CampaignGroup 생성",
-            outboundService.createCampaignGroup(request));
-        log.debug("createCampaignGroup 응답: {}", response);
-        return response;
+        return campaignGroupHandler.createCampaignGroup(request);
     }
 
     @PostMapping("/campaign-groups/update")
@@ -899,11 +782,7 @@ public class OutboundConfigController {
             )
         )
         @Valid @RequestBody CampaignGroupUpdateCommand command) {
-        log.debug("updateCampaignGroup 요청: groupDbid={}, request={}", command.groupDbid(), command.payload());
-        ApiResponse<CampaignGroupSummary> response = ApiResponse.ok("CampaignGroup 수정",
-            outboundService.updateCampaignGroup(command.groupDbid(), command.payload()));
-        log.debug("updateCampaignGroup 응답: {}", response);
-        return response;
+        return campaignGroupHandler.updateCampaignGroup(command);
     }
 
     @PostMapping("/campaign-groups/delete")
@@ -918,13 +797,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody DbidTenantRequest request) {
-        int groupDbid = request.dbid();
-        Integer tenantDbid = request.tenantDbid();
-        log.debug("deleteCampaignGroup 요청: groupDbid={}, tenantDbid={}", groupDbid, tenantDbid);
-        outboundService.deleteCampaignGroup(groupDbid, tenantDbid);
-        ApiResponse<Void> response = ApiResponse.ok("CampaignGroup 삭제", null);
-        log.debug("deleteCampaignGroup 응답: {}", response);
-        return response;
+        return campaignGroupHandler.deleteCampaignGroup(request);
     }
 
     @PostMapping("/campaigns/get")
@@ -950,12 +823,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody DbidTenantRequest request) {
-        int campaignDbid = request.dbid();
-        Integer tenantDbid = request.tenantDbid();
-        log.debug("getCampaign 요청: campaignDbid={}, tenantDbid={}", campaignDbid, tenantDbid);
-        ApiResponse<CampaignSummary> response = ApiResponse.ok("캠페인 조회", outboundService.getCampaign(campaignDbid, tenantDbid));
-        log.debug("getCampaign 응답: {}", response);
-        return response;
+        return campaignHandler.getCampaign(request);
     }
 
     @PostMapping("/campaigns/by-name")
@@ -970,12 +838,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody NameTenantRequest request) {
-        String name = request.name();
-        Integer tenantDbid = request.tenantDbid();
-        log.debug("getCampaignByName 요청: name={}, tenantDbid={}", name, tenantDbid);
-        ApiResponse<CampaignSummary> response = ApiResponse.ok("캠페인 조회", outboundService.getCampaignByName(name, tenantDbid));
-        log.debug("getCampaignByName 응답: {}", response);
-        return response;
+        return campaignHandler.getCampaignByName(request);
     }
 
     @PostMapping("/campaigns/create")
@@ -1005,10 +868,7 @@ public class OutboundConfigController {
             )
         )
         @Valid @RequestBody CampaignRequest request) {
-        log.debug("createCampaign 요청: {}", request);
-        ApiResponse<CampaignSummary> response = ApiResponse.ok("캠페인 생성", outboundService.createCampaign(request));
-        log.debug("createCampaign 응답: {}", response);
-        return response;
+        return campaignHandler.createCampaign(request);
     }
 
     @PostMapping("/batch-create")
@@ -1038,14 +898,7 @@ public class OutboundConfigController {
             )
         )
         @Valid @RequestBody OutboundBatchCreateCommand command) {
-        boolean detail = command.detail() == null || command.detail();
-        OutboundBatchCreateRequest request = command.request();
-        log.debug("createOutboundBatch 요청: request={}, detail={}", request, detail);
-        OutboundBatchCreateResponse fullResponse = outboundService.createOutboundBatch(request);
-        Object body = detail ? fullResponse : outboundService.summarizeBatch(fullResponse);
-        ApiResponse<Object> response = ApiResponse.ok("아웃바운드 배치 생성", body);
-        log.debug("createOutboundBatch 응답: {}", response);
-        return response;
+        return batchCreateHandler.createOutboundBatch(command);
     }
 
     @PostMapping("/campaigns/update")
@@ -1074,11 +927,7 @@ public class OutboundConfigController {
             )
         )
         @Valid @RequestBody CampaignUpdateCommand command) {
-        log.debug("updateCampaign 요청: campaignDbid={}, request={}", command.campaignDbid(), command.payload());
-        ApiResponse<CampaignSummary> response = ApiResponse.ok("캠페인 수정",
-            outboundService.updateCampaign(command.campaignDbid(), command.payload()));
-        log.debug("updateCampaign 응답: {}", response);
-        return response;
+        return campaignHandler.updateCampaign(command);
     }
 
     @PostMapping("/campaigns/delete")
@@ -1093,12 +942,7 @@ public class OutboundConfigController {
             )
         )
         @RequestBody DbidTenantRequest request) {
-        int campaignDbid = request.dbid();
-        Integer tenantDbid = request.tenantDbid();
-        log.debug("deleteCampaign 요청: campaignDbid={}, tenantDbid={}", campaignDbid, tenantDbid);
-        outboundService.deleteCampaign(campaignDbid, tenantDbid);
-        ApiResponse<Void> response = ApiResponse.ok("캠페인 삭제", null);
-        log.debug("deleteCampaign 응답: {}", response);
-        return response;
+        return campaignHandler.deleteCampaign(request);
     }
+
 }

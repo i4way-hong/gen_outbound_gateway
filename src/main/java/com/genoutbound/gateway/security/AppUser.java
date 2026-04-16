@@ -78,11 +78,11 @@ public class AppUser {
     }
 
     public Set<AppRole> getRoleEntities() {
-        return roleEntities;
+        return roleEntities == null ? null : new HashSet<>(roleEntities);
     }
 
     public void setRoleEntities(Set<AppRole> roleEntities) {
-        this.roleEntities = roleEntities;
+        this.roleEntities = roleEntities == null ? null : new HashSet<>(roleEntities);
     }
 
     public boolean isEnabled() {

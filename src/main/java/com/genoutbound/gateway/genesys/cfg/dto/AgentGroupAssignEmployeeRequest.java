@@ -9,4 +9,13 @@ public record AgentGroupAssignEmployeeRequest(
         @Schema(description = "사번 목록", example = "[\"E1001\",\"E1002\"]")
         List<String> employeeIds
 ) {
+
+        public AgentGroupAssignEmployeeRequest {
+                employeeIds = employeeIds == null ? List.of() : List.copyOf(employeeIds);
+        }
+
+        @Override
+        public List<String> employeeIds() {
+                return List.copyOf(employeeIds);
+        }
 }

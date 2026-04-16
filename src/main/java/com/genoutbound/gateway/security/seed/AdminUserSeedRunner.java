@@ -5,6 +5,7 @@ import com.genoutbound.gateway.security.AppUser;
 import com.genoutbound.gateway.security.AppUserRepository;
 import com.genoutbound.gateway.security.role.AppRole;
 import com.genoutbound.gateway.security.role.AppRoleRepository;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -27,6 +28,8 @@ public class AdminUserSeedRunner implements CommandLineRunner {
     private final AppRoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
+        justification = "Spring DI 의존성 참조를 시드 실행 시 내부 처리 용도로만 사용하며 외부로 노출하지 않습니다.")
     public AdminUserSeedRunner(SecurityProperties securityProperties,
                                AppUserRepository userRepository,
                                AppRoleRepository roleRepository,

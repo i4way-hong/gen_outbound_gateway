@@ -1,6 +1,7 @@
 package com.genoutbound.gateway.genesys.cfg.web;
 
 import com.genoutbound.gateway.core.ApiResponse;
+import com.genoutbound.gateway.core.logging.SensitiveLogMasker;
 import com.genoutbound.gateway.genesys.cfg.dto.PersonAgentLoginCommand;
 import com.genoutbound.gateway.genesys.cfg.dto.PersonByEmployeeRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.PersonDeleteRequest;
@@ -11,6 +12,7 @@ import com.genoutbound.gateway.genesys.cfg.dto.PersonSkillCommand;
 import com.genoutbound.gateway.genesys.cfg.dto.PersonSummary;
 import com.genoutbound.gateway.genesys.cfg.dto.PersonUpdateCommand;
 import com.genoutbound.gateway.genesys.cfg.service.PersonConfigService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -33,6 +35,8 @@ public class PersonController {
     private static final Logger log = LoggerFactory.getLogger(PersonController.class);
     private final PersonConfigService personService;
 
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
+        justification = "Spring DI 서비스 참조를 요청 처리 시 호출만 하며 외부로 노출하지 않습니다.")
     public PersonController(PersonConfigService personService) {
         this.personService = personService;
     }
@@ -107,7 +111,7 @@ public class PersonController {
             )
         )
         @Valid @RequestBody PersonRequest request) {
-        log.debug("createPerson 요청: {}", request);
+    log.debug("createPerson 요청: {}", SensitiveLogMasker.masked(request));
         ApiResponse<PersonSummary> response = ApiResponse.ok("상담사 생성", personService.createPerson(request));
         log.debug("createPerson 응답: {}", response);
         return response;
@@ -125,7 +129,7 @@ public class PersonController {
             )
         )
         @Valid @RequestBody PersonUpdateCommand command) {
-        log.debug("updatePerson 요청: personDbid={}, request={}", command.personDbid(), command.payload());
+    log.debug("updatePerson 요청: personDbid={}, payload={}", command.personDbid(), SensitiveLogMasker.masked(command.payload()));
         ApiResponse<PersonSummary> response = ApiResponse.ok("상담사 수정",
             personService.updatePerson(command.personDbid(), command.payload()));
         log.debug("updatePerson 응답: {}", response);
@@ -163,7 +167,7 @@ public class PersonController {
             )
         )
         @Valid @RequestBody PersonSkillCommand command) {
-        log.debug("setPersonSkills 요청: personDbid={}, request={}", command.personDbid(), command.payload());
+    log.debug("setPersonSkills 요청: personDbid={}, payload={}", command.personDbid(), SensitiveLogMasker.masked(command.payload()));
         personService.setPersonSkills(command.personDbid(), command.payload());
         ApiResponse<Void> response = ApiResponse.ok("상담사 스킬 설정", null);
         log.debug("setPersonSkills 응답: {}", response);
@@ -182,7 +186,7 @@ public class PersonController {
             )
         )
         @Valid @RequestBody PersonSkillCommand command) {
-        log.debug("removePersonSkills 요청: personDbid={}, request={}", command.personDbid(), command.payload());
+    log.debug("removePersonSkills 요청: personDbid={}, payload={}", command.personDbid(), SensitiveLogMasker.masked(command.payload()));
         personService.removePersonSkills(command.personDbid(), command.payload());
         ApiResponse<Void> response = ApiResponse.ok("상담사 스킬 삭제", null);
         log.debug("removePersonSkills 응답: {}", response);
@@ -201,7 +205,7 @@ public class PersonController {
             )
         )
         @Valid @RequestBody PersonAgentLoginCommand command) {
-        log.debug("assignPersonAgentLoginsByCode 요청: personDbid={}, request={}", command.personDbid(), command.payload());
+    log.debug("assignPersonAgentLoginsByCode 요청: personDbid={}, payload={}", command.personDbid(), SensitiveLogMasker.masked(command.payload()));
         personService.assignPersonAgentLoginsByCode(command.personDbid(), command.payload());
         ApiResponse<Void> response = ApiResponse.ok("AgentLogin 연결", null);
         log.debug("assignPersonAgentLoginsByCode 응답: {}", response);
@@ -220,7 +224,7 @@ public class PersonController {
             )
         )
         @Valid @RequestBody PersonAgentLoginCommand command) {
-        log.debug("unassignPersonAgentLoginsByCode 요청: personDbid={}, request={}", command.personDbid(), command.payload());
+    log.debug("unassignPersonAgentLoginsByCode 요청: personDbid={}, payload={}", command.personDbid(), SensitiveLogMasker.masked(command.payload()));
         personService.unassignPersonAgentLoginsByCode(command.personDbid(), command.payload());
         ApiResponse<Void> response = ApiResponse.ok("AgentLogin 해제", null);
         log.debug("unassignPersonAgentLoginsByCode 응답: {}", response);

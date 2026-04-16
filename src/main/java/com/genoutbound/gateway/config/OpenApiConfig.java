@@ -1,5 +1,6 @@
 package com.genoutbound.gateway.config;
 
+import com.genoutbound.gateway.config.policy.BlockedApiPolicy;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.tags.Tag;
@@ -14,19 +15,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
 
-    private static final List<String> BLOCKED_PREFIXES = List.of(
-        "/api/v1/configuration/agent-groups",
-        "/api/v1/configuration/agent-logins",
-        "/api/v1/configuration/dn-groups",
-        "/api/v1/configuration/dns",
-        "/api/v1/configuration/persons",
-        "/api/v1/configuration/place-groups",
-        "/api/v1/configuration/places",
-        "/api/v1/configuration/transactions",
-        //"/api/v1/outbound/health",
-        "/api/v1/outbound/desktop",
-        //"/api/status",
-        //"/api/v1/crypto",
+    private static final List<String> ADDITIONAL_HIDDEN_PREFIXES = List.of(
         "/api/v1/scs",
         "/api/v1/stat",
         "/api/v1/voice",
@@ -42,6 +31,12 @@ public class OpenApiConfig {
         "Tserver",
         "Favicon"
     );
+
+    private final BlockedApiPolicy blockedApiPolicy;
+
+    public OpenApiConfig(BlockedApiPolicy blockedApiPolicy) {
+        this.blockedApiPolicy = blockedApiPolicy;
+    }
 
     @Bean
     public OpenApiCustomizer configurationApiOpenApiCustomizer() {
@@ -90,7 +85,11 @@ public class OpenApiConfig {
     }
 
     private boolean isBlockedPath(String path) {
-        for (String prefix : BLOCKED_PREFIXES) {
+        if (blockedApiPolicy.isBlockedApiPath(path)) {
+            return true;
+        }
+
+        for (String prefix : ADDITIONAL_HIDDEN_PREFIXES) {
             if (path.startsWith(prefix)) {
                 return true;
             }

@@ -5,7 +5,6 @@
  * <ul>
  *   <li>{@code OutboundConfig}: Outbound 프로토콜 연동 빈 구성</li>
  *   <li>{@code OutboundProperties}: Outbound 서버 연결 설정값 바인딩</li>
- *   <li>{@code OutboundDesktopProperties}: Outbound Desktop 연계 설정값 바인딩</li>
  * </ul>
  */
 package com.genoutbound.gateway.genesys.outbound;

@@ -9,12 +9,15 @@ import com.genesyslab.platform.commons.protocol.Endpoint;
 import com.genesyslab.platform.commons.protocol.ProtocolException;
 import com.genesyslab.platform.configuration.protocol.ConfServerProtocol;
 import com.genesyslab.platform.configuration.protocol.types.CfgAppType;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import com.genoutbound.gateway.genesys.cfg.config.GenesysProperties;
 import com.genoutbound.gateway.core.ApiException;
+import com.genoutbound.gateway.genesys.common.GenesysConnectionConfigValidator;
 import com.genoutbound.gateway.genesys.common.GenesysUnavailableException;
 import jakarta.annotation.PreDestroy;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import org.slf4j.Logger;
@@ -36,8 +39,16 @@ public class GenesysConfigClient {
     private ConfServerProtocol protocol;
     private IConfService service;
 
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
+        justification = "Spring DI로 주입된 설정 빈은 연결 구성값 읽기 용도로만 사용되며 외부로 노출하지 않습니다.")
     public GenesysConfigClient(GenesysProperties properties) {
         this.properties = properties;
+        if (properties.isEnabled()) {
+            GenesysConnectionConfigValidator.validateConfigClientTimeouts(
+                properties.getAddpClientTimeout(),
+                properties.getAddpServerTimeout(),
+                properties.getHealthCheckIntervalMs());
+        }
     }
 
     /**
@@ -64,7 +75,7 @@ public class GenesysConfigClient {
             T result = action.apply(currentService);
             log.debug("withConfService 응답: result={}", result);
             return result;
-        } catch (Exception ex) {
+        } catch (RuntimeException ex) {
             if (isConnectionFailure(ex)) {
                 log.warn("Config Server 연결 이상 감지. 재연결을 시도합니다.", ex);
                 synchronized (connectionLock) {
@@ -79,10 +90,7 @@ public class GenesysConfigClient {
             if (ex instanceof ApiException apiException) {
                 throw apiException;
             }
-            if (ex instanceof RuntimeException runtimeException) {
-                throw runtimeException;
-            }
-            throw new GenesysUnavailableException("요청 처리 중 오류가 발생했습니다.", ex);
+            throw ex;
         }
     }
 
@@ -103,7 +111,7 @@ public class GenesysConfigClient {
                     resetConnection();
                     ensureConnected();
                 }
-            } catch (Exception ex) {
+            } catch (RuntimeException ex) {
                 log.warn("Config Server 헬스체크 실패. 재연결을 시도합니다.", ex);
                 resetConnection();
                 ensureConnected();
@@ -133,21 +141,34 @@ public class GenesysConfigClient {
     }
 
     private void connectWithFailover() {
+        int attempt = 1;
         try {
-            open(protocol, properties.getPrimary(), config);
+            open(protocol, properties.getPrimary(), config, "primary", attempt);
         } catch (GenesysUnavailableException primaryError) {
-            log.warn("Primary Config Server 연결 실패. Backup으로 재시도합니다.", primaryError);
+            log.warn("Primary Config Server 연결 실패(attempt={}). Backup으로 재시도합니다.", attempt, primaryError);
+            attempt++;
             try {
-                open(protocol, properties.getBackup(), config);
+                open(protocol, properties.getBackup(), config, "backup", attempt);
             } catch (GenesysUnavailableException backupError) {
                 throw new GenesysUnavailableException("Config Server 연결에 실패했습니다.", backupError);
             }
         }
     }
 
-    private void open(ConfServerProtocol protocol, GenesysProperties.ConfigServer server, PropertyConfiguration config) {
+    private void open(ConfServerProtocol protocol,
+                      GenesysProperties.ConfigServer server,
+                      PropertyConfiguration config,
+                      String role,
+                      int attempt) {
         protocol.setEndpoint(buildEndpoint(server, config));
-        log.info("Config Server 연결 시도: {}:{}", server.getIp(), server.getPort());
+        Instant startedAt = Instant.now();
+        log.info("Config Server 연결 시도: role={}, attempt={}, endpoint={}:{}, addpClientTimeout={}, addpServerTimeout={}",
+            role,
+            attempt,
+            server.getIp(),
+            server.getPort(),
+            properties.getAddpClientTimeout(),
+            properties.getAddpServerTimeout());
         try {
             protocol.open();
             Integer serverEncoding = protocol.getServerContext().getServerEncoding();
@@ -157,8 +178,20 @@ public class GenesysConfigClient {
                 protocol.setEndpoint(buildEndpoint(server, config));
                 protocol.open();
             }
-            log.info("Config Server 연결 성공: {}:{}", server.getIp(), server.getPort());
+            long elapsedMs = Duration.between(startedAt, Instant.now()).toMillis();
+            log.info("Config Server 연결 성공: role={}, endpoint={}:{}, elapsedMs={}",
+                role,
+                server.getIp(),
+                server.getPort(),
+                elapsedMs);
         } catch (ProtocolException | IllegalStateException | InterruptedException ex) {
+            long elapsedMs = Duration.between(startedAt, Instant.now()).toMillis();
+            log.warn("Config Server 연결 실패: role={}, endpoint={}:{}, elapsedMs={}",
+                role,
+                server.getIp(),
+                server.getPort(),
+                elapsedMs,
+                ex);
             throw new GenesysUnavailableException("Config Server 연결 실패", ex);
         }
     }
@@ -269,9 +302,7 @@ public class GenesysConfigClient {
     public Map<String, Object> getConnectionStatus() {
         Map<String, Object> status = new LinkedHashMap<>();
         status.put("enabled", properties.isEnabled());
-        //status.put("endpoints", buildEndpoints());
         status.put("connectionPool", buildPoolStatus(false, "singleton"));
-        //status.put("info", buildInfo());
 
         if (!properties.isEnabled()) {
             status.put("connected", false);
@@ -288,7 +319,7 @@ public class GenesysConfigClient {
                 ensureConnected();
                 connected = protocol != null && protocol.getState() == ChannelState.Opened;
                 state = protocol == null ? "NULL" : protocol.getState().name();
-            } catch (Exception ex) {
+            } catch (RuntimeException ex) {
                 connected = false;
                 state = "ERROR";
                 error = ex.getMessage();
@@ -311,32 +342,5 @@ public class GenesysConfigClient {
         pool.put("active", connected ? 1 : 0);
         pool.put("idle", 0);
         return pool;
-    }
-
-    private List<Map<String, Object>> buildEndpoints() {
-        return List.of(
-            buildEndpoint("primary", properties.getPrimary()),
-            buildEndpoint("backup", properties.getBackup())
-        );
-    }
-
-    private Map<String, Object> buildEndpoint(String role, GenesysProperties.ConfigServer server) {
-        Map<String, Object> info = new LinkedHashMap<>();
-        info.put("role", role);
-        if (server == null) {
-            return info;
-        }
-        info.put("endpoint", server.getEndpoint());
-        info.put("ip", server.getIp());
-        info.put("port", server.getPort());
-        return info;
-    }
-
-    private Map<String, Object> buildInfo() {
-        Map<String, Object> info = new LinkedHashMap<>();
-        info.put("clientName", properties.getClientName());
-        info.put("addpEnabled", properties.isAddpEnabled());
-        info.put("charset", properties.getCharset());
-        return info;
     }
 }

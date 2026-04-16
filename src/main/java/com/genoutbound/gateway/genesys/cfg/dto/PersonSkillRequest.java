@@ -1,6 +1,7 @@
 package com.genoutbound.gateway.genesys.cfg.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serializable;
 import java.util.List;
 
 public record PersonSkillRequest(
@@ -8,5 +9,14 @@ public record PersonSkillRequest(
         Integer tenantDbid,
         @Schema(description = "스킬 목록")
         List<SkillAssignment> skills
-) {
+) implements Serializable {
+
+        public PersonSkillRequest {
+                skills = skills == null ? null : List.copyOf(skills);
+        }
+
+        @Override
+        public List<SkillAssignment> skills() {
+                return skills == null ? null : List.copyOf(skills);
+        }
 }

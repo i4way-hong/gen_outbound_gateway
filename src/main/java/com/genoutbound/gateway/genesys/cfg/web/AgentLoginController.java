@@ -1,6 +1,7 @@
 package com.genoutbound.gateway.genesys.cfg.web;
 
 import com.genoutbound.gateway.core.ApiResponse;
+import com.genoutbound.gateway.core.logging.SensitiveLogMasker;
 import com.genoutbound.gateway.genesys.cfg.dto.AgentLoginDeleteRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.AgentLoginGetRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.AgentLoginQueryRequest;
@@ -8,6 +9,7 @@ import com.genoutbound.gateway.genesys.cfg.dto.AgentLoginRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.AgentLoginSummary;
 import com.genoutbound.gateway.genesys.cfg.dto.AgentLoginUpdateCommand;
 import com.genoutbound.gateway.genesys.cfg.service.AgentLoginConfigService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -30,6 +32,8 @@ public class AgentLoginController {
     private static final Logger log = LoggerFactory.getLogger(AgentLoginController.class);
     private final AgentLoginConfigService agentLoginService;
 
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
+        justification = "Spring DI 서비스 참조를 요청 처리 시 호출만 하며 외부로 노출하지 않습니다.")
     public AgentLoginController(AgentLoginConfigService agentLoginService) {
         this.agentLoginService = agentLoginService;
     }
@@ -89,7 +93,7 @@ public class AgentLoginController {
             )
         )
         @Valid @RequestBody AgentLoginRequest request) {
-        log.debug("createAgentLogin 요청: {}", request);
+        log.debug("createAgentLogin 요청: {}", SensitiveLogMasker.masked(request));
         ApiResponse<AgentLoginSummary> response = ApiResponse.ok("AgentLogin 생성", agentLoginService.createAgentLogin(request));
         log.debug("createAgentLogin 응답: {}", response);
         return response;
@@ -107,8 +111,8 @@ public class AgentLoginController {
             )
         )
         @Valid @RequestBody AgentLoginUpdateCommand command) {
-        log.debug("updateAgentLogin 요청: loginCode={}, tenantDbid={}, switchDbid={}, request={}",
-            command.loginCode(), command.tenantDbid(), command.switchDbid(), command.payload());
+        log.debug("updateAgentLogin 요청: loginCode={}, tenantDbid={}, switchDbid={}, payload={}",
+            command.loginCode(), command.tenantDbid(), command.switchDbid(), SensitiveLogMasker.masked(command.payload()));
         ApiResponse<AgentLoginSummary> response = ApiResponse.ok("AgentLogin 수정",
             agentLoginService.updateAgentLoginByCode(
                 command.loginCode(), command.tenantDbid(), command.switchDbid(), command.payload()));

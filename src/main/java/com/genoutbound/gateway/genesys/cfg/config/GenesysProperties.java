@@ -117,19 +117,30 @@ public class GenesysProperties {
     }
 
     public ConfigServer getPrimary() {
-        return primary;
+        return copyConfigServer(primary);
     }
 
     public void setPrimary(ConfigServer primary) {
-        this.primary = primary;
+        this.primary = copyConfigServer(primary);
     }
 
     public ConfigServer getBackup() {
-        return backup;
+        return copyConfigServer(backup);
     }
 
     public void setBackup(ConfigServer backup) {
-        this.backup = backup;
+        this.backup = copyConfigServer(backup);
+    }
+
+    private static ConfigServer copyConfigServer(ConfigServer source) {
+        if (source == null) {
+            return null;
+        }
+        ConfigServer copy = new ConfigServer();
+        copy.setEndpoint(source.getEndpoint());
+        copy.setIp(source.getIp());
+        copy.setPort(source.getPort());
+        return copy;
     }
 
     public static class ConfigServer {

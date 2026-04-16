@@ -142,8 +142,5 @@ app:
     addp-enabled: ${GENESYS_SCS_ADDP_ENABLED:true}
     addp-client-timeout: ${GENESYS_SCS_ADDP_CLIENT_TIMEOUT:10}
     addp-server-timeout: ${GENESYS_SCS_ADDP_SERVER_TIMEOUT:10}
-    sse:
-      emitter-timeout-ms: ${SCS_SSE_EMITTER_TIMEOUT_MS:0}
-      heartbeat-ms: ${SCS_SSE_HEARTBEAT_MS:25000}
     applications: [107,108,128]
  

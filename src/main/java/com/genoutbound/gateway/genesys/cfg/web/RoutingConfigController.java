@@ -1,6 +1,7 @@
 package com.genoutbound.gateway.genesys.cfg.web;
 
 import com.genoutbound.gateway.core.ApiResponse;
+import com.genoutbound.gateway.core.logging.SensitiveLogMasker;
 import com.genoutbound.gateway.genesys.cfg.dto.DbidTenantRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.DnDialPlanCommand;
 import com.genoutbound.gateway.genesys.cfg.dto.DnGroupRequest;
@@ -23,6 +24,7 @@ import com.genoutbound.gateway.genesys.cfg.dto.TransactionOptionsSaveCommand;
 import com.genoutbound.gateway.genesys.cfg.dto.TransactionSectionCommand;
 import com.genoutbound.gateway.genesys.cfg.dto.TransactionUpdateCommand;
 import com.genoutbound.gateway.genesys.cfg.service.RoutingConfigService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -45,6 +47,8 @@ public class RoutingConfigController {
     private static final Logger log = LoggerFactory.getLogger(RoutingConfigController.class);
     private final RoutingConfigService routingService;
 
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
+        justification = "Spring DI 서비스 참조를 요청 처리 시 호출만 하며 외부로 노출하지 않습니다.")
     public RoutingConfigController(RoutingConfigService routingService) {
         this.routingService = routingService;
     }
@@ -140,7 +144,7 @@ public class RoutingConfigController {
                 )
             )
             @Valid @RequestBody DnGroupRequest request) {
-        log.debug("createDnGroup 요청: {}", request);
+    log.debug("createDnGroup 요청: {}", SensitiveLogMasker.masked(request));
         ApiResponse<DnGroupSummary> response = ApiResponse.ok("DNGroup 생성", routingService.createDnGroup(request));
         log.debug("createDnGroup 응답: {}", response);
         return response;
@@ -220,7 +224,7 @@ public class RoutingConfigController {
                 )
             )
             @Valid @RequestBody DnRequest request) {
-        log.debug("createDn 요청: {}", request);
+    log.debug("createDn 요청: {}", SensitiveLogMasker.masked(request));
         ApiResponse<DnSummary> response = ApiResponse.ok("DN 생성", routingService.createDn(request));
         log.debug("createDn 응답: {}", response);
         return response;
@@ -238,7 +242,7 @@ public class RoutingConfigController {
                 )
             )
             @Valid @RequestBody DnUpdateCommand command) {
-        log.debug("updateDn 요청: dnDbid={}, request={}", command.dnDbid(), command.payload());
+    log.debug("updateDn 요청: dnDbid={}, payload={}", command.dnDbid(), SensitiveLogMasker.masked(command.payload()));
         ApiResponse<DnSummary> response = ApiResponse.ok("DN 수정",
             routingService.updateDn(command.dnDbid(), command.payload()));
         log.debug("updateDn 응답: {}", response);
@@ -257,7 +261,7 @@ public class RoutingConfigController {
                 )
             )
             @Valid @RequestBody DnDialPlanCommand command) {
-        log.debug("updateDnDialPlan 요청: dnDbid={}, request={}", command.dnDbid(), command.payload());
+    log.debug("updateDnDialPlan 요청: dnDbid={}, payload={}", command.dnDbid(), SensitiveLogMasker.masked(command.payload()));
         routingService.setDnDialPlan(command.dnDbid(), command.payload());
         ApiResponse<Void> response = ApiResponse.ok("DN DialPlan 설정", null);
         log.debug("updateDnDialPlan 응답: {}", response);
@@ -276,7 +280,7 @@ public class RoutingConfigController {
                 )
             )
             @RequestBody DnTServerOptionCommand command) {
-        log.debug("updateDnTserverOptions 요청: dnDbid={}, request={}", command.dnDbid(), command.payload());
+    log.debug("updateDnTserverOptions 요청: dnDbid={}, payload={}", command.dnDbid(), SensitiveLogMasker.masked(command.payload()));
         routingService.setDnTServerOptions(command.dnDbid(), command.payload());
         ApiResponse<Void> response = ApiResponse.ok("DN TServer 옵션 설정", null);
         log.debug("updateDnTserverOptions 응답: {}", response);
@@ -378,7 +382,7 @@ public class RoutingConfigController {
                 )
             )
             @Valid @RequestBody TransactionRequest request) {
-        log.debug("createTransaction 요청: {}", request);
+    log.debug("createTransaction 요청: {}", SensitiveLogMasker.masked(request));
         ApiResponse<TransactionSummary> response = ApiResponse.ok("트랜잭션 생성", routingService.createTransaction(request));
         log.debug("createTransaction 응답: {}", response);
         return response;
@@ -396,7 +400,7 @@ public class RoutingConfigController {
                 )
             )
             @Valid @RequestBody TransactionUpdateCommand command) {
-        log.debug("updateTransaction 요청: transactionDbid={}, request={}", command.transactionDbid(), command.payload());
+    log.debug("updateTransaction 요청: transactionDbid={}, payload={}", command.transactionDbid(), SensitiveLogMasker.masked(command.payload()));
         ApiResponse<TransactionSummary> response = ApiResponse.ok("트랜잭션 수정",
             routingService.updateTransaction(command.transactionDbid(), command.payload()));
         log.debug("updateTransaction 응답: {}", response);
@@ -436,7 +440,7 @@ public class RoutingConfigController {
                 )
             )
             @Valid @RequestBody TransactionSectionCommand command) {
-        log.debug("addTransactionSection 요청: transactionDbid={}, request={}", command.transactionDbid(), command.payload());
+    log.debug("addTransactionSection 요청: transactionDbid={}, payload={}", command.transactionDbid(), SensitiveLogMasker.masked(command.payload()));
         routingService.addTransactionSection(command.transactionDbid(), command.payload());
         ApiResponse<Void> response = ApiResponse.ok("트랜잭션 섹션 추가", null);
         log.debug("addTransactionSection 응답: {}", response);
@@ -455,7 +459,7 @@ public class RoutingConfigController {
                 )
             )
             @Valid @RequestBody TransactionSectionCommand command) {
-        log.debug("updateTransactionSection 요청: transactionDbid={}, request={}", command.transactionDbid(), command.payload());
+    log.debug("updateTransactionSection 요청: transactionDbid={}, payload={}", command.transactionDbid(), SensitiveLogMasker.masked(command.payload()));
         routingService.modifyTransactionSection(command.transactionDbid(), command.payload());
         ApiResponse<Void> response = ApiResponse.ok("트랜잭션 섹션 수정", null);
         log.debug("updateTransactionSection 응답: {}", response);
@@ -474,7 +478,7 @@ public class RoutingConfigController {
                 )
             )
             @Valid @RequestBody TransactionSectionCommand command) {
-        log.debug("deleteTransactionSection 요청: transactionDbid={}, request={}", command.transactionDbid(), command.payload());
+    log.debug("deleteTransactionSection 요청: transactionDbid={}, payload={}", command.transactionDbid(), SensitiveLogMasker.masked(command.payload()));
         routingService.removeTransactionSection(command.transactionDbid(), command.payload());
         ApiResponse<Void> response = ApiResponse.ok("트랜잭션 섹션 삭제", null);
         log.debug("deleteTransactionSection 응답: {}", response);
@@ -493,7 +497,7 @@ public class RoutingConfigController {
                 )
             )
             @Valid @RequestBody TransactionOptionCommand command) {
-        log.debug("addTransactionOption 요청: transactionDbid={}, request={}", command.transactionDbid(), command.payload());
+    log.debug("addTransactionOption 요청: transactionDbid={}, payload={}", command.transactionDbid(), SensitiveLogMasker.masked(command.payload()));
         routingService.addTransactionOption(command.transactionDbid(), command.payload());
         ApiResponse<Void> response = ApiResponse.ok("트랜잭션 옵션 추가", null);
         log.debug("addTransactionOption 응답: {}", response);
@@ -512,7 +516,7 @@ public class RoutingConfigController {
                 )
             )
             @Valid @RequestBody TransactionOptionCommand command) {
-        log.debug("updateTransactionOption 요청: transactionDbid={}, request={}", command.transactionDbid(), command.payload());
+    log.debug("updateTransactionOption 요청: transactionDbid={}, payload={}", command.transactionDbid(), SensitiveLogMasker.masked(command.payload()));
         routingService.modifyTransactionOption(command.transactionDbid(), command.payload());
         ApiResponse<Void> response = ApiResponse.ok("트랜잭션 옵션 수정", null);
         log.debug("updateTransactionOption 응답: {}", response);
@@ -531,7 +535,7 @@ public class RoutingConfigController {
                 )
             )
             @Valid @RequestBody TransactionOptionCommand command) {
-        log.debug("deleteTransactionOption 요청: transactionDbid={}, request={}", command.transactionDbid(), command.payload());
+    log.debug("deleteTransactionOption 요청: transactionDbid={}, payload={}", command.transactionDbid(), SensitiveLogMasker.masked(command.payload()));
         routingService.removeTransactionOption(command.transactionDbid(), command.payload());
         ApiResponse<Void> response = ApiResponse.ok("트랜잭션 옵션 삭제", null);
         log.debug("deleteTransactionOption 응답: {}", response);
@@ -550,7 +554,7 @@ public class RoutingConfigController {
                 )
             )
             @Valid @RequestBody TransactionOptionsSaveCommand command) {
-        log.debug("saveTransactionOptions 요청: transactionDbid={}, request={}", command.transactionDbid(), command.payload());
+    log.debug("saveTransactionOptions 요청: transactionDbid={}, payload={}", command.transactionDbid(), SensitiveLogMasker.masked(command.payload()));
         routingService.saveTransactionOptions(command.transactionDbid(), command.payload());
         ApiResponse<Void> response = ApiResponse.ok("트랜잭션 옵션 저장", null);
         log.debug("saveTransactionOptions 응답: {}", response);
@@ -648,7 +652,7 @@ public class RoutingConfigController {
                 )
             )
             @Valid @RequestBody PlaceGroupRequest request) {
-        log.debug("createPlaceGroup 요청: {}", request);
+    log.debug("createPlaceGroup 요청: {}", SensitiveLogMasker.masked(request));
         ApiResponse<PlaceGroupSummary> response = ApiResponse.ok("PlaceGroup 생성", routingService.createPlaceGroup(request));
         log.debug("createPlaceGroup 응답: {}", response);
         return response;
@@ -728,7 +732,7 @@ public class RoutingConfigController {
                 )
             )
             @Valid @RequestBody PlaceRequest request) {
-        log.debug("createPlace 요청: {}", request);
+    log.debug("createPlace 요청: {}", SensitiveLogMasker.masked(request));
         ApiResponse<PlaceSummary> response = ApiResponse.ok("Place 생성", routingService.createPlace(request));
         log.debug("createPlace 응답: {}", response);
         return response;
@@ -746,7 +750,7 @@ public class RoutingConfigController {
                 )
             )
             @Valid @RequestBody PlaceUpdateCommand command) {
-        log.debug("updatePlace 요청: placeDbid={}, request={}", command.placeDbid(), command.payload());
+    log.debug("updatePlace 요청: placeDbid={}, payload={}", command.placeDbid(), SensitiveLogMasker.masked(command.payload()));
         ApiResponse<PlaceSummary> response = ApiResponse.ok("Place 수정",
             routingService.updatePlace(command.placeDbid(), command.payload()));
         log.debug("updatePlace 응답: {}", response);

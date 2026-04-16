@@ -32,4 +32,12 @@ public record TableAccessSummary(
         @Schema(description = "사용자 속성")
         java.util.Map<String, Object> userProperties
 ) {
+        public TableAccessSummary {
+                userProperties = userProperties == null ? java.util.Map.of() : java.util.Map.copyOf(userProperties);
+        }
+
+        @Override
+        public java.util.Map<String, Object> userProperties() {
+                return java.util.Map.copyOf(userProperties);
+        }
 }

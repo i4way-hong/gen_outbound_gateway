@@ -18,8 +18,12 @@ import com.genesyslab.platform.reporting.protocol.statserver.StatisticObjectType
 import com.genesyslab.platform.reporting.protocol.statserver.events.EventInfo;
 import com.genesyslab.platform.reporting.protocol.statserver.requests.RequestCloseStatistic;
 import com.genesyslab.platform.reporting.protocol.statserver.requests.RequestOpenStatistic;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.genoutbound.gateway.genesys.common.GenesysConnectionConfigValidator;
 import com.genoutbound.gateway.genesys.stat.StatServerProperties;
 import com.genoutbound.gateway.genesys.common.GenesysUnavailableException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,8 +40,17 @@ public class StatServerClient {
     private static final Logger log = LoggerFactory.getLogger(StatServerClient.class);
     private final StatServerProperties properties;
 
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
+        justification = "Spring DI 설정 참조를 연결 구성 조회 용도로만 사용하며 외부 mutable 참조를 재노출하지 않습니다.")
     public StatServerClient(StatServerProperties properties) {
         this.properties = properties;
+        if (properties.isEnabled()) {
+            GenesysConnectionConfigValidator.validateStatClientTimeouts(
+                properties.getTimeoutMs(),
+                properties.getDelayMs(),
+                properties.getAddpClientTimeout(),
+                properties.getAddpServerTimeout());
+        }
     }
 
     public List<Map<String, Object>> getSkillGroupAgentStatuses(String skillGroupName) {
@@ -108,22 +121,58 @@ public class StatServerClient {
             throw new GenesysUnavailableException("Stat Server 접속 설정이 필요합니다.");
         }
         StatServerProtocol protocol = buildProtocol(properties.getPrimary(), eventInfoRef);
+        Instant primaryStartedAt = Instant.now();
+        int primaryAttempt = 1;
         try {
+            log.info("Stat Server 연결 시도: role=primary, attempt={}, endpoint={}:{}, timeoutMs={}, delayMs={}",
+                primaryAttempt,
+                properties.getPrimary().getIp(),
+                properties.getPrimary().getPort(),
+                properties.getTimeoutMs(),
+                properties.getDelayMs());
             protocol.open();
-            log.info("Stat Server 연결 성공: {}:{}", properties.getPrimary().getIp(), properties.getPrimary().getPort());
+            long elapsedMs = Duration.between(primaryStartedAt, Instant.now()).toMillis();
+            log.info("Stat Server 연결 성공: role=primary, endpoint={}:{}, elapsedMs={}",
+                properties.getPrimary().getIp(),
+                properties.getPrimary().getPort(),
+                elapsedMs);
             return protocol;
         } catch (ProtocolException | IllegalStateException | InterruptedException ex) {
+            long elapsedMs = Duration.between(primaryStartedAt, Instant.now()).toMillis();
+            log.warn("Stat Server 연결 실패: role=primary, endpoint={}:{}, elapsedMs={}",
+                properties.getPrimary().getIp(),
+                properties.getPrimary().getPort(),
+                elapsedMs,
+                ex);
             if (!isValidServer(properties.getBackup())) {
                 throw new GenesysUnavailableException("Stat Server 연결 실패", ex);
             }
-            log.warn("Primary Stat Server 연결 실패. Backup으로 재시도합니다.", ex);
+            int backupAttempt = 2;
+            log.warn("Primary Stat Server 연결 실패(attempt={}). Backup으로 재시도합니다.", primaryAttempt, ex);
             closeProtocol(protocol);
             StatServerProtocol backup = buildProtocol(properties.getBackup(), eventInfoRef);
+            Instant backupStartedAt = Instant.now();
             try {
+                log.info("Stat Server 연결 시도: role=backup, attempt={}, endpoint={}:{}, timeoutMs={}, delayMs={}",
+                    backupAttempt,
+                    properties.getBackup().getIp(),
+                    properties.getBackup().getPort(),
+                    properties.getTimeoutMs(),
+                    properties.getDelayMs());
                 backup.open();
-                log.info("Stat Server(backup) 연결 성공: {}:{}", properties.getBackup().getIp(), properties.getBackup().getPort());
+                long backupElapsedMs = Duration.between(backupStartedAt, Instant.now()).toMillis();
+                log.info("Stat Server 연결 성공: role=backup, endpoint={}:{}, elapsedMs={}",
+                    properties.getBackup().getIp(),
+                    properties.getBackup().getPort(),
+                    backupElapsedMs);
                 return backup;
             } catch (ProtocolException | IllegalStateException | InterruptedException backupEx) {
+                long backupElapsedMs = Duration.between(backupStartedAt, Instant.now()).toMillis();
+                log.warn("Stat Server 연결 실패: role=backup, endpoint={}:{}, elapsedMs={}",
+                    properties.getBackup().getIp(),
+                    properties.getBackup().getPort(),
+                    backupElapsedMs,
+                    backupEx);
                 closeProtocol(backup);
                 throw new GenesysUnavailableException("Stat Server 연결 실패", backupEx);
             }

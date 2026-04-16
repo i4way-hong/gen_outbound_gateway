@@ -1,5 +1,6 @@
 package com.genoutbound.gateway.web.admin;
 
+import com.genoutbound.gateway.config.AdminConsolePaths;
 import com.genoutbound.gateway.security.AppUser;
 import com.genoutbound.gateway.security.AppUserRepository;
 import com.genoutbound.gateway.security.role.AppRole;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/console/users")
+@RequestMapping(AdminConsolePaths.USERS_BASE)
 public class AdminUserController {
 
     private final AppUserRepository userRepository;
@@ -86,7 +87,7 @@ public class AdminUserController {
         user.setRoleEntities(roles);
         user.setRoles(toRoleString(roles));
         userRepository.save(user);
-    return "redirect:/console/users";
+    return "redirect:" + AdminConsolePaths.USERS_BASE;
     }
 
     @PostMapping("/{id}")
@@ -106,7 +107,7 @@ public class AdminUserController {
         user.setRoleEntities(roles);
         user.setRoles(toRoleString(roles));
         userRepository.save(user);
-    return "redirect:/console/users";
+    return "redirect:" + AdminConsolePaths.USERS_BASE;
     }
 
     private String renderForm(Model model, UserForm form, String error) {

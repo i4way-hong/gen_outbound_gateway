@@ -1,6 +1,7 @@
 package com.genoutbound.gateway.genesys.cfg.web;
 
 import com.genoutbound.gateway.core.ApiResponse;
+import com.genoutbound.gateway.core.logging.SensitiveLogMasker;
 import com.genoutbound.gateway.genesys.cfg.dto.AgentGroupAssignEmployeeCommand;
 import com.genoutbound.gateway.genesys.cfg.dto.AgentGroupAssignPersonCommand;
 import com.genoutbound.gateway.genesys.cfg.dto.AgentGroupByNameRequest;
@@ -11,6 +12,7 @@ import com.genoutbound.gateway.genesys.cfg.dto.AgentGroupRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.AgentGroupSummary;
 import com.genoutbound.gateway.genesys.cfg.dto.AgentGroupUpdateCommand;
 import com.genoutbound.gateway.genesys.cfg.service.AgentGroupConfigService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -33,6 +35,8 @@ public class AgentGroupController {
     private static final Logger log = LoggerFactory.getLogger(AgentGroupController.class);
     private final AgentGroupConfigService agentGroupService;
 
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
+        justification = "Spring DI 서비스 참조를 요청 처리 시 호출만 하며 외부로 노출하지 않습니다.")
     public AgentGroupController(AgentGroupConfigService agentGroupService) {
         this.agentGroupService = agentGroupService;
     }
@@ -107,7 +111,7 @@ public class AgentGroupController {
             )
         )
         @Valid @RequestBody AgentGroupRequest request) {
-        log.debug("createAgentGroup 요청: {}", request);
+    log.debug("createAgentGroup 요청: {}", SensitiveLogMasker.masked(request));
         ApiResponse<AgentGroupSummary> response = ApiResponse.ok("그룹 생성", agentGroupService.createAgentGroup(request));
         log.debug("createAgentGroup 응답: {}", response);
         return response;
@@ -125,7 +129,7 @@ public class AgentGroupController {
             )
         )
         @Valid @RequestBody AgentGroupUpdateCommand command) {
-        log.debug("updateAgentGroup 요청: groupDbid={}, request={}", command.groupDbid(), command.payload());
+    log.debug("updateAgentGroup 요청: groupDbid={}, payload={}", command.groupDbid(), SensitiveLogMasker.masked(command.payload()));
         ApiResponse<AgentGroupSummary> response = ApiResponse.ok("그룹 수정",
             agentGroupService.updateAgentGroup(command.groupDbid(), command.payload()));
         log.debug("updateAgentGroup 응답: {}", response);
@@ -163,8 +167,8 @@ public class AgentGroupController {
             )
         )
         @Valid @RequestBody AgentGroupAssignEmployeeCommand command) {
-        log.debug("assignAgentGroupByEmployeeIds 요청: groupDbid={}, request={}",
-            command.groupDbid(), command.payload());
+        log.debug("assignAgentGroupByEmployeeIds 요청: groupDbid={}, payload={}",
+            command.groupDbid(), SensitiveLogMasker.masked(command.payload()));
         ApiResponse<AgentGroupSummary> response = ApiResponse.ok("그룹 배치",
             agentGroupService.assignAgentGroupByEmployeeIds(command.groupDbid(), command.payload()));
         log.debug("assignAgentGroupByEmployeeIds 응답: {}", response);
@@ -183,8 +187,8 @@ public class AgentGroupController {
             )
         )
         @Valid @RequestBody AgentGroupAssignPersonCommand command) {
-        log.debug("assignAgentGroupByPersonDbids 요청: groupDbid={}, request={}",
-            command.groupDbid(), command.payload());
+        log.debug("assignAgentGroupByPersonDbids 요청: groupDbid={}, payload={}",
+            command.groupDbid(), SensitiveLogMasker.masked(command.payload()));
         ApiResponse<AgentGroupSummary> response = ApiResponse.ok("그룹 배치",
             agentGroupService.assignAgentGroupByPersonDbids(command.groupDbid(), command.payload()));
         log.debug("assignAgentGroupByPersonDbids 응답: {}", response);
@@ -203,8 +207,8 @@ public class AgentGroupController {
             )
         )
         @Valid @RequestBody AgentGroupAssignEmployeeCommand command) {
-        log.debug("unassignAgentGroupByEmployeeIds 요청: groupDbid={}, request={}",
-            command.groupDbid(), command.payload());
+        log.debug("unassignAgentGroupByEmployeeIds 요청: groupDbid={}, payload={}",
+            command.groupDbid(), SensitiveLogMasker.masked(command.payload()));
         ApiResponse<AgentGroupSummary> response = ApiResponse.ok("그룹 배치 해제",
             agentGroupService.unassignAgentGroupByEmployeeIds(command.groupDbid(), command.payload()));
         log.debug("unassignAgentGroupByEmployeeIds 응답: {}", response);
@@ -223,8 +227,8 @@ public class AgentGroupController {
             )
         )
         @Valid @RequestBody AgentGroupAssignPersonCommand command) {
-        log.debug("unassignAgentGroupByPersonDbids 요청: groupDbid={}, request={}",
-            command.groupDbid(), command.payload());
+        log.debug("unassignAgentGroupByPersonDbids 요청: groupDbid={}, payload={}",
+            command.groupDbid(), SensitiveLogMasker.masked(command.payload()));
         ApiResponse<AgentGroupSummary> response = ApiResponse.ok("그룹 배치 해제",
             agentGroupService.unassignAgentGroupByPersonDbids(command.groupDbid(), command.payload()));
         log.debug("unassignAgentGroupByPersonDbids 응답: {}", response);

@@ -56,4 +56,18 @@ public record CampaignGroupSummary(
         @Schema(description = "사용자 속성")
         Map<String, Object> userProperties
 ) {
+        public CampaignGroupSummary {
+                servers = servers == null ? List.of() : List.copyOf(servers);
+                userProperties = userProperties == null ? Map.of() : Map.copyOf(userProperties);
+        }
+
+        @Override
+        public List<ServerSummary> servers() {
+                return List.copyOf(servers);
+        }
+
+        @Override
+        public Map<String, Object> userProperties() {
+                return Map.copyOf(userProperties);
+        }
 }

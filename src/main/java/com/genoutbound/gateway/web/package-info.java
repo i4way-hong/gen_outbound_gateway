@@ -5,7 +5,6 @@
  * <ul>
  *   <li>{@code AuthController}: 로그인/리프레시/로그아웃 인증 API 제공</li>
  *   <li>{@code ApiStatusController}: 애플리케이션 및 Genesys 연동 상태 조회 API 제공</li>
- *   <li>{@code ScsSseController}: SCS 이벤트의 SSE 스트리밍 엔드포인트 제공</li>
  *   <li>{@code HomeController}: 기본 페이지(홈) 라우팅 처리</li>
  *   <li>{@code FaviconController}: favicon 요청 라우팅/응답 처리</li>
  * </ul>

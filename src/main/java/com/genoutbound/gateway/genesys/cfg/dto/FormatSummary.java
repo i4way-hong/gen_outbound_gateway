@@ -18,4 +18,32 @@ public record FormatSummary(
         @Schema(description = "사용자 속성")
         java.util.Map<String, java.util.Map<String, String>> userProperties
 ) {
+        public FormatSummary {
+                fields = fields == null ? java.util.List.of() : java.util.List.copyOf(fields);
+                userProperties = copyNestedMap(userProperties);
+        }
+
+        @Override
+        public java.util.List<FieldSummary> fields() {
+                return java.util.List.copyOf(fields);
+        }
+
+        @Override
+        public java.util.Map<String, java.util.Map<String, String>> userProperties() {
+                return copyNestedMap(userProperties);
+        }
+
+        private static java.util.Map<String, java.util.Map<String, String>> copyNestedMap(
+                        java.util.Map<String, java.util.Map<String, String>> source
+        ) {
+                if (source == null || source.isEmpty()) {
+                        return java.util.Map.of();
+                }
+                java.util.Map<String, java.util.Map<String, String>> copied = new java.util.LinkedHashMap<>();
+                for (java.util.Map.Entry<String, java.util.Map<String, String>> entry : source.entrySet()) {
+                        java.util.Map<String, String> value = entry.getValue();
+                        copied.put(entry.getKey(), value == null ? java.util.Map.of() : java.util.Map.copyOf(value));
+                }
+                return java.util.Map.copyOf(copied);
+        }
 }

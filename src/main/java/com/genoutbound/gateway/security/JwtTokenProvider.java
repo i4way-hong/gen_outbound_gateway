@@ -1,6 +1,7 @@
 package com.genoutbound.gateway.security;
 
 import com.genoutbound.gateway.config.JwtProperties;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -34,6 +35,8 @@ public class JwtTokenProvider {
     private final Key signingKey;
     private final Environment environment;
 
+    @SuppressFBWarnings(value = {"EI_EXPOSE_REP2", "CT_CONSTRUCTOR_THROW"},
+        justification = "DI 참조는 내부 토큰 처리에만 사용합니다. 생성자 예외는 보안 설정 오류를 조기에 차단하기 위한 의도된 fail-fast 동작입니다.")
     public JwtTokenProvider(JwtProperties properties, UserDetailsService userDetailsService, Environment environment) {
         this.properties = properties;
         this.userDetailsService = userDetailsService;

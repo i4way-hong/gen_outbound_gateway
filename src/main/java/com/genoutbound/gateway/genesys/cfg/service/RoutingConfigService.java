@@ -20,6 +20,8 @@ import com.genesyslab.platform.configuration.protocol.types.CfgTransactionType;
 import com.genesyslab.platform.commons.collections.KeyValueCollection;
 import com.genesyslab.platform.commons.collections.KeyValuePair;
 import com.genoutbound.gateway.core.ApiException;
+import com.genoutbound.gateway.core.logging.SensitiveLogMasker;
+import com.genoutbound.gateway.genesys.cfg.service.support.CfgValueParser;
 import com.genoutbound.gateway.genesys.cfg.dto.DnDialPlanRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.DnGroupRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.DnGroupSummary;
@@ -144,7 +146,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
     }
 
     public DnGroupSummary createDnGroup(DnGroupRequest request) {
-        log.debug("createDnGroup 요청: {}", request);
+    log.debug("createDnGroup 요청: {}", SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         DnGroupSummary result = configClient.withConfService(service -> {
             try {
@@ -235,7 +237,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
     }
 
     public DnSummary createDn(DnRequest request) {
-        log.debug("createDn 요청: {}", request);
+    log.debug("createDn 요청: {}", SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         int switchDbid = resolveSwitchDbid(request.switchDbid());
         DnSummary result = configClient.withConfService(service -> {
@@ -254,9 +256,10 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 if (request.name() != null) {
                     dn.setName(request.name());
                 }
-                dn.setType(CfgDNType.valueOf(request.type()));
-                dn.setRegisterAll(CfgDNRegisterFlag.valueOf(request.registerFlag()));
-                dn.setRouteType(CfgRouteType.valueOf(request.routeType()));
+                dn.setType(CfgValueParser.parseEnum(request.type(), CfgDNType.class, "type"));
+                dn.setRegisterAll(CfgValueParser.parseEnum(request.registerFlag(), CfgDNRegisterFlag.class,
+                    "registerFlag"));
+                dn.setRouteType(CfgValueParser.parseEnum(request.routeType(), CfgRouteType.class, "routeType"));
                 if (request.switchSpecificType() != null) {
                     dn.setSwitchSpecificType(request.switchSpecificType());
                 }
@@ -276,7 +279,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
     }
 
     public DnSummary updateDn(int dnDbid, DnRequest request) {
-        log.debug("updateDn 요청: dnDbid={}, request={}", dnDbid, request);
+    log.debug("updateDn 요청: dnDbid={}, payload={}", dnDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         DnSummary result = configClient.withConfService(service -> {
             try {
@@ -289,9 +292,10 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 }
                 dn.setNumber(request.number());
                 dn.setName(request.name());
-                dn.setType(CfgDNType.valueOf(request.type()));
-                dn.setRegisterAll(CfgDNRegisterFlag.valueOf(request.registerFlag()));
-                dn.setRouteType(CfgRouteType.valueOf(request.routeType()));
+                dn.setType(CfgValueParser.parseEnum(request.type(), CfgDNType.class, "type"));
+                dn.setRegisterAll(CfgValueParser.parseEnum(request.registerFlag(), CfgDNRegisterFlag.class,
+                    "registerFlag"));
+                dn.setRouteType(CfgValueParser.parseEnum(request.routeType(), CfgRouteType.class, "routeType"));
                 if (request.switchSpecificType() != null) {
                     dn.setSwitchSpecificType(request.switchSpecificType());
                 }
@@ -332,7 +336,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
     }
 
     public void setDnDialPlan(int dnDbid, DnDialPlanRequest request) {
-        log.debug("setDnDialPlan 요청: dnDbid={}, request={}", dnDbid, request);
+    log.debug("setDnDialPlan 요청: dnDbid={}, payload={}", dnDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         configClient.withConfService(service -> {
             try {
@@ -372,7 +376,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
     }
 
     public void setDnTServerOptions(int dnDbid, DnTServerOptionRequest request) {
-        log.debug("setDnTServerOptions 요청: dnDbid={}, request={}", dnDbid, request);
+    log.debug("setDnTServerOptions 요청: dnDbid={}, payload={}", dnDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         configClient.withConfService(service -> {
             try {
@@ -476,7 +480,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
     }
 
     public TransactionSummary createTransaction(TransactionRequest request) {
-        log.debug("createTransaction 요청: {}", request);
+    log.debug("createTransaction 요청: {}", SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         TransactionSummary result = configClient.withConfService(service -> {
             try {
@@ -490,7 +494,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 transaction.setTenantDBID(resolvedTenant);
                 transaction.setName(request.name());
                 transaction.setAlias(request.alias());
-                transaction.setType(CfgTransactionType.valueOf(request.type()));
+                transaction.setType(CfgValueParser.parseEnum(request.type(), CfgTransactionType.class, "type"));
                 transaction.setState(request.isEnabled() ? CfgObjectState.CFGEnabled : CfgObjectState.CFGDisabled);
                 transaction.save();
                 return new TransactionSummary(transaction.getDBID(), transaction.getName(), transaction.getAlias(),
@@ -504,7 +508,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
     }
 
     public TransactionSummary updateTransaction(int transactionDbid, TransactionRequest request) {
-        log.debug("updateTransaction 요청: transactionDbid={}, request={}", transactionDbid, request);
+    log.debug("updateTransaction 요청: transactionDbid={}, payload={}", transactionDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         TransactionSummary result = configClient.withConfService(service -> {
             try {
@@ -517,7 +521,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 }
                 transaction.setName(request.name());
                 transaction.setAlias(request.alias());
-                transaction.setType(CfgTransactionType.valueOf(request.type()));
+                transaction.setType(CfgValueParser.parseEnum(request.type(), CfgTransactionType.class, "type"));
                 transaction.setState(request.isEnabled() ? CfgObjectState.CFGEnabled : CfgObjectState.CFGDisabled);
                 transaction.save();
                 return new TransactionSummary(transaction.getDBID(), transaction.getName(), transaction.getAlias(),
@@ -552,7 +556,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
     }
 
     public void addTransactionSection(int transactionDbid, TransactionSectionRequest request) {
-        log.debug("addTransactionSection 요청: transactionDbid={}, request={}", transactionDbid, request);
+    log.debug("addTransactionSection 요청: transactionDbid={}, payload={}", transactionDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         configClient.withConfService(service -> {
             try {
@@ -573,7 +577,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
     }
 
     public void modifyTransactionSection(int transactionDbid, TransactionSectionRequest request) {
-        log.debug("modifyTransactionSection 요청: transactionDbid={}, request={}", transactionDbid, request);
+    log.debug("modifyTransactionSection 요청: transactionDbid={}, payload={}", transactionDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         configClient.withConfService(service -> {
             try {
@@ -599,7 +603,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
     }
 
     public void removeTransactionSection(int transactionDbid, TransactionSectionRequest request) {
-        log.debug("removeTransactionSection 요청: transactionDbid={}, request={}", transactionDbid, request);
+    log.debug("removeTransactionSection 요청: transactionDbid={}, payload={}", transactionDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         configClient.withConfService(service -> {
             try {
@@ -617,7 +621,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
     }
 
     public void addTransactionOption(int transactionDbid, TransactionOptionRequest request) {
-        log.debug("addTransactionOption 요청: transactionDbid={}, request={}", transactionDbid, request);
+    log.debug("addTransactionOption 요청: transactionDbid={}, payload={}", transactionDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         configClient.withConfService(service -> {
             try {
@@ -636,7 +640,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
     }
 
     public void modifyTransactionOption(int transactionDbid, TransactionOptionRequest request) {
-        log.debug("modifyTransactionOption 요청: transactionDbid={}, request={}", transactionDbid, request);
+    log.debug("modifyTransactionOption 요청: transactionDbid={}, payload={}", transactionDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         configClient.withConfService(service -> {
             try {
@@ -655,7 +659,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
     }
 
     public void removeTransactionOption(int transactionDbid, TransactionOptionRequest request) {
-        log.debug("removeTransactionOption 요청: transactionDbid={}, request={}", transactionDbid, request);
+    log.debug("removeTransactionOption 요청: transactionDbid={}, payload={}", transactionDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         configClient.withConfService(service -> {
             try {
@@ -673,7 +677,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
     }
 
     public void saveTransactionOptions(int transactionDbid, TransactionOptionsSaveRequest request) {
-        log.debug("saveTransactionOptions 요청: transactionDbid={}, request={}", transactionDbid, request);
+    log.debug("saveTransactionOptions 요청: transactionDbid={}, payload={}", transactionDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         configClient.withConfService(service -> {
             try {
@@ -786,7 +790,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
     }
 
     public PlaceGroupSummary createPlaceGroup(PlaceGroupRequest request) {
-        log.debug("createPlaceGroup 요청: {}", request);
+    log.debug("createPlaceGroup 요청: {}", SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         PlaceGroupSummary result = configClient.withConfService(service -> {
             try {
@@ -877,7 +881,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
     }
 
     public PlaceSummary createPlace(PlaceRequest request) {
-        log.debug("createPlace 요청: {}", request);
+    log.debug("createPlace 요청: {}", SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         int switchDbid = resolveSwitchDbid(request.switchDbid());
         PlaceSummary result = configClient.withConfService(service -> {
@@ -904,7 +908,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
     }
 
     public PlaceSummary updatePlace(int placeDbid, PlaceRequest request) {
-        log.debug("updatePlace 요청: placeDbid={}, request={}", placeDbid, request);
+    log.debug("updatePlace 요청: placeDbid={}, payload={}", placeDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         int switchDbid = resolveSwitchDbid(request.switchDbid());
         PlaceSummary result = configClient.withConfService(service -> {

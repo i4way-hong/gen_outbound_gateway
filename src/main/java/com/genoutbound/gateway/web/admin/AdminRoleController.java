@@ -1,5 +1,6 @@
 package com.genoutbound.gateway.web.admin;
 
+import com.genoutbound.gateway.config.AdminConsolePaths;
 import com.genoutbound.gateway.security.role.AppPermission;
 import com.genoutbound.gateway.security.role.AppPermissionRepository;
 import com.genoutbound.gateway.security.role.AppRole;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/console/roles")
+@RequestMapping(AdminConsolePaths.ROLES_BASE)
 public class AdminRoleController {
 
     private final AppRoleRepository roleRepository;
@@ -79,7 +80,7 @@ public class AdminRoleController {
         AppRole role = new AppRole();
         applyForm(role, form);
         roleRepository.save(role);
-    return "redirect:/console/roles";
+    return "redirect:" + AdminConsolePaths.ROLES_BASE;
     }
 
     @PostMapping("/{id}")
@@ -93,7 +94,7 @@ public class AdminRoleController {
             .orElseThrow(() -> new IllegalArgumentException("역할을 찾을 수 없습니다."));
         applyForm(role, form);
         roleRepository.save(role);
-    return "redirect:/console/roles";
+    return "redirect:" + AdminConsolePaths.ROLES_BASE;
     }
 
     private String renderForm(Model model, RoleForm form, String error) {

@@ -66,7 +66,7 @@ public class StatController {
         } catch (GenesysUnavailableException ex) {
             log.warn("getSkillGrpStat 실패", ex);
             return new ApiResponse<>(false, ex.getMessage(), null, OffsetDateTime.now());
-        } catch (Exception ex) {
+        } catch (RuntimeException ex) {
             log.error("getSkillGrpStat 오류", ex);
             return new ApiResponse<>(false, "스킬그룹 상담사 상태 조회 실패", null, OffsetDateTime.now());
         }

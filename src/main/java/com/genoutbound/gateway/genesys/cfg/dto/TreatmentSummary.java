@@ -35,4 +35,12 @@ public record TreatmentSummary(
 	@Schema(description = "사용자 속성")
 	Map<String, Object> userProperties
 ) {
+	public TreatmentSummary {
+		userProperties = userProperties == null ? Map.of() : Map.copyOf(userProperties);
+	}
+
+	@Override
+	public Map<String, Object> userProperties() {
+		return Map.copyOf(userProperties);
+	}
 }

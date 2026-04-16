@@ -6,6 +6,7 @@ import com.genesyslab.platform.applicationblocks.com.objects.CfgAgentLogin;
 import com.genesyslab.platform.applicationblocks.com.queries.CfgAgentLoginQuery;
 import com.genesyslab.platform.configuration.protocol.types.CfgObjectState;
 import com.genoutbound.gateway.core.ApiException;
+import com.genoutbound.gateway.core.logging.SensitiveLogMasker;
 import com.genoutbound.gateway.genesys.cfg.dto.AgentLoginRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.AgentLoginSummary;
 import com.genoutbound.gateway.genesys.cfg.dto.AgentLoginUpdateRequest;
@@ -127,7 +128,7 @@ public class AgentLoginConfigService extends GenesysConfigSupport {
     }
 
     public AgentLoginSummary createAgentLogin(AgentLoginRequest request) {
-        log.debug("createAgentLogin 요청: {}", request);
+    log.debug("createAgentLogin 요청: {}", SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         int resolvedSwitch = resolveSwitchDbid(request.switchDbid());
         AgentLoginSummary result = configClient.withConfService(service -> {
@@ -158,7 +159,7 @@ public class AgentLoginConfigService extends GenesysConfigSupport {
     }
 
     public AgentLoginSummary updateAgentLogin(int loginDbid, AgentLoginUpdateRequest request) {
-        log.debug("updateAgentLogin 요청: loginDbid={}, request={}", loginDbid, request);
+    log.debug("updateAgentLogin 요청: loginDbid={}, payload={}", loginDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(null);
         int resolvedSwitch = resolveSwitchDbid(null);
         AgentLoginSummary result = configClient.withConfService(service -> {
@@ -186,8 +187,8 @@ public class AgentLoginConfigService extends GenesysConfigSupport {
 
     public AgentLoginSummary updateAgentLoginByCode(String loginCode, Integer tenantDbid, Integer switchDbid,
             AgentLoginUpdateRequest request) {
-        log.debug("updateAgentLoginByCode 요청: loginCode={}, tenantDbid={}, switchDbid={}, request={}",
-            loginCode, tenantDbid, switchDbid, request);
+        log.debug("updateAgentLoginByCode 요청: loginCode={}, tenantDbid={}, switchDbid={}, payload={}",
+            loginCode, tenantDbid, switchDbid, SensitiveLogMasker.masked(request));
         if (loginCode == null || loginCode.isBlank()) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "loginCode 설정이 필요합니다.");
         }

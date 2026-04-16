@@ -2,6 +2,7 @@ package com.genoutbound.gateway.security;
 
 import com.genoutbound.gateway.core.ApiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -26,6 +27,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final TokenVersionService tokenVersionService;
     private final ObjectMapper objectMapper;
 
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
+        justification = "Spring DI 의존성 참조는 인증 처리 로직에서만 사용하며 외부 mutable 참조를 재노출하지 않습니다.")
     public JwtAuthenticationFilter(JwtTokenProvider tokenProvider,
                                    TokenRevocationService tokenRevocationService,
                                    TokenVersionService tokenVersionService,

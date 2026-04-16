@@ -152,7 +152,7 @@ public class TserverController {
             payload.put("LOGIN_ID", "");
             payload.put("RESULT_MSG", ex.getMessage());
             return new ApiResponse<>(false, ex.getMessage(), payload, OffsetDateTime.now());
-        } catch (Exception ex) {
+        } catch (RuntimeException ex) {
             log.error("checkAgentStatus 오류", ex);
             payload.put("RESULT", "F");
             payload.put("LOGIN_ID", "");
@@ -189,7 +189,7 @@ public class TserverController {
             payload.put("LOGIN_ID", "");
             payload.put("RESULT_MSG", ex.getMessage());
             return new ApiResponse<>(false, ex.getMessage(), payload, OffsetDateTime.now());
-        } catch (Exception ex) {
+        } catch (RuntimeException ex) {
             log.error("{} 오류", type, ex);
             payload.put("RESULT", "F");
             payload.put("LOGIN_ID", "");

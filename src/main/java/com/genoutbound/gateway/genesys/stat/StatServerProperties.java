@@ -99,19 +99,30 @@ public class StatServerProperties {
     }
 
     public Server getPrimary() {
-        return primary;
+        return copyServer(primary);
     }
 
     public void setPrimary(Server primary) {
-        this.primary = primary;
+        this.primary = copyServer(primary);
     }
 
     public Server getBackup() {
-        return backup;
+        return copyServer(backup);
     }
 
     public void setBackup(Server backup) {
-        this.backup = backup;
+        this.backup = copyServer(backup);
+    }
+
+    private static Server copyServer(Server source) {
+        if (source == null) {
+            return null;
+        }
+        Server copy = new Server();
+        copy.setEndpoint(source.getEndpoint());
+        copy.setIp(source.getIp());
+        copy.setPort(source.getPort());
+        return copy;
     }
 
     public static class Server {

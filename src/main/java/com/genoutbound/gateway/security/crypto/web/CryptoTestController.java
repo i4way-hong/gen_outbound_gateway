@@ -4,7 +4,9 @@ import com.genoutbound.gateway.config.EncryptionProperties;
 import com.genoutbound.gateway.core.ApiException;
 import com.genoutbound.gateway.core.ApiResponse;
 import com.genoutbound.gateway.security.crypto.Aes256;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -26,6 +28,8 @@ public class CryptoTestController {
     private final EncryptionProperties properties;
     private final ObjectMapper objectMapper;
 
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
+        justification = "Spring DI 설정/ObjectMapper 참조를 요청 처리 용도로만 사용하며 외부 mutable 참조를 재노출하지 않습니다.")
     public CryptoTestController(EncryptionProperties properties, ObjectMapper objectMapper) {
         this.properties = properties;
         this.objectMapper = objectMapper;
@@ -63,7 +67,7 @@ public class CryptoTestController {
             }
             String encrypted = Aes256.encrypt(rawText, properties.getKey(), properties.getIv());
             return ApiResponse.ok("암호화 성공", new EncryptResponse(encrypted));
-        } catch (Exception ex) {
+        } catch (JsonProcessingException | IllegalStateException ex) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "암호화할 요청 본문이 올바르지 않습니다.");
         }
     }

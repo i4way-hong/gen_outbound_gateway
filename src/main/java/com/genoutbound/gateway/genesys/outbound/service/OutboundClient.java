@@ -4,6 +4,7 @@ import com.genesyslab.platform.commons.protocol.ChannelState;
 import com.genesyslab.platform.commons.protocol.Endpoint;
 import com.genesyslab.platform.commons.protocol.ProtocolException;
 import com.genesyslab.platform.outbound.protocol.OutboundServerProtocol;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import com.genoutbound.gateway.core.ApiException;
 import com.genoutbound.gateway.genesys.outbound.OutboundProperties;
 import com.genoutbound.gateway.genesys.common.GenesysUnavailableException;
@@ -31,6 +32,8 @@ public class OutboundClient {
      *
      * @param properties Outbound 설정
      */
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
+        justification = "Spring DI로 주입된 설정 빈 참조를 연결 구성 조회 용도로만 사용하며 외부로 노출하지 않습니다.")
     public OutboundClient(OutboundProperties properties) {
         this.properties = properties;
     }
@@ -52,7 +55,7 @@ public class OutboundClient {
             return action.apply(protocol);
         } catch (ApiException ex) {
             throw ex;
-        } catch (Exception ex) {
+        } catch (RuntimeException ex) {
             throw new GenesysUnavailableException("Outbound 요청 처리 실패", ex);
         } finally {
             closeProtocol(protocol);

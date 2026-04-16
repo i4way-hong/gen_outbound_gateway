@@ -13,6 +13,7 @@ import com.genesyslab.platform.applicationblocks.com.queries.CfgPersonQuery;
 import com.genesyslab.platform.configuration.protocol.types.CfgFlag;
 import com.genesyslab.platform.configuration.protocol.types.CfgObjectState;
 import com.genoutbound.gateway.core.ApiException;
+import com.genoutbound.gateway.core.logging.SensitiveLogMasker;
 import com.genoutbound.gateway.genesys.cfg.dto.PersonAgentLoginCodeRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.PersonRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.PersonSkillRequest;
@@ -98,7 +99,7 @@ public class PersonConfigService extends GenesysConfigSupport {
     }
 
     public PersonSummary createPerson(PersonRequest request) {
-        log.debug("createPerson 요청: {}", request);
+    log.debug("createPerson 요청: {}", SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         PersonSummary result = configClient.withConfService(service -> {
             try {
@@ -130,7 +131,7 @@ public class PersonConfigService extends GenesysConfigSupport {
     }
 
     public PersonSummary updatePerson(int personDbid, PersonUpdateRequest request) {
-        log.debug("updatePerson 요청: personDbid={}, request={}", personDbid, request);
+    log.debug("updatePerson 요청: personDbid={}, payload={}", personDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(null);
         PersonSummary result = configClient.withConfService(service -> {
             try {
@@ -169,7 +170,7 @@ public class PersonConfigService extends GenesysConfigSupport {
     }
 
     public void assignPersonAgentLoginsByCode(int personDbid, PersonAgentLoginCodeRequest request) {
-        log.debug("assignPersonAgentLoginsByCode 요청: personDbid={}, request={}", personDbid, request);
+    log.debug("assignPersonAgentLoginsByCode 요청: personDbid={}, payload={}", personDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         int resolvedSwitch = resolveSwitchDbid(request.switchDbid());
         configClient.withConfService(service -> {
@@ -203,7 +204,7 @@ public class PersonConfigService extends GenesysConfigSupport {
     }
 
     public void unassignPersonAgentLoginsByCode(int personDbid, PersonAgentLoginCodeRequest request) {
-        log.debug("unassignPersonAgentLoginsByCode 요청: personDbid={}, request={}", personDbid, request);
+    log.debug("unassignPersonAgentLoginsByCode 요청: personDbid={}, payload={}", personDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         configClient.withConfService(service -> {
             try {
@@ -227,7 +228,7 @@ public class PersonConfigService extends GenesysConfigSupport {
     }
 
     public void setPersonSkills(int personDbid, PersonSkillRequest request) {
-        log.debug("setPersonSkills 요청: personDbid={}, request={}", personDbid, request);
+    log.debug("setPersonSkills 요청: personDbid={}, payload={}", personDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         configClient.withConfService(service -> {
             try {
@@ -255,7 +256,7 @@ public class PersonConfigService extends GenesysConfigSupport {
     }
 
     public void removePersonSkills(int personDbid, PersonSkillRequest request) {
-        log.debug("removePersonSkills 요청: personDbid={}, request={}", personDbid, request);
+    log.debug("removePersonSkills 요청: personDbid={}, payload={}", personDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         configClient.withConfService(service -> {
             try {

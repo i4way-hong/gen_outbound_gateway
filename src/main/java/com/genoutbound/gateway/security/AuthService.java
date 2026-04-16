@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -110,7 +111,7 @@ public class AuthService {
         UserDetails userDetails;
         try {
             userDetails = userDetailsService.loadUserByUsername(request.username());
-        } catch (Exception ex) {
+        } catch (UsernameNotFoundException ex) {
             throw new ApiException(HttpStatus.UNAUTHORIZED, "인증 실패");
         }
 

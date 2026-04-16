@@ -15,4 +15,12 @@ public record PlaceRequest(
         @Schema(description = "DN 번호 목록", example = "[\"1001\",\"1002\"]")
         @NotEmpty List<String> dnNumbers
 ) {
+        public PlaceRequest {
+                dnNumbers = dnNumbers == null ? List.of() : List.copyOf(dnNumbers);
+        }
+
+        @Override
+        public List<String> dnNumbers() {
+                return List.copyOf(dnNumbers);
+        }
 }

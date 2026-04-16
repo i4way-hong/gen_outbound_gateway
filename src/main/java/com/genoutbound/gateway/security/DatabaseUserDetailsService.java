@@ -4,6 +4,7 @@ import com.genoutbound.gateway.security.permission.PermissionCodes;
 import com.genoutbound.gateway.security.role.AppPermission;
 import com.genoutbound.gateway.security.role.AppPermissionRepository;
 import com.genoutbound.gateway.security.role.AppRole;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -28,6 +29,8 @@ public class DatabaseUserDetailsService implements UserDetailsService {
     private final SecurityProperties securityProperties;
     private final AppPermissionRepository permissionRepository;
 
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
+        justification = "Spring DI 의존성 참조를 사용자 조회/권한 계산 용도로만 사용하며 외부로 노출하지 않습니다.")
     public DatabaseUserDetailsService(AppUserRepository userRepository,
                                       PasswordEncoder passwordEncoder,
                                       SecurityProperties securityProperties,

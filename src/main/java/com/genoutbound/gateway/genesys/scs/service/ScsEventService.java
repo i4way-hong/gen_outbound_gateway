@@ -24,15 +24,11 @@ import com.genesyslab.platform.management.protocol.solutioncontrolserver.events.
 import com.genesyslab.platform.management.protocol.solutioncontrolserver.requests.applications.RequestGetApplicationInfo;
 import com.genesyslab.platform.management.protocol.solutioncontrolserver.requests.RequestSubscribe;
 import com.genesyslab.platform.management.protocol.SolutionControlServerProtocol;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import com.genoutbound.gateway.genesys.cfg.service.GenesysConfigClient;
-import com.genoutbound.gateway.genesys.common.GenesysUnavailableException;
 import com.genoutbound.gateway.genesys.scs.ScsProperties;
-import com.genoutbound.gateway.sse.AppStatusEvent;
-import com.genoutbound.gateway.sse.AppStatusSseService;
-import com.genoutbound.gateway.core.ApiException;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +36,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -50,7 +45,6 @@ public class ScsEventService {
     private static final String APP_NAME_UNKNOWN = "__UNKNOWN__";
 
     private final ScsProperties properties;
-    private final AppStatusSseService sseService;
     private final GenesysConfigClient configClient;
     private final Map<Integer, String> appNameMap = new ConcurrentHashMap<>();
     private final Map<Integer, EventSignature> lastEventMap = new ConcurrentHashMap<>();
@@ -59,10 +53,10 @@ public class ScsEventService {
     private WarmStandbyService warmStandbyService;
     private final AtomicReference<String> lastError = new AtomicReference<>();
 
-    public ScsEventService(ScsProperties properties, AppStatusSseService sseService,
-                           GenesysConfigClient configClient) {
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
+        justification = "Spring DI 설정/서비스 참조를 내부 이벤트 처리 및 설정 조회에만 사용하며 외부로 노출하지 않습니다.")
+    public ScsEventService(ScsProperties properties, GenesysConfigClient configClient) {
         this.properties = properties;
-        this.sseService = sseService;
         this.configClient = configClient;
     }
 
@@ -128,7 +122,6 @@ public class ScsEventService {
             public void onChannelOpened(java.util.EventObject event) {
                 log.info("SCS 채널 오픈");
                 subscribeAll();
-                refreshCurrentStatuses();
             }
 
             @Override
@@ -174,7 +167,6 @@ public class ScsEventService {
             public void onSwitchover(java.util.EventObject event) {
                 log.warn("SCS WarmStandby Switchover 발생");
                 subscribeAll();
-                refreshCurrentStatuses();
             }
         });
         warmStandbyService.start();
@@ -185,7 +177,6 @@ public class ScsEventService {
             protocol.open();
             log.info("SCS 연결 성공: {}:{}", properties.getPrimary().getIp(), properties.getPrimary().getPort());
             subscribeAll();
-            refreshCurrentStatuses();
     } catch (ProtocolException | IllegalStateException | InterruptedException ex) {
             lastError.set(ex.getMessage());
             log.warn("SCS 연결 실패", ex);
@@ -240,17 +231,20 @@ public class ScsEventService {
         if (info.getControlObjectType() != ControlObjectType.Application) {
             return;
         }
-        AppStatusEvent event = buildEvent(info);
-        if (event == null) {
+        Integer appDbid = info.getControlObjectId();
+        if (appDbid == null) {
             return;
         }
         EventSignature signature = buildSignature(info);
-        EventSignature previous = lastEventMap.put(event.appDbid(), signature);
+        EventSignature previous = lastEventMap.put(appDbid, signature);
         if (signature.equals(previous)) {
             return;
         }
-        sseService.broadcast(event);
-        log.debug("SCS 상태 이벤트 수신: {}", event);
+        log.debug("SCS 상태 이벤트 수신: appDbid={}, appName={}, status={}, executionMode={}",
+            appDbid,
+            resolveAppName(appDbid),
+            resolveStatusName(info.getControlStatus()),
+            signature.executionMode());
     }
 
     private String resolveStatusName(Integer controlStatus) {
@@ -259,30 +253,6 @@ public class ScsEventService {
         }
     ApplicationStatus status = (ApplicationStatus) ApplicationStatus.getValue(ApplicationStatus.class, controlStatus);
     return status == null ? "Unknown" : status.name();
-    }
-
-    public AppStatusEvent getCurrentStatus(Integer appDbid) {
-        if (appDbid == null) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "applicationDbid 설정이 필요합니다.");
-        }
-        if (!properties.isEnabled()) {
-            throw new GenesysUnavailableException("SCS가 비활성화되어 있습니다.");
-        }
-        if (protocol == null || protocol.getState() != ChannelState.Opened) {
-            String error = lastError.get();
-            throw new GenesysUnavailableException(error == null ? "SCS 연결이 필요합니다." : error);
-        }
-        try {
-            RequestGetApplicationInfo request = RequestGetApplicationInfo.create(appDbid);
-            Message response = protocol.request(request);
-            if (response instanceof EventInfo info) {
-                updateSnapshot(info);
-                return buildEvent(info);
-            }
-            throw new ApiException(HttpStatus.NOT_FOUND, "application 상태를 찾을 수 없습니다.");
-        } catch (ProtocolException | IllegalStateException ex) {
-            throw new GenesysUnavailableException("SCS 상태 조회 실패", ex);
-        }
     }
 
     public void refreshCurrentStatuses() {
@@ -297,42 +267,15 @@ public class ScsEventService {
                 RequestGetApplicationInfo request = RequestGetApplicationInfo.create(dbid);
                 Message response = protocol.request(request);
                 if (response instanceof EventInfo info) {
-                    updateSnapshot(info);
+                    Integer appDbid = info.getControlObjectId();
+                    if (appDbid != null) {
+                        lastEventMap.put(appDbid, buildSignature(info));
+                    }
                 }
             } catch (ProtocolException | IllegalStateException ex) {
                 log.warn("SCS 현재 상태 조회 실패: appDbid={}", dbid, ex);
             }
         }
-    }
-
-    private void updateSnapshot(EventInfo info) {
-        AppStatusEvent event = buildEvent(info);
-        if (event == null) {
-            return;
-        }
-        lastEventMap.put(event.appDbid(), buildSignature(info));
-        sseService.updateSnapshot(event);
-    }
-
-    private AppStatusEvent buildEvent(EventInfo info) {
-        Integer appDbid = info.getControlObjectId();
-        Integer controlStatus = info.getControlStatus();
-        if (appDbid == null) {
-            return null;
-        }
-        String appName = resolveAppName(appDbid);
-        String statusName = resolveStatusName(controlStatus);
-        ApplicationExecutionMode executionMode = info.getExecutionMode();
-        String executionModeName = executionMode == null ? null : executionMode.name();
-        return new AppStatusEvent(
-            appDbid,
-            appName,
-            controlStatus,
-            statusName,
-            executionModeName,
-            info.getDescription(),
-            OffsetDateTime.now()
-        );
     }
 
     private EventSignature buildSignature(EventInfo info) {
@@ -392,7 +335,7 @@ public class ScsEventService {
                     return null;
                 }
             });
-        } catch (Exception ex) {
+        } catch (RuntimeException ex) {
             log.debug("SCS appName 조회 불가: appDbid={}, reason={}", appDbid, ex.getMessage());
             return null;
         }
@@ -463,7 +406,7 @@ public class ScsEventService {
         if (warmStandbyService != null) {
             try {
                 warmStandbyService.stop();
-            } catch (Exception ex) {
+            } catch (RuntimeException ex) {
                 log.warn("WarmStandby 종료 실패", ex);
             }
         }

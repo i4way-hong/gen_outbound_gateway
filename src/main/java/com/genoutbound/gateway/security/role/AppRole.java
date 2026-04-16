@@ -71,10 +71,10 @@ public class AppRole {
     }
 
     public Set<AppPermission> getPermissions() {
-        return permissions;
+        return permissions == null ? null : new HashSet<>(permissions);
     }
 
     public void setPermissions(Set<AppPermission> permissions) {
-        this.permissions = permissions;
+        this.permissions = permissions == null ? null : new HashSet<>(permissions);
     }
 }

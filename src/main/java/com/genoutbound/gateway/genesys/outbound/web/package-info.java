@@ -4,7 +4,6 @@
  * <p>클래스 역할:
  * <ul>
  *   <li>{@code OutboundController}: Outbound 명령/조회 REST API 제공</li>
- *   <li>{@code OutboundDesktopController}: Outbound Desktop 이벤트/명령 REST API 제공</li>
  * </ul>
  */
 package com.genoutbound.gateway.genesys.outbound.web;

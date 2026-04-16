@@ -13,4 +13,12 @@ public record AgentGroupSummary(
         @Schema(description = "그룹에 속한 상담사 목록")
         List<AgentGroupMemberSummary> members
 ) {
+        public AgentGroupSummary {
+                members = members == null ? List.of() : List.copyOf(members);
+        }
+
+        @Override
+        public List<AgentGroupMemberSummary> members() {
+                return List.copyOf(members);
+        }
 }

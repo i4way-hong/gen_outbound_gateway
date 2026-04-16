@@ -22,18 +22,22 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdviceAd
 @ControllerAdvice
 public class EncryptionRequestBodyAdvice extends RequestBodyAdviceAdapter {
 
-    private final EncryptionProperties properties;
+    private final boolean encryptionEnabled;
+    private final String encryptionKey;
+    private final String encryptionIv;
     private final ObjectMapper objectMapper;
 
     public EncryptionRequestBodyAdvice(EncryptionProperties properties, ObjectMapper objectMapper) {
-        this.properties = properties;
-        this.objectMapper = objectMapper;
+        this.encryptionEnabled = properties.isEnabled();
+        this.encryptionKey = properties.getKey();
+        this.encryptionIv = properties.getIv();
+        this.objectMapper = objectMapper.copy();
     }
 
     @Override
     public boolean supports(MethodParameter methodParameter, java.lang.reflect.Type targetType,
                             Class<? extends HttpMessageConverter<?>> converterType) {
-        if (!properties.isEnabled()) {
+        if (!encryptionEnabled) {
             return false;
         }
         return isConfigurationApiController(methodParameter);
@@ -54,7 +58,7 @@ public class EncryptionRequestBodyAdvice extends RequestBodyAdviceAdapter {
             if (encData == null || encData.isBlank()) {
                 throw new ApiException(HttpStatus.BAD_REQUEST, "encData 값이 비어 있습니다.");
             }
-            String decrypted = Aes256.decrypt(encData, properties.getKey(), properties.getIv());
+            String decrypted = Aes256.decrypt(encData, encryptionKey, encryptionIv);
             return new ResettableHttpInputMessage(inputMessage.getHeaders(), decrypted);
         }
         throw new ApiException(HttpStatus.BAD_REQUEST, "암호화가 활성화되어 있어 encData 요청만 허용됩니다.");

@@ -34,6 +34,27 @@ public record TreatmentRequest(
     @Schema(description = "활성화 여부", example = "true")
     Boolean enabled
 ) {
+    public TreatmentRequest {
+        userProperties = copyNestedMap(userProperties);
+    }
+
+    @Override
+    public Map<String, Map<String, String>> userProperties() {
+        return copyNestedMap(userProperties);
+    }
+
+    private static Map<String, Map<String, String>> copyNestedMap(Map<String, Map<String, String>> source) {
+        if (source == null || source.isEmpty()) {
+            return Map.of();
+        }
+        Map<String, Map<String, String>> copied = new java.util.LinkedHashMap<>();
+        for (Map.Entry<String, Map<String, String>> entry : source.entrySet()) {
+            Map<String, String> value = entry.getValue();
+            copied.put(entry.getKey(), value == null ? Map.of() : Map.copyOf(value));
+        }
+        return Map.copyOf(copied);
+    }
+
     public boolean isEnabled() {
         return enabled == null || enabled;
     }

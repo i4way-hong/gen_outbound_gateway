@@ -44,10 +44,10 @@ public class RoleForm {
     }
 
     public List<Long> getPermissionIds() {
-        return permissionIds;
+        return permissionIds == null ? null : List.copyOf(permissionIds);
     }
 
     public void setPermissionIds(List<Long> permissionIds) {
-        this.permissionIds = permissionIds;
+        this.permissionIds = permissionIds == null ? null : new ArrayList<>(permissionIds);
     }
 }

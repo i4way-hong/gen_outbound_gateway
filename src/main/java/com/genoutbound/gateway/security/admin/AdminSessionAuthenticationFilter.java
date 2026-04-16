@@ -1,5 +1,6 @@
 package com.genoutbound.gateway.security.admin;
 
+import com.genoutbound.gateway.config.AdminConsolePaths;
 import com.genoutbound.gateway.security.permission.PermissionCodes;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -44,9 +45,9 @@ public class AdminSessionAuthenticationFilter extends OncePerRequestFilter {
         if (path == null) {
             return false;
         }
-        if (!path.startsWith("/console")) {
+        if (!path.startsWith(AdminConsolePaths.CONSOLE_BASE)) {
             return false;
         }
-        return !path.startsWith("/console/session/new") && !path.startsWith("/console/session/end");
+        return !path.startsWith(AdminConsolePaths.SESSION_NEW) && !path.startsWith(AdminConsolePaths.SESSION_END);
     }
 }

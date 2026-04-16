@@ -2,6 +2,7 @@ package com.genoutbound.gateway.genesys.cfg.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.util.Map;
 
 public record TransactionOptionsSaveRequest(
@@ -11,5 +12,14 @@ public record TransactionOptionsSaveRequest(
         @NotBlank String sectionName,
         @Schema(description = "옵션 목록", example = "{\"KEY\":\"VALUE\"}")
         Map<String, String> options
-) {
+) implements Serializable {
+
+        public TransactionOptionsSaveRequest {
+                options = options == null ? null : Map.copyOf(options);
+        }
+
+        @Override
+        public Map<String, String> options() {
+                return options == null ? null : Map.copyOf(options);
+        }
 }

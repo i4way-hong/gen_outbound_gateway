@@ -20,6 +20,15 @@ public record PersonUpdateRequest(
     @Schema(description = "배치할 그룹명 목록", example = "[\"GROUP_A\"]")
     List<String> agentGroupNames
 ) {
+    public PersonUpdateRequest {
+        agentGroupNames = agentGroupNames == null ? List.of() : List.copyOf(agentGroupNames);
+    }
+
+    @Override
+    public List<String> agentGroupNames() {
+        return List.copyOf(agentGroupNames);
+    }
+
     public boolean isAgent() {
         return agent != null && agent;
     }

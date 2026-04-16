@@ -1,6 +1,8 @@
 package com.genoutbound.gateway.web.admin;
 
+import com.genoutbound.gateway.config.AdminConsolePaths;
 import com.genoutbound.gateway.config.SecurityProperties;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import com.genoutbound.gateway.security.admin.AdminSessionAuthenticationFilter;
 import jakarta.servlet.http.HttpSession;
 import java.util.Optional;
@@ -15,11 +17,13 @@ public class AdminLoginController {
 
     private final SecurityProperties securityProperties;
 
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
+        justification = "Spring DI 설정 참조를 로그인 검증 로직에서만 사용하며 외부로 노출하지 않습니다.")
     public AdminLoginController(SecurityProperties securityProperties) {
         this.securityProperties = securityProperties;
     }
 
-    @GetMapping("/console/session/new")
+    @GetMapping(AdminConsolePaths.SESSION_NEW)
     public String login(@RequestParam Optional<String> error,
                         @RequestParam Optional<String> logout,
                         Model model) {
@@ -29,7 +33,7 @@ public class AdminLoginController {
         return "admin/login";
     }
 
-    @PostMapping("/console/session/new")
+    @PostMapping(AdminConsolePaths.SESSION_NEW)
     public String doLogin(@RequestParam String username,
                           @RequestParam String password,
                           HttpSession session,
@@ -46,15 +50,15 @@ public class AdminLoginController {
             return "admin/login";
         }
         session.setAttribute(AdminSessionAuthenticationFilter.SESSION_KEY, Boolean.TRUE);
-        return "redirect:/console/users";
+        return "redirect:" + AdminConsolePaths.USERS_BASE;
     }
 
-    @GetMapping("/console/session/end")
+    @GetMapping(AdminConsolePaths.SESSION_END)
     public String logout(HttpSession session) {
         if (session != null) {
             session.invalidate();
         }
-        return "redirect:/console/session/new?logout=true";
+        return "redirect:" + AdminConsolePaths.SESSION_NEW + "?logout=true";
     }
 
     private boolean isAdminConfigured() {

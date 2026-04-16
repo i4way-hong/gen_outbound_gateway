@@ -11,4 +11,12 @@ public record PersonAgentLoginCodeRequest(
         @Schema(description = "AgentLogin 코드 목록", example = "[\"1001\",\"1002\"]")
         List<String> loginCodes
 ) {
+        public PersonAgentLoginCodeRequest {
+                loginCodes = loginCodes == null ? List.of() : List.copyOf(loginCodes);
+        }
+
+        @Override
+        public List<String> loginCodes() {
+                return List.copyOf(loginCodes);
+        }
 }

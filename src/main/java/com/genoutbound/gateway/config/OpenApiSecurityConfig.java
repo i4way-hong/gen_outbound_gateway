@@ -1,5 +1,6 @@
 package com.genoutbound.gateway.config;
 
+import com.genoutbound.gateway.config.policy.BlockedApiPolicy;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import java.util.ArrayList;
@@ -18,6 +19,12 @@ import org.springframework.context.annotation.Configuration;
 )
 public class OpenApiSecurityConfig {
 
+    private final BlockedApiPolicy blockedApiPolicy;
+
+    public OpenApiSecurityConfig(BlockedApiPolicy blockedApiPolicy) {
+        this.blockedApiPolicy = blockedApiPolicy;
+    }
+
     @Bean
     public OpenApiCustomizer hideBlockedApisCustomizer() {
         return openApi -> {
@@ -27,10 +34,7 @@ public class OpenApiSecurityConfig {
 
             List<String> toRemove = new ArrayList<>();
             openApi.getPaths().keySet().forEach(path -> {
-                if ("/api/status".equals(path)
-                        || path.startsWith("/api/v1/configuration")
-                        || path.startsWith("/api/v1/crypto")
-                        || path.startsWith("/api/v1/outbound")) {
+                if (blockedApiPolicy.isBlockedApiPath(path)) {
                     toRemove.add(path);
                 }
             });

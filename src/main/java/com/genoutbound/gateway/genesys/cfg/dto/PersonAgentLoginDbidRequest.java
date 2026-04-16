@@ -12,4 +12,12 @@ public record PersonAgentLoginDbidRequest(
         @Schema(description = "AgentLogin 코드 목록(Deprecated: DBID 대신 코드 사용)", example = "[\"1001\",\"1002\"]")
         List<String> loginCodes
 ) {
+        public PersonAgentLoginDbidRequest {
+                loginCodes = loginCodes == null ? List.of() : List.copyOf(loginCodes);
+        }
+
+        @Override
+        public List<String> loginCodes() {
+                return List.copyOf(loginCodes);
+        }
 }

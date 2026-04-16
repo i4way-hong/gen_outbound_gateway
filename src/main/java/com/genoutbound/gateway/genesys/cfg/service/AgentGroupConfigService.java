@@ -7,6 +7,7 @@ import com.genesyslab.platform.applicationblocks.com.objects.CfgPerson;
 import com.genesyslab.platform.applicationblocks.com.queries.CfgAgentGroupQuery;
 import com.genesyslab.platform.configuration.protocol.types.CfgObjectState;
 import com.genoutbound.gateway.core.ApiException;
+import com.genoutbound.gateway.core.logging.SensitiveLogMasker;
 import com.genoutbound.gateway.genesys.cfg.dto.AgentGroupAssignEmployeeRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.AgentGroupAssignPersonRequest;
 import com.genoutbound.gateway.genesys.cfg.dto.AgentGroupMemberSummary;
@@ -99,7 +100,7 @@ public class AgentGroupConfigService extends GenesysConfigSupport {
     }
 
     public AgentGroupSummary createAgentGroup(AgentGroupRequest request) {
-        log.debug("createAgentGroup 요청: {}", request);
+    log.debug("createAgentGroup 요청: {}", SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         AgentGroupSummary result = configClient.withConfService(service -> {
             try {
@@ -128,7 +129,7 @@ public class AgentGroupConfigService extends GenesysConfigSupport {
     }
 
     public AgentGroupSummary updateAgentGroup(int groupDbid, AgentGroupRequest request) {
-        log.debug("updateAgentGroup 요청: groupDbid={}, request={}", groupDbid, request);
+    log.debug("updateAgentGroup 요청: groupDbid={}, payload={}", groupDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         AgentGroupSummary result = configClient.withConfService(service -> {
             try {
@@ -161,7 +162,7 @@ public class AgentGroupConfigService extends GenesysConfigSupport {
     }
 
     public AgentGroupSummary assignAgentGroupByEmployeeIds(int groupDbid, AgentGroupAssignEmployeeRequest request) {
-        log.debug("assignAgentGroupByEmployeeIds 요청: groupDbid={}, request={}", groupDbid, request);
+    log.debug("assignAgentGroupByEmployeeIds 요청: groupDbid={}, payload={}", groupDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         AgentGroupSummary result = configClient.withConfService(service -> {
             try {
@@ -190,7 +191,7 @@ public class AgentGroupConfigService extends GenesysConfigSupport {
     }
 
     public AgentGroupSummary assignAgentGroupByPersonDbids(int groupDbid, AgentGroupAssignPersonRequest request) {
-        log.debug("assignAgentGroupByPersonDbids 요청: groupDbid={}, request={}", groupDbid, request);
+    log.debug("assignAgentGroupByPersonDbids 요청: groupDbid={}, payload={}", groupDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         AgentGroupSummary result = configClient.withConfService(service -> {
             try {
@@ -219,7 +220,7 @@ public class AgentGroupConfigService extends GenesysConfigSupport {
     }
 
     public AgentGroupSummary unassignAgentGroupByEmployeeIds(int groupDbid, AgentGroupAssignEmployeeRequest request) {
-        log.debug("unassignAgentGroupByEmployeeIds 요청: groupDbid={}, request={}", groupDbid, request);
+    log.debug("unassignAgentGroupByEmployeeIds 요청: groupDbid={}, payload={}", groupDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         AgentGroupSummary result = configClient.withConfService(service -> {
             try {
@@ -250,7 +251,7 @@ public class AgentGroupConfigService extends GenesysConfigSupport {
     }
 
     public AgentGroupSummary unassignAgentGroupByPersonDbids(int groupDbid, AgentGroupAssignPersonRequest request) {
-        log.debug("unassignAgentGroupByPersonDbids 요청: groupDbid={}, request={}", groupDbid, request);
+    log.debug("unassignAgentGroupByPersonDbids 요청: groupDbid={}, payload={}", groupDbid, SensitiveLogMasker.masked(request));
         int resolvedTenant = resolveTenantDbid(request.tenantDbid());
         AgentGroupSummary result = configClient.withConfService(service -> {
             try {

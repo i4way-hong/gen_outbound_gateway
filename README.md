@@ -190,7 +190,6 @@ $env:ENV_FILE="./scripts/config/.env.prod"
 - `GENESYS_SCS_ENDPOINT_B`, `GENESYS_SCS_IP_B`, `GENESYS_SCS_PORT_B`
 - `GENESYS_SCS_CLIENT_NAME`, `GENESYS_SCS_CLIENT_ID`
 - `GENESYS_SCS_USERNAME`, `GENESYS_SCS_CHARSET`
-- `SCS_SSE_EMITTER_TIMEOUT_MS`, `SCS_SSE_HEARTBEAT_MS`
 
 ## API 요약
 
@@ -222,14 +221,6 @@ $env:ENV_FILE="./scripts/config/.env.prod"
 - `/dial/stop`
 - `/health`
 
-### Outbound Desktop API (`/api/v1/outbound/desktop`)
-
-- `/add-record`, `/add-record/send`
-- `/add-record/ack`, `/add-record/ack/send`
-- `/do-not-call`, `/do-not-call/send`
-- `/do-not-call/ack`, `/do-not-call/ack/send`
-- `/events`, `/events/clear`
-
 ### Stat / Voice / SCS / Crypto
 
 - `POST /api/v1/stat/getSkillGrpStat`
@@ -237,9 +228,6 @@ $env:ENV_FILE="./scripts/config/.env.prod"
 - `POST /api/v1/voice/ready`
 - `POST /api/v1/voice/notReady`
 - `POST /api/v1/voice/checkStatus`
-- `GET /api/v1/scs/app-status/stream`
-- `POST /api/v1/scs/app-status`
-- `GET /api/v1/scs/metrics`
 - `POST /api/v1/crypto/encrypt`
 - `POST /api/v1/crypto/decrypt`
 
@@ -255,6 +243,27 @@ $env:ENV_FILE="./scripts/config/.env.prod"
 - Config Server 클라이언트는 싱글톤 연결 + 주기적 헬스체크(`GENESYS_CFG_HEALTH_CHECK_INTERVAL_MS`)를 사용합니다.
 - Outbound/Stat/T-Server는 요청 시 연결(per-request) 패턴 기반으로 동작합니다.
 - 통합 상태는 `GET /api/status`에서 확인할 수 있습니다.
+
+## Timeout/Retry 프로파일 가이드 (P3)
+
+애플리케이션은 기동 시 timeout/retry 설정값을 fail-fast로 검증합니다.
+
+- `app.genesys.addp-client-timeout`, `app.genesys.addp-server-timeout`: `1..300`
+- `app.genesys.health-check-interval-ms`: `1000..600000`
+- `app.stat.timeout-ms`: `100..120000`
+- `app.stat.delay-ms`: `0..10000`
+- `app.stat.addp-client-timeout`, `app.stat.addp-server-timeout`: `1..300`
+- `app.tserver.addp-client-timeout`, `app.tserver.addp-server-timeout`: `1..300`
+
+권장값(초기 운영 기준):
+
+| 항목 | local | stage | prod |
+| --- | ---: | ---: | ---: |
+| `GENESYS_CFG_ADDP_CLIENT_TIMEOUT` / `SERVER_TIMEOUT` | 5 | 5 | 5 |
+| `GENESYS_CFG_HEALTH_CHECK_INTERVAL_MS` | 30000 | 60000 | 120000 |
+| `GENESYS_STAT_TIMEOUT_MS` | 5000 | 5000 | 5000 |
+| `GENESYS_STAT_DELAY_MS` | 200 | 200 | 200 |
+| `GENESYS_TSERVER_ADDP_CLIENT_TIMEOUT` / `SERVER_TIMEOUT` | 10 | 10 | 10 |
 
 ## 빌드/검증
 

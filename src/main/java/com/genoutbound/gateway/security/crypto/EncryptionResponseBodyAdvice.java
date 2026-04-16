@@ -3,6 +3,7 @@ package com.genoutbound.gateway.security.crypto;
 import com.genoutbound.gateway.config.EncryptionProperties;
 import com.genoutbound.gateway.genesys.cfg.web.ConfigurationApiController;
 import com.genoutbound.gateway.web.annotation.CccEncryptedController;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -17,17 +18,21 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 @ControllerAdvice
 public class EncryptionResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 
-    private final EncryptionProperties properties;
+    private final boolean encryptionEnabled;
+    private final String encryptionKey;
+    private final String encryptionIv;
     private final ObjectMapper objectMapper;
 
     public EncryptionResponseBodyAdvice(EncryptionProperties properties, ObjectMapper objectMapper) {
-        this.properties = properties;
-        this.objectMapper = objectMapper;
+        this.encryptionEnabled = properties.isEnabled();
+        this.encryptionKey = properties.getKey();
+        this.encryptionIv = properties.getIv();
+        this.objectMapper = objectMapper.copy();
     }
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-        if (!properties.isEnabled()) {
+        if (!encryptionEnabled) {
             return false;
         }
         return AnnotatedElementUtils.hasAnnotation(returnType.getContainingClass(),
@@ -45,9 +50,9 @@ public class EncryptionResponseBodyAdvice implements ResponseBodyAdvice<Object> 
         }
         try {
             String json = objectMapper.writeValueAsString(body);
-            String encrypted = Aes256.encrypt(json, properties.getKey(), properties.getIv());
+            String encrypted = Aes256.encrypt(json, encryptionKey, encryptionIv);
             return Map.of("encData", encrypted);
-        } catch (Exception ex) {
+        } catch (JsonProcessingException | IllegalStateException ex) {
             throw new IllegalStateException("응답 암호화 실패", ex);
         }
     }

@@ -21,7 +21,6 @@ public class ScsProperties {
     private Server primary = new Server();
     private Server backup = new Server();
     private List<Integer> applications = new ArrayList<>();
-    private Sse sse = new Sse();
 
     public boolean isEnabled() {
         return enabled;
@@ -112,35 +111,38 @@ public class ScsProperties {
     }
 
     public Server getPrimary() {
-        return primary;
+        return copyServer(primary);
     }
 
     public void setPrimary(Server primary) {
-        this.primary = primary;
+        this.primary = copyServer(primary);
     }
 
     public Server getBackup() {
-        return backup;
+        return copyServer(backup);
     }
 
     public void setBackup(Server backup) {
-        this.backup = backup;
+        this.backup = copyServer(backup);
     }
 
     public List<Integer> getApplications() {
-        return applications;
+        return applications == null ? null : List.copyOf(applications);
     }
 
     public void setApplications(List<Integer> applications) {
-        this.applications = applications;
+        this.applications = applications == null ? null : List.copyOf(applications);
     }
 
-    public Sse getSse() {
-        return sse;
-    }
-
-    public void setSse(Sse sse) {
-        this.sse = sse;
+    private static Server copyServer(Server source) {
+        if (source == null) {
+            return null;
+        }
+        Server copy = new Server();
+        copy.setEndpoint(source.getEndpoint());
+        copy.setIp(source.getIp());
+        copy.setPort(source.getPort());
+        return copy;
     }
 
     public static class Server {
@@ -173,24 +175,4 @@ public class ScsProperties {
         }
     }
 
-    public static class Sse {
-        private long emitterTimeoutMs = 0;
-        private long heartbeatMs = 25000;
-
-        public long getEmitterTimeoutMs() {
-            return emitterTimeoutMs;
-        }
-
-        public void setEmitterTimeoutMs(long emitterTimeoutMs) {
-            this.emitterTimeoutMs = emitterTimeoutMs;
-        }
-
-        public long getHeartbeatMs() {
-            return heartbeatMs;
-        }
-
-        public void setHeartbeatMs(long heartbeatMs) {
-            this.heartbeatMs = heartbeatMs;
-        }
-    }
 }

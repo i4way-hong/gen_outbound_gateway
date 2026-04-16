@@ -26,4 +26,25 @@ public record CampaignSummary(
         @Schema(description = "캠페인 그룹 상세 목록")
         List<CampaignGroupSummary> campaignGroups
 ) {
+
+        public CampaignSummary {
+                callingLists = callingLists == null ? List.of() : List.copyOf(callingLists);
+                userProperties = userProperties == null ? Map.of() : Map.copyOf(userProperties);
+                campaignGroups = campaignGroups == null ? List.of() : List.copyOf(campaignGroups);
+        }
+
+        @Override
+        public List<CallingListDetailSummary> callingLists() {
+                return List.copyOf(callingLists);
+        }
+
+        @Override
+        public Map<String, Object> userProperties() {
+                return Map.copyOf(userProperties);
+        }
+
+        @Override
+        public List<CampaignGroupSummary> campaignGroups() {
+                return List.copyOf(campaignGroups);
+        }
 }

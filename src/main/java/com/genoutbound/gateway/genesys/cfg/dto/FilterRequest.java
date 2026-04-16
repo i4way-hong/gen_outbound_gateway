@@ -1,6 +1,7 @@
 package com.genoutbound.gateway.genesys.cfg.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serializable;
 
 public record FilterRequest(
         @Schema(description = "테넌트 DBID", example = "101")
@@ -18,5 +19,24 @@ public record FilterRequest(
         java.util.Map<String, java.util.Map<String, String>> userProperties,
         @Schema(description = "활성화 여부", example = "true")
         boolean enabled
-) {
+) implements Serializable {
+
+        public FilterRequest {
+                userProperties = copyNestedMap(userProperties);
+        }
+
+        @Override
+        public java.util.Map<String, java.util.Map<String, String>> userProperties() {
+                return copyNestedMap(userProperties);
+        }
+
+        private static java.util.Map<String, java.util.Map<String, String>> copyNestedMap(
+                        java.util.Map<String, java.util.Map<String, String>> source) {
+                if (source == null) {
+                        return null;
+                }
+                java.util.Map<String, java.util.Map<String, String>> copy = new java.util.HashMap<>();
+                source.forEach((key, value) -> copy.put(key, value == null ? null : java.util.Map.copyOf(value)));
+                return java.util.Map.copyOf(copy);
+        }
 }
