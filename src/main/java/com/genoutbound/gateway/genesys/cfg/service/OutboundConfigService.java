@@ -76,6 +76,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 log.debug("listCallingLists 응답: count={}", summaries.size());
                 return summaries;
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "콜링리스트 조회 실패");
             }
         });
@@ -95,6 +96,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 }
                 return summaries;
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Filter 조회 실패");
             }
         });
@@ -116,6 +118,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 }
                 return toFilterSummary(filter);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Filter 조회 실패");
             }
         });
@@ -137,6 +140,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 }
                 return toFilterSummary(filter);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Filter 조회 실패");
             }
         });
@@ -171,6 +175,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 filter.save();
                 return toFilterSummary(filter);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Filter 생성 실패");
             }
         });
@@ -201,6 +206,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 filter.save();
                 return toFilterSummary(filter);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Filter 수정 실패");
             }
         });
@@ -223,6 +229,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 filter.delete();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Filter 삭제 실패");
             }
         });
@@ -243,6 +250,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 }
                 return summaries;
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Format 조회 실패");
             }
         });
@@ -264,6 +272,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 }
                 return toFormatSummary(format);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Format 조회 실패");
             }
         });
@@ -285,6 +294,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 }
                 return toFormatSummary(format);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Format 조회 실패");
             }
         });
@@ -308,6 +318,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 log.debug("getCallingList 응답: {}", summary);
                 return summary;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "콜링리스트 조회 실패");
             }
         });
@@ -329,6 +340,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 log.debug("getCallingListByName 응답: {}", summary);
                 return summary;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "콜링리스트 조회 실패");
             }
         });
@@ -384,6 +396,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 log.debug("createCallingList 응답: {}", summary);
                 return summary;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "콜링리스트 생성 실패");
             }
         });
@@ -437,6 +450,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 log.debug("updateCallingList 응답: {}", summary);
                 return summary;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "콜링리스트 수정 실패");
             }
         });
@@ -458,6 +472,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 log.debug("deleteCallingList 완료: callingListDbid={}", callingListDbid);
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "콜링리스트 삭제 실패");
             }
         });
@@ -477,6 +492,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 }
                 return toTableAccessSummary(tableAccess);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "TableAccess 조회 실패");
             }
         });
@@ -498,6 +514,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 }
                 return toTableAccessSummary(tableAccess);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "TableAccess 조회 실패");
             }
         });
@@ -519,6 +536,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 }
                 return summaries;
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "TableAccess 목록 조회 실패");
             }
         });
@@ -541,6 +559,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 }
                 return toTreatmentSummary(treatment);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Treatment 조회 실패");
             }
         });
@@ -562,6 +581,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 }
                 return toTreatmentSummary(treatment);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Treatment 조회 실패");
             }
         });
@@ -583,6 +603,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 }
                 return summaries;
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Treatment 목록 조회 실패");
             }
         });
@@ -608,6 +629,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 treatment.save();
                 return toTreatmentSummary(treatment);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Treatment 생성 실패");
             }
         });
@@ -632,6 +654,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 treatment.save();
                 return toTreatmentSummary(treatment);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Treatment 수정 실패");
             }
         });
@@ -654,6 +677,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 treatment.delete();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Treatment 삭제 실패");
             }
         });
@@ -674,6 +698,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 }
                 return summaries;
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "캠페인 조회 실패");
             }
         });
@@ -695,6 +720,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 }
                 return summaries;
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "CampaignGroup 조회 실패");
             }
         });
@@ -716,6 +742,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 }
                 return toCampaignGroupSummary(group);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "CampaignGroup 조회 실패");
             }
         });
@@ -737,6 +764,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 }
                 return toCampaignGroupSummary(group);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "CampaignGroup 조회 실패");
             }
         });
@@ -762,6 +790,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 group.save();
                 return toCampaignGroupSummary(group);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "CampaignGroup 생성 실패");
             }
         });
@@ -786,6 +815,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 group.save();
                 return toCampaignGroupSummary(group);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "CampaignGroup 수정 실패");
             }
         });
@@ -808,6 +838,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 group.delete();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "CampaignGroup 삭제 실패");
             }
         });
@@ -828,6 +859,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 }
                 return toCampaignSummary(service, campaign);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "캠페인 조회 실패");
             }
         });
@@ -849,6 +881,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 }
                 return toCampaignSummary(service, campaign);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "캠페인 조회 실패");
             }
         });
@@ -885,6 +918,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 campaign.save();
                 return toCampaignSummary(service, campaign);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "캠페인 생성 실패");
             }
         });
@@ -969,6 +1003,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 campaign.save();
                 return toCampaignSummary(service, campaign);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "캠페인 수정 실패");
             }
         });
@@ -991,6 +1026,7 @@ public class OutboundConfigService extends GenesysConfigSupport {
                 campaign.delete();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "캠페인 삭제 실패");
             }
         });

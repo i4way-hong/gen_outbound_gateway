@@ -75,6 +75,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 }
                 return summaries;
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "DN 조회 실패");
             }
         });
@@ -96,6 +97,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 }
                 return summaries;
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "DNGroup 조회 실패");
             }
         });
@@ -117,6 +119,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 }
                 return new DnGroupSummary(group.getDBID(), group.getGroupInfo().getName(), null);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "DNGroup 조회 실패");
             }
         });
@@ -138,6 +141,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 }
                 return new DnGroupSummary(group.getDBID(), group.getGroupInfo().getName(), null);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "DNGroup 조회 실패");
             }
         });
@@ -164,6 +168,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 group.save();
                 return new DnGroupSummary(group.getDBID(), group.getGroupInfo().getName(), null);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "DNGroup 생성 실패");
             }
         });
@@ -186,6 +191,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 group.delete();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "DNGroup 삭제 실패");
             }
         });
@@ -207,6 +213,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 return new DnSummary(dn.getDBID(), dn.getNumber(), dn.getName(), dn.getType().name(),
                         dn.getState() == CfgObjectState.CFGEnabled);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "DN 조회 실패");
             }
         });
@@ -229,6 +236,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 return new DnSummary(dn.getDBID(), dn.getNumber(), dn.getName(), dn.getType().name(),
                         dn.getState() == CfgObjectState.CFGEnabled);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "DN 조회 실패");
             }
         });
@@ -271,6 +279,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 return new DnSummary(dn.getDBID(), dn.getNumber(), dn.getName(), dn.getType().name(),
                         dn.getState() == CfgObjectState.CFGEnabled);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "DN 생성 실패");
             }
         });
@@ -307,6 +316,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 return new DnSummary(dn.getDBID(), dn.getNumber(), dn.getName(), dn.getType().name(),
                         dn.getState() == CfgObjectState.CFGEnabled);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "DN 수정 실패");
             }
         });
@@ -329,6 +339,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 dn.delete();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "DN 삭제 실패");
             }
         });
@@ -369,6 +380,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 dn.save();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "DN DialPlan 설정 실패");
             }
         });
@@ -406,6 +418,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 dn.save();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "DN TServer 옵션 설정 실패");
             }
         });
@@ -428,6 +441,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 }
                 return summaries;
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "트랜잭션 조회 실패");
             }
         });
@@ -450,6 +464,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 return new TransactionSummary(transaction.getDBID(), transaction.getName(), transaction.getAlias(),
                         transaction.getType().name(), transaction.getState() == CfgObjectState.CFGEnabled);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "트랜잭션 조회 실패");
             }
         });
@@ -472,6 +487,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 return new TransactionSummary(transaction.getDBID(), transaction.getName(), transaction.getAlias(),
                         transaction.getType().name(), transaction.getState() == CfgObjectState.CFGEnabled);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "트랜잭션 조회 실패");
             }
         });
@@ -500,6 +516,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 return new TransactionSummary(transaction.getDBID(), transaction.getName(), transaction.getAlias(),
                         transaction.getType().name(), transaction.getState() == CfgObjectState.CFGEnabled);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "트랜잭션 생성 실패");
             }
         });
@@ -527,6 +544,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 return new TransactionSummary(transaction.getDBID(), transaction.getName(), transaction.getAlias(),
                         transaction.getType().name(), transaction.getState() == CfgObjectState.CFGEnabled);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "트랜잭션 수정 실패");
             }
         });
@@ -549,6 +567,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 transaction.delete();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "트랜잭션 삭제 실패");
             }
         });
@@ -570,6 +589,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 transaction.save();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "트랜잭션 섹션 추가 실패");
             }
         });
@@ -596,6 +616,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 transaction.save();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "트랜잭션 섹션 수정 실패");
             }
         });
@@ -614,6 +635,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 transaction.save();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "트랜잭션 섹션 삭제 실패");
             }
         });
@@ -633,6 +655,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 transaction.save();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "트랜잭션 옵션 추가 실패");
             }
         });
@@ -652,6 +675,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 transaction.save();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "트랜잭션 옵션 수정 실패");
             }
         });
@@ -670,6 +694,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 transaction.save();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "트랜잭션 옵션 삭제 실패");
             }
         });
@@ -698,6 +723,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 transaction.save();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "트랜잭션 옵션 저장 실패");
             }
         });
@@ -719,6 +745,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 }
                 return summaries;
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Place 조회 실패");
             }
         });
@@ -740,6 +767,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 }
                 return summaries;
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "PlaceGroup 조회 실패");
             }
         });
@@ -761,6 +789,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 }
                 return new PlaceGroupSummary(group.getDBID(), group.getGroupInfo().getName());
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "PlaceGroup 조회 실패");
             }
         });
@@ -782,6 +811,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 }
                 return new PlaceGroupSummary(group.getDBID(), group.getGroupInfo().getName());
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "PlaceGroup 조회 실패");
             }
         });
@@ -808,6 +838,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 group.save();
                 return new PlaceGroupSummary(group.getDBID(), group.getGroupInfo().getName());
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "PlaceGroup 생성 실패");
             }
         });
@@ -830,6 +861,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 group.delete();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "PlaceGroup 삭제 실패");
             }
         });
@@ -851,6 +883,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 int dnCount = place.getDNs() == null ? 0 : place.getDNs().size();
                 return new PlaceSummary(place.getDBID(), place.getName(), dnCount);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Place 조회 실패");
             }
         });
@@ -873,6 +906,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 int dnCount = place.getDNs() == null ? 0 : place.getDNs().size();
                 return new PlaceSummary(place.getDBID(), place.getName(), dnCount);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Place 조회 실패");
             }
         });
@@ -900,6 +934,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 int dnCount = place.getDNs() == null ? 0 : place.getDNs().size();
                 return new PlaceSummary(place.getDBID(), place.getName(), dnCount);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Place 생성 실패");
             }
         });
@@ -926,6 +961,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 int dnCount = place.getDNs() == null ? 0 : place.getDNs().size();
                 return new PlaceSummary(place.getDBID(), place.getName(), dnCount);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Place 수정 실패");
             }
         });
@@ -948,6 +984,7 @@ public class RoutingConfigService extends GenesysConfigSupport {
                 place.delete();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Place 삭제 실패");
             }
         });

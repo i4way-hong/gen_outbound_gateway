@@ -7,6 +7,14 @@ chcp 65001 >nul
 
 if "%SPRING_PROFILES_ACTIVE%"=="" set SPRING_PROFILES_ACTIVE=prod
 
+if "%SPRING_CONFIG_ADDITIONAL_LOCATION%"=="" set SPRING_CONFIG_ADDITIONAL_LOCATION=optional:file:./scripts/config/
+
+if exist "scripts\config\.env.%SPRING_PROFILES_ACTIVE%" (
+  for /f "usebackq tokens=1,* delims==" %%A in (`findstr /R "^[A-Za-z_][A-Za-z0-9_]*=.*" "scripts\config\.env.%SPRING_PROFILES_ACTIVE%"`) do (
+    set "%%A=%%B"
+  )
+)
+
 if "%LOGBACK_CONFIG_PATH%"=="" set LOGBACK_CONFIG_PATH=./scripts/config/logback-spring.xml
 if "%LOG_DIR%"=="" set LOG_DIR=./logs
 

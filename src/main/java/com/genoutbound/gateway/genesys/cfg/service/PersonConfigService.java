@@ -56,6 +56,7 @@ public class PersonConfigService extends GenesysConfigSupport {
                 }
                 return summaries;
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "상담사 목록 조회 실패");
             }
         });
@@ -70,6 +71,7 @@ public class PersonConfigService extends GenesysConfigSupport {
             try {
                 return toSummary(getPersonByDbid(service, resolvedTenant, personDbid));
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "상담사 조회 실패");
             }
         });
@@ -91,6 +93,7 @@ public class PersonConfigService extends GenesysConfigSupport {
                 }
                 return toSummary(person);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "상담사 조회 실패");
             }
         });
@@ -123,6 +126,7 @@ public class PersonConfigService extends GenesysConfigSupport {
                 assignPersonToAgentGroups(service, resolvedTenant, person, request.agentGroupNames());
                 return toSummary(person);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "상담사 생성 실패");
             }
         });
@@ -147,6 +151,7 @@ public class PersonConfigService extends GenesysConfigSupport {
                 assignPersonToAgentGroups(service, resolvedTenant, person, request.agentGroupNames());
                 return toSummary(person);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "상담사 수정 실패");
             }
         });
@@ -163,6 +168,7 @@ public class PersonConfigService extends GenesysConfigSupport {
                 person.delete();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "상담사 삭제 실패");
             }
         });
@@ -197,6 +203,7 @@ public class PersonConfigService extends GenesysConfigSupport {
                 person.save();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "AgentLogin 연결 실패");
             }
         });
@@ -221,6 +228,7 @@ public class PersonConfigService extends GenesysConfigSupport {
                 person.save();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "AgentLogin 해제 실패");
             }
         });
@@ -249,6 +257,7 @@ public class PersonConfigService extends GenesysConfigSupport {
                 person.save();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "상담사 스킬 설정 실패");
             }
         });
@@ -283,6 +292,7 @@ public class PersonConfigService extends GenesysConfigSupport {
                 person.save();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "상담사 스킬 삭제 실패");
             }
         });

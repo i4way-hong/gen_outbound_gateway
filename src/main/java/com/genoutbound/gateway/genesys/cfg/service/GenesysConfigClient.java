@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
@@ -97,11 +96,14 @@ public class GenesysConfigClient {
     /**
      * Config Server 상태를 주기적으로 점검합니다.
      */
-    @Scheduled(fixedDelayString = "${app.genesys.health-check-interval-ms:30000}")
     public void healthCheck() {
         log.debug("healthCheck 요청");
         if (!properties.isEnabled()) {
             log.debug("healthCheck 중단: genesys 비활성화");
+            return;
+        }
+        if (!properties.isHealthCheckEnabled()) {
+            log.debug("healthCheck 중단: health-check-enabled=false");
             return;
         }
         synchronized (connectionLock) {
@@ -133,6 +135,14 @@ public class GenesysConfigClient {
             protocol.setClientApplicationType(CfgAppType.CFGSCE.ordinal());
             protocol.setUserName(properties.getUsername());
             protocol.setUserPassword(properties.getPassword());
+            // set request timeout to avoid indefinite blocking when server is slow/unreachable
+            try {
+                protocol.setTimeout(properties.getRequestTimeoutMs());
+                log.debug("protocol timeout set to {} ms", properties.getRequestTimeoutMs());
+            } catch (Throwable t) {
+                // defensive: if the underlying SDK doesn't support timeout setting, continue
+                log.warn("Failed to set protocol timeout: {}", t.toString());
+            }
         }
         if (service == null) {
             service = ConfServiceFactory.createConfService(protocol);
@@ -184,7 +194,7 @@ public class GenesysConfigClient {
                 server.getIp(),
                 server.getPort(),
                 elapsedMs);
-        } catch (ProtocolException | IllegalStateException | InterruptedException ex) {
+        } catch (ProtocolException | IllegalStateException ex) {
             long elapsedMs = Duration.between(startedAt, Instant.now()).toMillis();
             log.warn("Config Server 연결 실패: role={}, endpoint={}:{}, elapsedMs={}",
                 role,
@@ -193,6 +203,16 @@ public class GenesysConfigClient {
                 elapsedMs,
                 ex);
             throw new GenesysUnavailableException("Config Server 연결 실패", ex);
+        } catch (InterruptedException ex) {
+            long elapsedMs = Duration.between(startedAt, Instant.now()).toMillis();
+            log.warn("Config Server 연결 인터럽트: role={}, endpoint={}:{}, elapsedMs={}",
+                role,
+                server.getIp(),
+                server.getPort(),
+                elapsedMs,
+                ex);
+            Thread.currentThread().interrupt();
+            throw new GenesysUnavailableException("Config Server 연결 중 인터럽트 발생", ex);
         }
     }
 
@@ -212,6 +232,9 @@ public class GenesysConfigClient {
             closeProtocol(protocol);
         } catch (ProtocolException | IllegalStateException | InterruptedException ex) {
             log.warn("Config Protocol 종료 중 오류", ex);
+            if (ex instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
         }
         protocol = null;
     }
@@ -245,6 +268,9 @@ public class GenesysConfigClient {
             closeProtocol(service.getProtocol());
         } catch (ProtocolException | IllegalStateException | InterruptedException ex) {
             log.warn("Config Service 종료 중 오류", ex);
+            if (ex instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
         } finally {
             ConfServiceFactory.releaseConfService(service);
         }

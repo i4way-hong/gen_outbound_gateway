@@ -1,8 +1,6 @@
 spring:
   application:
     name: gen-outbound-gateway
-  profiles:
-    active: ${SPRING_PROFILES_ACTIVE:prod}
   datasource:
     url: ${DB_URL:}
     username: "${DB_USERNAME:}"
@@ -88,6 +86,8 @@ app:
     addp-enabled: ${GENESYS_CFG_ADDP_ENABLED:true}
     addp-client-timeout: ${GENESYS_CFG_ADDP_CLIENT_TIMEOUT:5}
     addp-server-timeout: ${GENESYS_CFG_ADDP_SERVER_TIMEOUT:5}
+    request-timeout-ms: ${GENESYS_CFG_REQUEST_TIMEOUT_MS:10000}
+    health-check-enabled: ${GENESYS_CFG_HEALTH_CHECK_ENABLED:false}
     health-check-interval-ms: ${GENESYS_CFG_HEALTH_CHECK_INTERVAL_MS:600000}
   stat:
     enabled: ${GENESYS_STAT_ENABLED:true}

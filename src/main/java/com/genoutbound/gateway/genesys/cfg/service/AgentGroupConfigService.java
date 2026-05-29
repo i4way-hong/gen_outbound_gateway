@@ -52,6 +52,7 @@ public class AgentGroupConfigService extends GenesysConfigSupport {
                 }
                 return summaries;
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "그룹 목록 조회 실패");
             }
         });
@@ -67,6 +68,7 @@ public class AgentGroupConfigService extends GenesysConfigSupport {
                 CfgAgentGroup group = getAgentGroupByDbid(service, resolvedTenant, groupDbid);
                 return toAgentGroupSummary(group, true);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "그룹 조회 실패");
             }
         });
@@ -92,6 +94,7 @@ public class AgentGroupConfigService extends GenesysConfigSupport {
                 }
                 return summaries;
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "그룹 조회 실패");
             }
         });
@@ -121,6 +124,7 @@ public class AgentGroupConfigService extends GenesysConfigSupport {
 
                 return toAgentGroupSummary(group, true);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "그룹 생성 실패");
             }
         });
@@ -139,6 +143,7 @@ public class AgentGroupConfigService extends GenesysConfigSupport {
                 group.save();
                 return toAgentGroupSummary(group, true);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "그룹 수정 실패");
             }
         });
@@ -155,6 +160,7 @@ public class AgentGroupConfigService extends GenesysConfigSupport {
                 group.delete();
                 return null;
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "그룹 삭제 실패");
             }
         });
@@ -183,6 +189,7 @@ public class AgentGroupConfigService extends GenesysConfigSupport {
                 group.save();
                 return toAgentGroupSummary(group, true);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "그룹 배치 실패");
             }
         });
@@ -212,6 +219,7 @@ public class AgentGroupConfigService extends GenesysConfigSupport {
                 group.save();
                 return toAgentGroupSummary(group, true);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "그룹 배치 실패");
             }
         });
@@ -243,6 +251,7 @@ public class AgentGroupConfigService extends GenesysConfigSupport {
                 group.save();
                 return toAgentGroupSummary(group, true);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "그룹 배치 해제 실패");
             }
         });
@@ -274,6 +283,7 @@ public class AgentGroupConfigService extends GenesysConfigSupport {
                 group.save();
                 return toAgentGroupSummary(group, true);
             } catch (ConfigException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "그룹 배치 해제 실패");
             }
         });

@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -26,6 +27,13 @@ import jakarta.annotation.PostConstruct;
 @EnableMethodSecurity
 @EnableConfigurationProperties(SecurityProperties.class)
 public class SecurityConfig {
+
+    private static final String[] PUBLIC_ENDPOINTS = {
+        "/", "/favicon.ico", "/css/**", "/js/**", "/images/**", "/actuator/health", "/error",
+        "/auth/login", "/auth/refresh", "/auth/logout"
+    };
+
+    private static final String[] SWAGGER_ENDPOINTS = {"/swagger-ui/**", "/v3/api-docs/**"};
 
     private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
 
@@ -55,7 +63,22 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter) throws Exception {
         http.csrf(csrf -> csrf.disable());
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+        configureExceptionHandling(http);
 
+        if (isInsecureSecurityMode()) {
+            validateInsecureModeAllowed();
+            configureInsecureAuthorization(http);
+            return http.build();
+        }
+
+        configureSecureAuthorization(http);
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(adminSessionAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+    private void configureExceptionHandling(HttpSecurity http) throws Exception {
         http.exceptionHandling(exception -> exception
             .authenticationEntryPoint((request, response, authException) -> {
                 if (isBlockedPath(request)) {
@@ -80,79 +103,98 @@ public class SecurityConfig {
                 }
                 response.sendError(org.springframework.http.HttpStatus.FORBIDDEN.value(), "Forbidden");
             }));
+    }
 
-        if (!securityProperties.isAuthEnabled() || !securityProperties.isJwtEnabled()) {
-            if (!securityProperties.isAuthEnabled()) {
-                log.warn("인증이 비활성화되어 모든 요청을 허용합니다. app.security.auth-enabled=true 설정 필요.");
-            }
-            if (!securityProperties.isJwtEnabled()) {
-                log.warn("JWT 인증이 비활성화되어 모든 요청을 허용합니다. app.security.jwt-enabled=true 설정 필요.");
-            }
-            if (!securityProperties.isAllowInsecure()) {
-                throw new IllegalStateException("보안 설정이 비활성화되었습니다. app.security.allow-insecure=true 설정 시에만 허용됩니다.");
-            }
-            http.authorizeHttpRequests(auth -> auth
-                .requestMatchers(blockedApiPolicy.blockedPatternsArray()).denyAll()
-                .anyRequest().permitAll());
-            return http.build();
+    private boolean isInsecureSecurityMode() {
+        return !securityProperties.isAuthEnabled() || !securityProperties.isJwtEnabled();
+    }
+
+    private void validateInsecureModeAllowed() {
+        if (!securityProperties.isAuthEnabled()) {
+            log.warn("인증이 비활성화되어 모든 요청을 허용합니다. app.security.auth-enabled=true 설정 필요.");
         }
+        if (!securityProperties.isJwtEnabled()) {
+            log.warn("JWT 인증이 비활성화되어 모든 요청을 허용합니다. app.security.jwt-enabled=true 설정 필요.");
+        }
+        if (!securityProperties.isAllowInsecure()) {
+            throw new IllegalStateException("보안 설정이 비활성화되었습니다. app.security.allow-insecure=true 설정 시에만 허용됩니다.");
+        }
+    }
 
+    private void configureInsecureAuthorization(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(auth -> auth
+            .requestMatchers(blockedApiPolicy.blockedPatternsArray()).denyAll()
+            .anyRequest().permitAll());
+    }
+
+    private void configureSecureAuthorization(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth -> {
-        auth.requestMatchers(blockedApiPolicy.blockedPatternsArray())
-            .denyAll();
+            auth.requestMatchers(blockedApiPolicy.blockedPatternsArray())
+                .denyAll();
 
-        auth.requestMatchers("/", "/favicon.ico", "/css/**", "/js/**", "/images/**", "/actuator/health", "/error",
-            "/auth/login", "/auth/refresh", "/auth/logout")
+            auth.requestMatchers(PUBLIC_ENDPOINTS)
                 .permitAll();
 
-            if (securityProperties.isAllowSwagger()) {
-                auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
-            } else {
-                auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").hasRole("ADMIN");
-            }
+            configureSwaggerAccess(auth);
 
             if (securityProperties.isAllowCryptoTest()) {
                 log.info("app.security.allow-crypto-test=true 이지만 /api/v1/crypto/** 는 정책에 따라 denyAll 처리됩니다.");
             }
 
-            if (securityProperties.isAllowAdminUi()) {
-                auth.requestMatchers(AdminConsolePaths.SESSION_NEW, AdminConsolePaths.SESSION_END).permitAll();
-                auth.requestMatchers(AdminConsolePaths.WILDCARD)
-                    .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.ADMIN_UI);
-            } else {
-                auth.requestMatchers(AdminConsolePaths.SESSION_NEW, AdminConsolePaths.SESSION_END,
-                    AdminConsolePaths.WILDCARD)
-                    .denyAll();
-            }
+            configureAdminUiAccess(auth);
 
             auth.requestMatchers("/admin/**").denyAll();
 
-            auth.requestMatchers(
-                    "/console/permissions/new",
-                    "/console/permissions/*")
-                .denyAll();
-
-            // auth.requestMatchers("/api/v1/configuration/**")
-            //     .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.CONFIG_READ, PermissionCodes.CONFIG_WRITE);
-
-            // auth.requestMatchers("/api/v1/outbound/**")
-            //     .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.OUTBOUND_READ, PermissionCodes.OUTBOUND_WRITE);
-
-            auth.requestMatchers("/api/v1/stat/**")
-                .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.STAT_READ);
-
-            auth.requestMatchers("/api/v1/voice/**")
-                .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.TSERVER_WRITE);
-
-            auth.requestMatchers("/api/v1/scs/**")
-                .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.SCS_READ);
+            configureApiAuthorization(auth);
 
             auth.anyRequest()
                 .authenticated();
-        }).addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(adminSessionAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        });
+    }
 
-        return http.build();
+    private void configureSwaggerAccess(
+        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
+        if (securityProperties.isAllowSwagger()) {
+            auth.requestMatchers(SWAGGER_ENDPOINTS).permitAll();
+        } else {
+            auth.requestMatchers(SWAGGER_ENDPOINTS).hasRole("ADMIN");
+        }
+    }
+
+    private void configureAdminUiAccess(
+        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
+        if (securityProperties.isAllowAdminUi()) {
+            auth.requestMatchers(AdminConsolePaths.SESSION_NEW, AdminConsolePaths.SESSION_END).permitAll();
+            auth.requestMatchers(AdminConsolePaths.WILDCARD)
+                .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.ADMIN_UI);
+            return;
+        }
+        auth.requestMatchers(AdminConsolePaths.SESSION_NEW, AdminConsolePaths.SESSION_END,
+            AdminConsolePaths.WILDCARD)
+            .denyAll();
+    }
+
+    private void configureApiAuthorization(
+        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
+        auth.requestMatchers(
+                "/console/permissions/new",
+                "/console/permissions/*")
+            .denyAll();
+
+        auth.requestMatchers("/api/v1/configuration/**")
+            .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.CONFIG_READ, PermissionCodes.CONFIG_WRITE);
+
+        auth.requestMatchers("/api/v1/outbound/**")
+            .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.OUTBOUND_READ, PermissionCodes.OUTBOUND_WRITE);
+
+        auth.requestMatchers("/api/v1/stat/**")
+            .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.STAT_READ);
+
+        auth.requestMatchers("/api/v1/voice/**")
+            .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.TSERVER_WRITE);
+
+        auth.requestMatchers("/api/v1/scs/**")
+            .hasAnyAuthority("ROLE_ADMIN", PermissionCodes.SCS_READ);
     }
 
     @Bean

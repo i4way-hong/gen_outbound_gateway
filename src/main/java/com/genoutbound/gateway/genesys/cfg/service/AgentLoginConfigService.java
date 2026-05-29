@@ -67,6 +67,7 @@ public class AgentLoginConfigService extends GenesysConfigSupport {
                 }
                 return summaries;
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "AgentLogin 조회 실패");
             }
         });
@@ -95,6 +96,7 @@ public class AgentLoginConfigService extends GenesysConfigSupport {
                 return new AgentLoginSummary(login.getDBID(), login.getLoginCode(), login.getSwitchDBID(),
                     login.getState() == CfgObjectState.CFGEnabled, isAssignable);
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "AgentLogin 조회 실패");
             }
         });
@@ -120,6 +122,7 @@ public class AgentLoginConfigService extends GenesysConfigSupport {
                 return new AgentLoginSummary(login.getDBID(), login.getLoginCode(), login.getSwitchDBID(),
                     login.getState() == CfgObjectState.CFGEnabled, isAssignable);
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "AgentLogin 조회 실패");
             }
         });
@@ -151,6 +154,7 @@ public class AgentLoginConfigService extends GenesysConfigSupport {
                 return new AgentLoginSummary(login.getDBID(), login.getLoginCode(), login.getSwitchDBID(),
                     login.getState() == CfgObjectState.CFGEnabled, isAssignable);
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "AgentLogin 생성 실패");
             }
         });
@@ -178,6 +182,7 @@ public class AgentLoginConfigService extends GenesysConfigSupport {
                 return new AgentLoginSummary(login.getDBID(), login.getLoginCode(), login.getSwitchDBID(),
                     login.getState() == CfgObjectState.CFGEnabled, isAssignable);
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "AgentLogin 수정 실패");
             }
         });
@@ -210,6 +215,7 @@ public class AgentLoginConfigService extends GenesysConfigSupport {
                 return new AgentLoginSummary(login.getDBID(), login.getLoginCode(), login.getSwitchDBID(),
                     login.getState() == CfgObjectState.CFGEnabled, isAssignable);
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "AgentLogin 수정 실패");
             }
         });
@@ -234,6 +240,7 @@ public class AgentLoginConfigService extends GenesysConfigSupport {
                 login.delete();
                 return null;
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "AgentLogin 삭제 실패");
             }
         });
@@ -260,6 +267,7 @@ public class AgentLoginConfigService extends GenesysConfigSupport {
                 login.delete();
                 return null;
             } catch (ConfigException | InterruptedException ex) {
+                log.error("Genesys ConfigException 발생", ex);
                 throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "AgentLogin 삭제 실패");
             }
         });

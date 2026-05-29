@@ -16,6 +16,8 @@ public class GenesysProperties {
     private boolean addpEnabled = true;
     private int addpClientTimeout = 5;
     private int addpServerTimeout = 5;
+    private int requestTimeoutMs = 10000;
+    private boolean healthCheckEnabled = true;
     private int healthCheckIntervalMs = 30000;
     private ConfigServer primary = new ConfigServer();
     private ConfigServer backup = new ConfigServer();
@@ -108,8 +110,24 @@ public class GenesysProperties {
         this.addpServerTimeout = addpServerTimeout;
     }
 
+    public int getRequestTimeoutMs() {
+        return requestTimeoutMs;
+    }
+
+    public void setRequestTimeoutMs(int requestTimeoutMs) {
+        this.requestTimeoutMs = requestTimeoutMs;
+    }
+
     public int getHealthCheckIntervalMs() {
         return healthCheckIntervalMs;
+    }
+
+    public boolean isHealthCheckEnabled() {
+        return healthCheckEnabled;
+    }
+
+    public void setHealthCheckEnabled(boolean healthCheckEnabled) {
+        this.healthCheckEnabled = healthCheckEnabled;
     }
 
     public void setHealthCheckIntervalMs(int healthCheckIntervalMs) {

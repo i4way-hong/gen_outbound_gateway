@@ -14,6 +14,8 @@ public class BlockedApiPolicy {
     private static final String API_STATUS_PATH = "/api/status";
 
     private static final List<Rule> RULES = List.of(
+        //기본 홈 화면 차단
+        //new Rule("/", MatchType.PATTERN, RuleScope.BLOCKED_API),
         //API 상태(API 서버, Genesys Process) 확인
         new Rule(API_STATUS_PATH, MatchType.PATTERN, RuleScope.BLOCKED_API),
         //암복호화 테스트
@@ -28,23 +30,31 @@ public class BlockedApiPolicy {
         new Rule("/api/v1/configuration/persons", MatchType.PREFIX, RuleScope.BLOCKED_API),
         new Rule("/api/v1/configuration/place-groups", MatchType.PREFIX, RuleScope.BLOCKED_API),
         new Rule("/api/v1/configuration/places", MatchType.PREFIX, RuleScope.BLOCKED_API),
-        new Rule("/api/v1/configuration/transactions", MatchType.PREFIX, RuleScope.BLOCKED_API),
+        new Rule("/api/v1/configuration/transactions", MatchType.PREFIX, RuleScope.BLOCKED_API)
         //outbound
-        new Rule("/api/v1/configuration/batch-create", MatchType.PREFIX, RuleScope.BLOCKED_API),
+        //new Rule("/api/v1/configuration/batch-create", MatchType.PREFIX, RuleScope.BLOCKED_API),
         //new Rule("/api/v1/configuration/calling-lists", MatchType.PREFIX, RuleScope.BLOCKED_API),
-        new Rule("/api/v1/configuration/campaign-groups", MatchType.PREFIX, RuleScope.BLOCKED_API),
-        new Rule("/api/v1/configuration/campaigns", MatchType.PREFIX, RuleScope.BLOCKED_API),
-        new Rule("/api/v1/configuration/filters", MatchType.PREFIX, RuleScope.BLOCKED_API),
-        new Rule("/api/v1/configuration/formats", MatchType.PREFIX, RuleScope.BLOCKED_API),
-        new Rule("/api/v1/configuration/table-access", MatchType.PREFIX, RuleScope.BLOCKED_API),
-        new Rule("/api/v1/configuration/treatment", MatchType.PREFIX, RuleScope.BLOCKED_API)
+        //new Rule("/api/v1/configuration/campaign-groups", MatchType.PREFIX, RuleScope.BLOCKED_API),
+        //new Rule("/api/v1/configuration/campaigns", MatchType.PREFIX, RuleScope.BLOCKED_API),
+        //new Rule("/api/v1/configuration/filters", MatchType.PREFIX, RuleScope.BLOCKED_API),
+        //new Rule("/api/v1/configuration/formats", MatchType.PREFIX, RuleScope.BLOCKED_API),
+        //new Rule("/api/v1/configuration/table-access", MatchType.PREFIX, RuleScope.BLOCKED_API),
+        //new Rule("/api/v1/configuration/treatment", MatchType.PREFIX, RuleScope.BLOCKED_API)
     );
 
     public String[] blockedPatternsArray() {
         return RULES.stream()
-            .filter(rule -> rule.scope() == RuleScope.BLOCKED_API && rule.matchType() == MatchType.PATTERN)
-            .map(Rule::path)
+            .filter(rule -> rule.scope() == RuleScope.BLOCKED_API)
+            .map(this::toRequestMatcherPattern)
+            .distinct()
             .toArray(String[]::new);
+    }
+
+    private String toRequestMatcherPattern(Rule rule) {
+        if (rule.matchType() == MatchType.PATTERN) {
+            return rule.path();
+        }
+        return rule.path().endsWith("/**") ? rule.path() : rule.path() + "/**";
     }
 
     public boolean isBlockedApiPath(HttpServletRequest request) {

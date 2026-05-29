@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,18 +20,15 @@ public class AuthService {
     private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     private final UserDetailsService userDetailsService;
-    private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
     private final TokenRevocationService tokenRevocationService;
     private final TokenVersionService tokenVersionService;
 
     public AuthService(UserDetailsService userDetailsService,
-                       PasswordEncoder passwordEncoder,
                        JwtTokenProvider tokenProvider,
                        TokenRevocationService tokenRevocationService,
                        TokenVersionService tokenVersionService) {
         this.userDetailsService = userDetailsService;
-        this.passwordEncoder = passwordEncoder;
         this.tokenProvider = tokenProvider;
         this.tokenRevocationService = tokenRevocationService;
         this.tokenVersionService = tokenVersionService;
@@ -118,13 +114,11 @@ public class AuthService {
         String normalizedRequestPassword = normalizeBcryptPrefix(request.password());
         String normalizedStoredPassword = normalizeBcryptPrefix(userDetails.getPassword());
 
-        boolean authenticated;
-        if (isEncodedPassword(normalizedRequestPassword)) {
-            authenticated = normalizedRequestPassword.equals(normalizedStoredPassword);
-        } else {
-            authenticated = passwordEncoder.matches(request.password(), normalizedStoredPassword);
+        if (!isEncodedPassword(normalizedRequestPassword)) {
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "인증 실패");
         }
 
+        boolean authenticated = normalizedRequestPassword.equals(normalizedStoredPassword);
         if (!authenticated) {
             throw new ApiException(HttpStatus.UNAUTHORIZED, "인증 실패");
         }
